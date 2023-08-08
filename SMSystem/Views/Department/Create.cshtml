@@ -1,0 +1,83 @@
+﻿@model SMSystem.Models.Department.DepartmentViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Add Department</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="loader">Department</a></li>
+                    <li class="breadcrumb-item active">Add Department</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="form-title"><span>Department Details</span></h5>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group local-forms">
+                                    <label asp-for="DepartmentId">Department ID <span class="login-danger">*</span></label>
+                                    <input asp-for="DepartmentId" type="text" class="form-control" value="@Model.DepartmentId" disabled/>
+                                    <input asp-for="DepartmentId" type="text" class="form-control" value="@Model.DepartmentId" hidden/>
+                                    <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group local-forms">
+                                    <label asp-for="DepartmentName">Department Name <span class="login-danger">*</span></label>
+                                    <input asp-for="DepartmentName" class="form-control" type="text" />
+                                    <span asp-validation-for="DepartmentName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group local-forms">
+                                    <label asp-for="HeadOfDepartment">Head of Department <span class="login-danger">*</span></label>
+                                    <input asp-for="HeadOfDepartment" class="form-control" type="text" />
+                                    <span asp-validation-for="HeadOfDepartment" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group local-forms calendar-icon">
+                                    <label asp-for="StartedYear">Department Start Date <span class="login-danger">*</span></label>
+                                    <input asp-for="StartedYear" class="form-control datetimepicker" placeholder="DD-MM-YYYY" type="datetime" autocomplete="off" value=""/>
+                                    <span asp-validation-for="StartedYear" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group local-forms">
+                                    <label asp-for="NoOfStudents">No of Students <span class="login-danger">*</span></label>
+                                    <input asp-for="NoOfStudents" type="text" class="form-control" />
+                                    <span asp-validation-for="NoOfStudents" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="student-submit">
+                                    <button type="submit" class="btn btn-primary loader">Create</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

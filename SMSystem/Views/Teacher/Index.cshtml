@@ -1,0 +1,84 @@
+﻿@model SMSystem.Models.Teacher.TeacherPagedViewModel
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Teachers</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="loader">Dashboard</a></li>
+                    <li class="breadcrumb-item loader" asp-controller="Teacher" asp-action="Index">Teachers</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="student-group-form">
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="form-group">
+                    <input type="text" id="teach_Id" name="id" class="form-control" onkeyup="searchingTeach()" placeholder="Search by Teacher-ID ...">
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="form-group">
+                    <input type="text" id="teach_Name" name="name" class="form-control" onkeyup="searchingTeach()" placeholder="Search by Name ...">
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="form-group">
+                    <input type="text" id="teach_Phone" name="phone" class="form-control" onkeyup="searchingTeach()" placeholder="Search by Phone ...">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card card-table">
+                <div class="card-body">
+
+                    <div class="page-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="page-title">Teachers</h3>
+                            </div>
+                            <div class="col-auto text-end float-end ms-auto download-grp">
+                                <a asp-controller="Teacher" asp-action="Index" class="btn btn-outline-gray me-2 active loader"><i class="feather-list"></i></a>
+                                <a asp-controller="Teacher" asp-action="GridIndex" class="btn btn-outline-gray me-2 loader"><i class="feather-grid "></i></a>
+                                <a asp-controller="Teacher" asp-action="ExportExcel" class="btn btn-outline-primary me-2 loader"><i class="fas fa-download"></i> Download</a>
+                                <a asp-controller="Teacher" asp-action="Create" class="btn btn-primary loader"><i class="fas fa-plus"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="teacherData">
+                        <div id="overlay">
+                            <div class="cv-spinner">
+                                <span class="spinner"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    Html.RenderPartial("_Footer");
+}
+
+<script src="~/js/teacher.js"></script>
+<script>
+    $(document).ready(function () {
+        let url = "/Teacher/GetAll";
+        let element = "#teacherData";
+        let obj = {
+            SId: $("#teach_Id").val(),
+            Name: $("#teach_Name").val(),
+            Phone: $("#teach_Phone").val(),
+            PageIndex: 1
+        };
+        GetData(obj, url, element);
+    });
+</script>

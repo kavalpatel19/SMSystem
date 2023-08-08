@@ -1,0 +1,81 @@
+﻿@model SMSystem.Models.Subject.SubjectPaggedViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Subjects</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller ="Home" asp-action="Index" class="loader">Dashboard</a></li>
+                    <li class="breadcrumb-item loader" asp-controller="Subject" asp-action="Index">All Subjects</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="student-group-form">
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="text" id="sub_Id" class="form-control" onkeyup="searchingSub()" placeholder="Search by ID ...">
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="text" id="sub_Name" class="form-control" onkeyup="searchingSub()" placeholder="Search by Name ...">
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="form-group">
+                    <input type="text" id="sub_Class" class="form-control" onkeyup="searchingSub()" placeholder="Search by Class ...">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card card-table">
+                <div class="card-body">
+
+                    <div class="page-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="page-title">Subjects</h3>
+                            </div>
+                            <div class="col-auto text-end float-end ms-auto download-grp">
+                                <a asp-action="ExportExcel" asp-controller="Subject" class="btn btn-outline-primary me-2 loader"><i class="fas fa-download"></i> Download</a>
+                                <a asp-action="Create" asp-controller="Department" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="SubjectData">
+                        <div id="overlay">
+                            <div class="cv-spinner">
+                                <span class="spinner"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/subject.js"></script>
+<script>
+    $(document).ready(function () {
+        let url = "/Subject/GetAll";
+        let element = "#SubjectData";
+        let obj = {
+            SId: $("#sub_Id").val(),
+            Name: $("#sub_Name").val(),
+            Year: $("#sub_Class").val(),
+            PageIndex: 1
+        };
+        GetData(obj, url, element);
+    });
+</script>

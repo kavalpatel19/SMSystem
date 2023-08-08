@@ -1,0 +1,42 @@
+﻿
+@{
+    var preDisable = !Model.PaggedModel.PreviousPage ? "disabled" : "";
+    var nextDisable = !Model.PaggedModel.NextPage ? "disabled" : "";
+    var pageIndex = Model.PaggedModel.PageIndex;
+    var totalPage = Model.PaggedModel.TotalPage;
+}
+<div class="col-sm-12 col-md-5">
+    <div class="mt-4">Showing @pageIndex of @totalPage Pages.</div>
+</div>
+<div class="col-sm-12 col-md-7 ">
+@using (Html.BeginForm())
+{
+    <div>
+            <ul class="pagination mt-3 mb-4 justify-content-end">
+            <li class="page-item @preDisable">
+                <button type="button" value="@(pageIndex - 1)" class="page-link paggingBtn ">
+                    Previous
+                </button>
+            </li>
+            @for (var i = 1; i <= totalPage; i++)
+            {
+                <li id="currentIndex_@i" class="page-item"><button class="page-link paggingBtn " type="button" value="@i">@i</button></li>
+            }
+            <li class="page-item @nextDisable">
+                <button type="button" value="@(pageIndex + 1)" class="page-link paggingBtn ">
+                    Next
+                </button>
+            </li>
+        </ul>
+    </div>
+}
+</div>
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+    var index = @pageIndex;
+    var total = @totalPage;
+    $('#currentIndex_' + index).addClass('active');
+</script>

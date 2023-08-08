@@ -1,0 +1,153 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\PreSkool\**" />
+    <Content Remove="wwwroot\PreSkool\**" />
+    <EmbeddedResource Remove="wwwroot\PreSkool\**" />
+    <None Remove="wwwroot\PreSkool\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.102.0" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.20" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational.Design" Version="1.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="16.205.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.15" />
+    <PackageReference Include="System.Data.OleDb" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\assets\fonts\Feather.svg" />
+    <None Include="wwwroot\assets\img\arrow.svg" />
+    <None Include="wwwroot\assets\img\icons\award-icon-01.svg" />
+    <None Include="wwwroot\assets\img\icons\award-icon-02.svg" />
+    <None Include="wwwroot\assets\img\icons\award-icon-03.svg" />
+    <None Include="wwwroot\assets\img\icons\award-icon-04.svg" />
+    <None Include="wwwroot\assets\img\icons\buliding-icon.svg" />
+    <None Include="wwwroot\assets\img\icons\dash-icon-01.svg" />
+    <None Include="wwwroot\assets\img\icons\dash-icon-02.svg" />
+    <None Include="wwwroot\assets\img\icons\dash-icon-03.svg" />
+    <None Include="wwwroot\assets\img\icons\dash-icon-04.svg" />
+    <None Include="wwwroot\assets\img\icons\header-icon-01.svg" />
+    <None Include="wwwroot\assets\img\icons\header-icon-04.svg" />
+    <None Include="wwwroot\assets\img\icons\header-icon-05.svg" />
+    <None Include="wwwroot\assets\img\icons\invoices-icon1.svg" />
+    <None Include="wwwroot\assets\img\icons\invoices-icon2.svg" />
+    <None Include="wwwroot\assets\img\icons\invoices-icon3.svg" />
+    <None Include="wwwroot\assets\img\icons\invoices-icon4.svg" />
+    <None Include="wwwroot\assets\img\icons\lesson-icon-01.svg" />
+    <None Include="wwwroot\assets\img\icons\lesson-icon-02.svg" />
+    <None Include="wwwroot\assets\img\icons\lesson-icon-03.svg" />
+    <None Include="wwwroot\assets\img\icons\lesson-icon-04.svg" />
+    <None Include="wwwroot\assets\img\icons\lesson-icon-05.svg" />
+    <None Include="wwwroot\assets\img\icons\lesson-icon-06.svg" />
+    <None Include="wwwroot\assets\img\icons\social-icon-01.svg" />
+    <None Include="wwwroot\assets\img\icons\social-icon-02.svg" />
+    <None Include="wwwroot\assets\img\icons\social-icon-03.svg" />
+    <None Include="wwwroot\assets\img\icons\social-icon-04.svg" />
+    <None Include="wwwroot\assets\img\icons\student-icon-01.svg" />
+    <None Include="wwwroot\assets\img\icons\student-icon-02.svg" />
+    <None Include="wwwroot\assets\img\icons\teacher-icon-01.svg" />
+    <None Include="wwwroot\assets\img\icons\teacher-icon-02.svg" />
+    <None Include="wwwroot\assets\img\icons\teacher-icon-03.svg" />
+    <None Include="wwwroot\assets\js\bootstrap-datetimepicker.min.js" />
+    <None Include="wwwroot\assets\js\calander.js" />
+    <None Include="wwwroot\assets\js\circle-progress.min.js" />
+    <None Include="wwwroot\assets\js\ckeditor.js" />
+    <None Include="wwwroot\assets\js\feather.min.js" />
+    <None Include="wwwroot\assets\js\form-validation.js" />
+    <None Include="wwwroot\assets\js\jquery-3.6.0.min.js" />
+    <None Include="wwwroot\assets\js\jquery-ui.min.js" />
+    <None Include="wwwroot\assets\js\jquery.maskedinput.min.js" />
+    <None Include="wwwroot\assets\js\mask.js" />
+    <None Include="wwwroot\assets\js\moment.min.js" />
+    <None Include="wwwroot\assets\plugins\alertify\alertify.min.js" />
+    <None Include="wwwroot\assets\plugins\alertify\custom-alertify.min.js" />
+    <None Include="wwwroot\assets\plugins\apexchart\apexcharts.min.js" />
+    <None Include="wwwroot\assets\plugins\apexchart\chart-data.js" />
+    <None Include="wwwroot\assets\plugins\bootstrap-tagsinput\js\bootstrap-tagsinput.js" />
+    <None Include="wwwroot\assets\plugins\bootstrap\js\bootstrap.bundle.min.js" />
+    <None Include="wwwroot\assets\plugins\c3-chart\c3.min.js" />
+    <None Include="wwwroot\assets\plugins\c3-chart\chart-data.js" />
+    <None Include="wwwroot\assets\plugins\c3-chart\d3.v5.min.js" />
+    <None Include="wwwroot\assets\plugins\chartjs\chart-data.js" />
+    <None Include="wwwroot\assets\plugins\chartjs\chart.min.js" />
+    <None Include="wwwroot\assets\plugins\clipboard\clipboard.min.js" />
+    <None Include="wwwroot\assets\plugins\countup\jquery.counterup.min.js" />
+    <None Include="wwwroot\assets\plugins\countup\jquery.missofis-countdown.js" />
+    <None Include="wwwroot\assets\plugins\countup\jquery.waypoints.min.js" />
+    <None Include="wwwroot\assets\plugins\datatables\datatables.min.js" />
+    <None Include="wwwroot\assets\plugins\datatables\jquery.dataTables.min.js" />
+    <None Include="wwwroot\assets\plugins\daterangepicker\daterangepicker.js" />
+    <None Include="wwwroot\assets\plugins\dragula\js\drag-drop.min.js" />
+    <None Include="wwwroot\assets\plugins\dragula\js\dragula.min.js" />
+    <None Include="wwwroot\assets\plugins\feather\fonts\Feather.svg" />
+    <None Include="wwwroot\assets\plugins\flot\chart-data.js" />
+    <None Include="wwwroot\assets\plugins\flot\jquery.flot.fillbetween.js" />
+    <None Include="wwwroot\assets\plugins\flot\jquery.flot.js" />
+    <None Include="wwwroot\assets\plugins\flot\jquery.flot.pie.js" />
+    <None Include="wwwroot\assets\plugins\fontawesome\webfonts\fa-brands-400.svg" />
+    <None Include="wwwroot\assets\plugins\fontawesome\webfonts\fa-brands-400.woff2" />
+    <None Include="wwwroot\assets\plugins\fontawesome\webfonts\fa-regular-400.svg" />
+    <None Include="wwwroot\assets\plugins\fontawesome\webfonts\fa-regular-400.woff2" />
+    <None Include="wwwroot\assets\plugins\fontawesome\webfonts\fa-solid-900.svg" />
+    <None Include="wwwroot\assets\plugins\fontawesome\webfonts\fa-solid-900.woff2" />
+    <None Include="wwwroot\assets\plugins\fullcalendar\fullcalendar.min.js" />
+    <None Include="wwwroot\assets\plugins\fullcalendar\jquery.fullcalendar.js" />
+    <None Include="wwwroot\assets\plugins\icons\weather\fonts\weathericons-regular-webfont.woff2" />
+    <None Include="wwwroot\assets\plugins\ion-rangeslider\js\custom-rangeslider.js" />
+    <None Include="wwwroot\assets\plugins\ion-rangeslider\js\ion.rangeSlider.min.js" />
+    <None Include="wwwroot\assets\plugins\lightbox\glightbox.min.js" />
+    <None Include="wwwroot\assets\plugins\lightbox\lightbox.js" />
+    <None Include="wwwroot\assets\plugins\material\fonts\Material-Design-Iconic-Font.woff2" />
+    <None Include="wwwroot\assets\plugins\material\fonts\materialdesignicons-webfont.woff2" />
+    <None Include="wwwroot\assets\plugins\moment\moment.min.js" />
+    <None Include="wwwroot\assets\plugins\morris\chart-data.js" />
+    <None Include="wwwroot\assets\plugins\morris\morris.min.js" />
+    <None Include="wwwroot\assets\plugins\morris\raphael-min.js" />
+    <None Include="wwwroot\assets\plugins\peity\chart-data.js" />
+    <None Include="wwwroot\assets\plugins\peity\jquery.peity.min.js" />
+    <None Include="wwwroot\assets\plugins\raty\custom.raty.js" />
+    <None Include="wwwroot\assets\plugins\raty\jquery.raty.js" />
+    <None Include="wwwroot\assets\plugins\scrollbar\custom-scroll.js" />
+    <None Include="wwwroot\assets\plugins\scrollbar\scrollbar.min.js" />
+    <None Include="wwwroot\assets\plugins\select2\js\select2.min.js" />
+    <None Include="wwwroot\assets\plugins\simple-calendar\jquery.simple-calendar.js" />
+    <None Include="wwwroot\assets\plugins\simpleline\fonts\Simple-Line-Icons.woff2" />
+    <None Include="wwwroot\assets\plugins\slimscroll\jquery.slimscroll.min.js" />
+    <None Include="wwwroot\assets\plugins\stickynote\sticky.js" />
+    <None Include="wwwroot\assets\plugins\summernote\font\summernote.woff2" />
+    <None Include="wwwroot\assets\plugins\summernote\summernote-bs4.min.js" />
+    <None Include="wwwroot\assets\plugins\summernote\summernote-lite.min.js" />
+    <None Include="wwwroot\assets\plugins\sweetalert\sweetalert2.all.min.js" />
+    <None Include="wwwroot\assets\plugins\sweetalert\sweetalerts.min.js" />
+    <None Include="wwwroot\assets\plugins\timeline\horizontal-timeline.js" />
+    <None Include="wwwroot\assets\plugins\toastr\toastr.js" />
+    <None Include="wwwroot\assets\plugins\toastr\toastr.min.js" />
+    <None Include="wwwroot\assets\plugins\twitter-bootstrap-wizard\form-wizard.js" />
+    <None Include="wwwroot\assets\plugins\twitter-bootstrap-wizard\jquery.bootstrap.wizard.min.js" />
+    <None Include="wwwroot\assets\plugins\twitter-bootstrap-wizard\prettify.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\Teachers\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,87 @@
+﻿@model SMSystem.Models.Department.DepartmentPaggedViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+<link rel="stylesheet" href="~/ToastDemo.styles.css" asp-append-version="true" />
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Departments</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="loader">Dashboard</a></li>
+                    <li class="breadcrumb-item loader" asp-controller="Department" asp-action="Index">All Departments</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="student-group-form">
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="form-group">
+                    <input type="text" id="dep_Id" class="form-control" onkeyup="searchingDep()" placeholder="Search by ID ...">
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="form-group">
+                    <input type="text" id="dep_Name" class="form-control" onkeyup="searchingDep()" placeholder="Search by Name ...">
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="form-group">
+                    <input type="text" id="dep_Year" class="form-control" onkeyup="searchingDep()" placeholder="Search by Year ...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card card-table">
+                <div class="card-body">
+
+                    <div class="page-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="page-title">Departments</h3>
+                            </div>
+                            <div class="col-auto text-end float-end ms-auto download-grp">
+                                <a asp-action="ExportExcel" asp-controller="Department" id="type-success" class="btn btn-outline-primary me-2 loader"><i class="fas fa-download"></i> Download</a>
+                                <a asp-action="Create" asp-controller="Department" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="departmentData">
+                        <div id="overlay">
+                            <div class="cv-spinner">
+                                <span class="spinner"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    Html.RenderPartial("_Footer");
+}
+<script src="~/js/department.js"></script>
+<script>
+    $(document).ready(function () {
+        let url = "/Department/GetAll";
+        let element = "#departmentData";
+        let obj = {
+            SId: $("#std_Id").val(),
+            Name: $("#std_Name").val(),
+            Phone: $("#std_Phone").val(),
+            PageIndex: 1
+        };
+        GetData(obj, url, element);
+    });
+</script>
