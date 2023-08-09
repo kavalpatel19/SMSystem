@@ -1,0 +1,64 @@
+﻿@model SMSystem.Models.Subject.SubjectViewModel
+@using SMSystem.Helpers.DropdownHelper;
+
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Edit Subject</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="loader">Subject</a></li>
+                    <li class="breadcrumb-item active">Edit Subject</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="form-title"><span>Subject Information</span></h5>
+                            </div>
+                            <input asp-for="Id" class="form-control" value="@Model.Id" hidden>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group local-forms">
+                                    <label asp-for="SubjectId">Subject ID <span class="login-danger">*</span></label>
+                                    <input asp-for="SubjectId" type="text" class="form-control" value="@Model.SubjectId" disabled />
+                                    <input asp-for="SubjectId" type="text" class="form-control" value="@Model.SubjectId" hidden />
+                                    <span asp-validation-for="SubjectId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group local-forms">
+                                    <label asp-for="SubjectName">Subject Name <span class="login-danger">*</span></label>
+                                    <input asp-for="SubjectName" type="text" class="form-control" />
+                                    <span asp-validation-for="SubjectName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <div class="form-group local-forms">
+                                    <label asp-for="Class">Class <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="Class" asp-items="EnumHelper.GetEnumSelectList<Class>()">
+                                        <option value="">Please Select Class </option>
+                                    </select>
+                                    <span asp-validation-for="Class" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="student-submit">
+                                    <button type="submit" class="btn btn-primary loader">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

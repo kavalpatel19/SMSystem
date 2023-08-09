@@ -52,11 +52,18 @@ namespace SMSystem.Controllers
         {
             DepartmentViewModel department = new DepartmentViewModel();
             var departments = DepRepo.GetAllDepartments();
-            var lastId = departments.OrderByDescending(x => x.DepartmentId).FirstOrDefault().DepartmentId;
-            char[] spearator = { '-', ' ' };
-            string[] depId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
-            int id = (Convert.ToInt32(depId[1]))+1;
-            department.DepartmentId = "DEP-" + (id.ToString("0000"));
+            if (departments.Count > 0)
+            {
+                var lastId = departments.OrderByDescending(x => x.DepartmentId).FirstOrDefault().DepartmentId;
+                char[] spearator = { '-', ' ' };
+                string[] depId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
+                int id = (Convert.ToInt32(depId[1]))+1;
+                department.DepartmentId = "DEP-" + (id.ToString("0000"));
+            }
+            else
+            {
+                department.DepartmentId = "DEP-0001";
+            }
             return View(department);
         }
 

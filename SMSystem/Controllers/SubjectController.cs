@@ -50,11 +50,19 @@ namespace SMSystem.Controllers
         {
             SubjectViewModel subject = new SubjectViewModel();
             var subjects = SubRepo.GetAllSubjects();
-            var lastId = subjects.OrderByDescending(x => x.SubjectId).FirstOrDefault().SubjectId;
-            char[] spearator = { '-', ' ' };
-            string[] subId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
-            int id = (Convert.ToInt32(subId[1])) + 1;
-            subject.SubjectId = "SUB-" + (id.ToString("0000"));
+            if (subjects.Count > 0)
+            {
+                var lastId = subjects.OrderByDescending(x => x.SubjectId).FirstOrDefault().SubjectId;
+                char[] spearator = { '-', ' ' };
+                string[] subId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
+                int id = (Convert.ToInt32(subId[1])) + 1;
+                subject.SubjectId = "SUB-" + (id.ToString("0000"));
+            }
+            else
+            {
+                subject.SubjectId = "SUB-0001";
+            }
+            
             return View(subject);
         }
 
