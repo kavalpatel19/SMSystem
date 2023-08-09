@@ -59,3 +59,8 @@ $(document).on('click', '#dlt_departmnet', function (e) {
             }
         });
 });
+
+$("#Export-Dep").on('click', function () {
+    var url = "/Department/ExportExcel";
+    ExportData(url);
+});

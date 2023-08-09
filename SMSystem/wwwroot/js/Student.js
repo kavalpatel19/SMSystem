@@ -60,3 +60,7 @@ $(document).on('click', '#dlt_student', function (e) {
             }
         });
 });
+$("#Export-Stud").on('click', function () {
+    var url = "/Student/ExportExcel";
+    ExportData(url);
+});

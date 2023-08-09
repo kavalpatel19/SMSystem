@@ -60,3 +60,9 @@ $(document).on('click', '#dlt_teacher', function (e) {
             }
         });
 });
+
+// Export toast notification //
+$("#Export-Teach").on('click', function () {
+    var url = "/Teacher/ExportExcel";
+    ExportData(url);
+});
