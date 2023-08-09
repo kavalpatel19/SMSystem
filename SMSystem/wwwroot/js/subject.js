@@ -61,3 +61,8 @@ $(document).on('click', '#dlt_subject', function (e) {
             }
         });
 });
+
+$("#Export-Sub").on('click', function () {
+    var url = "/Subject/ExportExcel";
+    ExportData(url);
+});

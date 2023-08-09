@@ -27,3 +27,38 @@ function GetData(obj, url, element) {
         }
     });
 };
+
+function ExportData(url) {
+    $.ajax({
+        type: "GET",
+        url: url,
+        success: function () {
+            Command: toastr["success"]("Data Exported Successfully.", "Success")
+
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "onclick": null,
+                "timeOut": "1500",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+        },
+        Error: function () {
+            Command: toastr["error"]("Something's Wrong", "Error")
+
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "onclick": null,
+                "timeOut": "1500",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+        }
+    });
+};

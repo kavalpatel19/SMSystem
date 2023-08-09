@@ -105,7 +105,7 @@ namespace SMSystem.Repository
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                var response = await client.PostAsJsonAsync<StudentViewModel>("StudentApi", student);
+                var response = client.PostAsJsonAsync<StudentViewModel>("StudentApi", student).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -145,7 +145,7 @@ namespace SMSystem.Repository
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                var response = await client.PutAsJsonAsync<StudentViewModel>("StudentApi", student);
+                var response = client.PutAsJsonAsync<StudentViewModel>("StudentApi", student).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
