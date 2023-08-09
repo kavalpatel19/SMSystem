@@ -37,7 +37,11 @@ function ExportData(url) {
 
             toastr.options = {
                 "closeButton": true,
-                "positionClass": "toast-top-right",
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-bottom-right",
+                "preventDuplicates": false,
                 "onclick": null,
                 "timeOut": "1500",
                 "showEasing": "swing",
@@ -51,7 +55,11 @@ function ExportData(url) {
 
             toastr.options = {
                 "closeButton": true,
-                "positionClass": "toast-top-right",
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-bottom-right",
+                "preventDuplicates": false,
                 "onclick": null,
                 "timeOut": "1500",
                 "showEasing": "swing",

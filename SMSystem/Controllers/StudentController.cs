@@ -10,6 +10,7 @@ using System.Collections;
 using System.Configuration;
 using System.Data;
 using System.Reflection;
+using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds;
 
 namespace SMSystem.Controllers
 {
@@ -72,11 +73,19 @@ namespace SMSystem.Controllers
         {
             StudentViewModel student = new StudentViewModel();
             var students = StdRepo.GetAllStudents();
-            var lastId = students.OrderByDescending(x => x.StudentId).FirstOrDefault().StudentId;
-            char[] spearator = { '-', ' ' };
-            string [] stdId = lastId.Split(spearator, 2 , StringSplitOptions.RemoveEmptyEntries);
-            int id = (Convert.ToInt32(stdId[1]))+1;
-            student.StudentId = "STD-" + (id.ToString("0000"));
+            if (students.Count > 0)
+            {
+                var lastId = students.OrderByDescending(x => x.StudentId).FirstOrDefault().StudentId;
+                char[] spearator = { '-', ' ' };
+                string[] stdId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
+                int id = (Convert.ToInt32(stdId[1])) + 1;
+                student.StudentId = "STD-" + (id.ToString("0000"));
+            }
+            else
+            {
+                student.StudentId = "STD-0001";
+            }
+            
             return View(student);
         }
 
