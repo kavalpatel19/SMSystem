@@ -58,12 +58,13 @@
                                 <div class="form-group">
                                     <label asp-for="HolidayType">Type of Holiday <span class="login-danger">*</span></label>
                                     <select class="form-control select" asp-for="HolidayType">
-                                        <option>Select Holiday</option>
+                                        <option value="">Select Holiday</option>
                                         <option>Public Holiday</option>
                                         <option>College Holiday</option>
                                         <option>Exam Holiday</option>
                                         <option>Others</option>
                                     </select>
+                                    <span asp-validation-for="HolidayType" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12">
