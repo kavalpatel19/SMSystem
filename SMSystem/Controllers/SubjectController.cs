@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
 using SMSystem.Models.Department;
 using SMSystem.Models.Subject;
-using SMSystem.Repository;
+using SMSystem.Repository.Interfaces;
 
 namespace SMSystem.Controllers
 {

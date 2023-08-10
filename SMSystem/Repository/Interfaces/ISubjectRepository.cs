@@ -2,7 +2,7 @@
 using SMSystem.Models.Department;
 using SMSystem.Models.Subject;
 
-namespace SMSystem.Repository
+namespace SMSystem.Repository.Interfaces
 {
     public interface ISubjectRepository
     {

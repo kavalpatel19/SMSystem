@@ -6,6 +6,7 @@ using SMSystem_Api.Model;
 using SMSystem_Api.Model.Subjects;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
+using SMSystem_Api.Repository.Interfaces;
 
 namespace SMSystem_Api.Repository
 {
@@ -22,7 +23,7 @@ namespace SMSystem_Api.Repository
 
         public List<SubjectModel> GetAllSubjects()
         {
-            var Data = context.Subjects.ToList();
+            var Data = context.Subjects.Where(x => x.IsActive).ToList();
             return Data;
         }
 

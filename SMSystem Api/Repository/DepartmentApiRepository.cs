@@ -6,6 +6,7 @@ using SMSystem_Api.Migrations;
 using SMSystem_Api.Model;
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Students;
+using SMSystem_Api.Repository.Interfaces;
 using System.Data;
 
 namespace SMSystem_Api.Repository
@@ -23,7 +24,7 @@ namespace SMSystem_Api.Repository
 
         public List<DepartmentModel> GetAllDepartments()
         {
-            var Data = context.Departments.ToList();
+            var Data = context.Departments.Where(x => x.IsActive).ToList();
             return Data;
         }
 

@@ -2,7 +2,7 @@
 using SMSystem_Api.Helpers;
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Students;
-using SMSystem_Api.Repository;
+using SMSystem_Api.Repository.Interfaces;
 using System.Net.Security;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -18,6 +18,7 @@ namespace SMSystem_Api.Controllers
         {
             DepRepo = depRepo;
         }
+
         // GET: api/<DepartmentApiController>
         [HttpGet]
         public async Task<IActionResult> Get(string? sid,string? name, string? year,int pageIndex)

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Model;
 using SMSystem_Api.Model.Department;
+using SMSystem_Api.Model.Holiday;
 using SMSystem_Api.Model.Students;
 using SMSystem_Api.Model.Subjects;
 using SMSystem_Api.Model.Teachers;
@@ -34,5 +35,6 @@ namespace SMSystem_Api.Data
         public DbSet<TeacherModel> Teachers { get; set; }
         public DbSet<DepartmentModel> Departments { get; set; }
         public DbSet<SubjectModel> Subjects { get; set; }
+        public DbSet<HolidayModel>  Holidays { get; set; }
     }
 }

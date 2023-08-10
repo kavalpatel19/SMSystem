@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using SMSystem.Helpers;
 using SMSystem.Models.Students;
-using SMSystem.Repository;
+using SMSystem.Repository.Interfaces;
 using System.Collections;
 using System.Configuration;
 using System.Data;

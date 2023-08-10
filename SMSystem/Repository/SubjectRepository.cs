@@ -2,6 +2,7 @@
 using SMSystem.Helpers;
 using SMSystem.Models.Department;
 using SMSystem.Models.Subject;
+using SMSystem.Repository.Interfaces;
 
 namespace SMSystem.Repository
 {

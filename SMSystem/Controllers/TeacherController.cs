@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
 using SMSystem.Models.Students;
 using SMSystem.Models.Teacher;
-using SMSystem.Repository;
+using SMSystem.Repository.Interfaces;
 
 namespace SMSystem.Controllers
 {

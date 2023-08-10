@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Differencing;
 using Newtonsoft.Json;
 using SMSystem.Helpers;
 using SMSystem.Models.Students;
+using SMSystem.Repository.Interfaces;
 
 namespace SMSystem.Repository
 {

@@ -2,7 +2,7 @@
 using SMSystem_Api.Helpers;
 using SMSystem_Api.Model.Students;
 using SMSystem_Api.Model.Teachers;
-using SMSystem_Api.Repository;
+using SMSystem_Api.Repository.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
