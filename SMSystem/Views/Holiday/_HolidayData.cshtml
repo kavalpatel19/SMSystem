@@ -1,0 +1,64 @@
+﻿@model SMSystem.Models.Holiday.HolidayPaggedViewModel
+
+
+<div class="table-responsive">
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table border-0 star-student table-hover table-center mb-0 table-striped">
+                <thead class="student-thread">
+                    <tr>
+                        <th>ID</th>
+                        <th>Holiday Name</th>
+                        <th>Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.HolidayModel.Count > 0)
+                    {
+                        @foreach (var item in Model.HolidayModel)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.HolidayId)
+                                </td>
+                                <td>
+                                    <h2>
+                                        <a>
+                                            @Html.DisplayFor(modelItem => item.HolidayName)
+                                        </a>
+                                    </h2>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.HolidayType)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.StartDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.EndDate)
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                <h3 style="color:red;">
+                                    No Data Found!
+                                </h3>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="paginationData" class="row">
+    @{
+        Html.RenderPartial("_Pagination");
+    }
+</div>

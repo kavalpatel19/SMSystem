@@ -29,10 +29,14 @@ function GetData(obj, url, element) {
 };
 
 function ExportData(url) {
+    $("#overlay").fadeIn(1)
+
     $.ajax({
         type: "GET",
         url: url,
         success: function () {
+            $("#overlay").fadeOut();
+
             Command: toastr["success"]("Data Exported Successfully.", "Success")
 
             toastr.options = {

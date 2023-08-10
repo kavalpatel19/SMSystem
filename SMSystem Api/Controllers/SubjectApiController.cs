@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SMSystem_Api.Helpers;
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Subjects;
-using SMSystem_Api.Repository;
+using SMSystem_Api.Repository.Interfaces;
 
 namespace SMSystem_Api.Controllers
 {

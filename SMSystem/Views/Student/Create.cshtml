@@ -60,7 +60,6 @@
                                     <label asp-for="Gender">Gender <span class="login-danger">*</span></label>
                                     <select class="form-control select" asp-for="Gender" asp-items="EnumHelper.GetEnumSelectList<Gender>()">
                                         <option value="">Select Gender</option>
-
                                     </select>
                                     <span asp-validation-for="Gender" class="text-danger"></span>
                                 </div>
