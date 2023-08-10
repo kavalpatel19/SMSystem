@@ -2,7 +2,7 @@
 using SMSystem.Models.Students;
 using SMSystem.Models.Teacher;
 
-namespace SMSystem.Repository
+namespace SMSystem.Repository.Interfaces
 {
     public interface ITeacherRepository
     {

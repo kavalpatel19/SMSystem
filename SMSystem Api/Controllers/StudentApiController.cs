@@ -1,9 +1,9 @@
-﻿ using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Data;
 using SMSystem_Api.Helpers;
 using SMSystem_Api.Model.Students;
-using SMSystem_Api.Repository;
+using SMSystem_Api.Repository.Interfaces;
 using System.Data.Common;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860

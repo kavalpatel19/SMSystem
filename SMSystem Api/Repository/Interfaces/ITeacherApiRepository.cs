@@ -2,7 +2,7 @@
 using SMSystem_Api.Model.Students;
 using SMSystem_Api.Model.Teachers;
 
-namespace SMSystem_Api.Repository
+namespace SMSystem_Api.Repository.Interfaces
 {
     public interface ITeacherApiRepository
     {

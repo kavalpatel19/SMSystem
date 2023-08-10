@@ -2,7 +2,7 @@
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Subjects;
 
-namespace SMSystem_Api.Repository
+namespace SMSystem_Api.Repository.Interfaces
 {
     public interface ISubjectApiRepository
     {

@@ -4,6 +4,7 @@ using SMSystem_Api.Data;
 using SMSystem_Api.Helpers;
 using SMSystem_Api.Model;
 using SMSystem_Api.Model.Students;
+using SMSystem_Api.Repository.Interfaces;
 using System.Configuration;
 using System.Data;
 using System.Drawing.Text;
@@ -23,7 +24,7 @@ namespace SMSystem_Api.Repository
 
         public List<StudentModel> GetAllStudents()
         {
-            List<StudentModel> student = context.Students.ToList();
+            List<StudentModel> student = context.Students.Where(x => x.IsActive).ToList();
             return student;
         }
 

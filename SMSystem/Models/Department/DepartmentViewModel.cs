@@ -3,7 +3,7 @@ using System.Web.Mvc;
 
 namespace SMSystem.Models.Department
 {
-    public class DepartmentViewModel:BaseEntityViewModel
+    public class DepartmentViewModel : BaseEntityViewModel
     {
         [Key]
         public int Id { get; set; }

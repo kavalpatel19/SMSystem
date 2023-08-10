@@ -6,6 +6,7 @@ using SMSystem_Api.Model;
 using SMSystem_Api.Model.Teachers;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
+using SMSystem_Api.Repository.Interfaces;
 
 namespace SMSystem_Api.Repository
 {
@@ -22,7 +23,7 @@ namespace SMSystem_Api.Repository
 
         public List<TeacherModel> GetAllTeachers()
         {
-            List<TeacherModel> teachers = context.Teachers.ToList();
+            List<TeacherModel> teachers = context.Teachers.Where(x => x.IsActive).ToList();
             return teachers;
         }
 

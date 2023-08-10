@@ -1,0 +1,85 @@
+﻿@model SMSystem.Models.Holiday.HolidayViewModel
+@using SMSystem.Helpers.DropdownHelper;
+
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Add Holiday</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action ="Index" class="loader">Holiday</a></li>
+                    <li class="breadcrumb-item active">Add Holiday</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="form-title"><span>Holiday Information</span></h5>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label asp-for="HolidayId">Holiday ID <span class="login-danger">*</span></label>
+                                    <input asp-for="HolidayId" type="text" class="form-control" value="@Model.HolidayId" disabled />
+                                    <input asp-for="HolidayId" type="text" class="form-control" value="@Model.HolidayId" hidden />
+                                    <span asp-validation-for="HolidayId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label asp-for="HolidayName">Holiday Name <span class="login-danger">*</span></label>
+                                    <input asp-for="HolidayName" class="form-control" type="text" />
+                                    <span asp-validation-for="HolidayName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label asp-for="StartDate">Start Date <span class="login-danger">*</span></label>
+                                    <input asp-for="StartDate" class="form-control datetimepicker" placeholder="DD-MM-YYYY" type="datetime" autocomplete="off" value="" />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label asp-for="EndDate">End Date <span class="login-danger">*</span></label>
+                                    <input asp-for="EndDate" class="form-control datetimepicker" placeholder="DD-MM-YYYY" type="datetime" autocomplete="off" value="" />
+                                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label asp-for="HolidayType">Type of Holiday <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="HolidayType">
+                                        <option>Select Holiday</option>
+                                        <option>Public Holiday</option>
+                                        <option>College Holiday</option>
+                                        <option>Exam Holiday</option>
+                                        <option>Others</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary loader">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
