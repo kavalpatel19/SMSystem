@@ -4,7 +4,7 @@ $(document).on('click', '.paggingBtn', function () {
     let obj = {
         SId: $("#sub_Id").val(),
         Name: $("#sub_Name").val(),
-        Year: $("#sub_Class").val(),
+        Class: $("#sub_Class").val(),
         PageIndex: $(this).val()
     };
     let url = "/Subject/GetAll";
@@ -17,7 +17,7 @@ function searchingSub() {
     let obj = {
         SId: $("#sub_Id").val(),
         Name: $("#sub_Name").val(),
-        Year: $("#sub_Class").val(),
+        Class: $("#sub_Class").val(),
         PageIndex: 1
     };
 

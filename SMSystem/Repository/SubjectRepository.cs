@@ -46,7 +46,7 @@ namespace SMSystem.Repository
                 para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
                 para.Class = string.IsNullOrEmpty(para.Class) ? string.Empty : para.Class;
 
-                var response = await client.GetAsync($"SubjectApi?sid={para.SId}&name={para.Name}&year={para.Class}&pageIndex={para.PageIndex}");
+                var response = await client.GetAsync($"SubjectApi?sid={para.SId}&name={para.Name}&clas={para.Class}&pageIndex={para.PageIndex}");
 
                 if (response.IsSuccessStatusCode)
                 {
