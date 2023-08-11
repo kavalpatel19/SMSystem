@@ -32,6 +32,7 @@ namespace SMSystem.Controllers
             DepartmentPaggedViewModel departments = await DepRepo.GetDepartmnets(para);
             return PartialView("_DepartmentData", departments);
         }
+
         public IActionResult ExportExcel()
         {
             var Data = DepRepo.GetAllDepartments();

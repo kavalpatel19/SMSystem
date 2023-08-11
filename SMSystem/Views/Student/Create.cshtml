@@ -29,8 +29,11 @@
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="StudentId">Student Id<span class="login-danger">*</span></label>
-                                    <input class="form-control" value="@Model.StudentId" disabled />
+                                    <label asp-for="StudentId">Student Id</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input class="form-control" value="@Model.StudentId" disabled />
+                                    </div>
                                     <input asp-for="StudentId" class="form-control" value="@Model.StudentId" hidden/>
                                 </div>
                             </div>

@@ -33,7 +33,11 @@
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
                                     <label asp-for="DepartmentId">Department ID <span class="login-danger">*</span></label>
-                                    <input asp-for="DepartmentId" type="text" class="form-control" placeholder="eg. DEP0000" />
+                                    <div class="input-group">
+                                        <span class="input-group-text"></span>
+                                        <input class="form-control" value="@Model.DepartmentId" disabled />
+                                    </div>
+                                        <input asp-for="DepartmentId" class="form-control" value="@Model.DepartmentId" hidden />
                                     <span asp-validation-for="DepartmentId" class="text-danger"></span>
                                 </div>
                             </div>
