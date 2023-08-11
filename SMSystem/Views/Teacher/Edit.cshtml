@@ -33,8 +33,11 @@
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
                                     <label asp-for="TeacherId">Teacher ID <span class="login-danger">*</span></label>
-                                    <input asp-for="TeacherId" class="form-control" value="@Model.TeacherId" hidden />
-                                    <input class="form-control" value="@Model.TeacherId" disabled />
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input asp-for="TeacherId" class="form-control" value="@Model.TeacherId" hidden />
+                                        <input class="form-control" value="@Model.TeacherId" disabled />
+                                    </div>
                                     <span asp-validation-for="TeacherId" class="text-danger"></span>
                                 </div>
                             </div>
