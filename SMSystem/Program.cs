@@ -11,6 +11,7 @@ builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
 builder.Services.AddScoped<IHolidayRepository, HolidayRepository>();
 builder.Services.AddScoped<IFeesRepository, FeesRepository>();
+builder.Services.AddScoped<IExamRepository, ExamRepository>();
 
 
 
