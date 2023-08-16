@@ -22,11 +22,11 @@ namespace SMSystem_Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(int pageIndex)
         {
-            SearchingPara para = new SearchingPara()
+            var para = new SearchingPara()
             {
                 PageIndex = pageIndex
             };
-            PaggedExamModel exams = await ExamRepo.GetAll(para);
+            var exams = await ExamRepo.GetAll(para).ConfigureAwait(false);
             return Ok(exams);
         }
 
@@ -34,15 +34,15 @@ namespace SMSystem_Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            ExamModel exam = await ExamRepo.Get(id);
+            var exam = await ExamRepo.Get(id).ConfigureAwait(false);
             return Ok(exam);
-        }
+            }
 
         // POST api/<ExamApiController>/Export
         [HttpGet("Export")]
         public IActionResult GetAllFees()
         {
-            List<ExamModel> data = ExamRepo.GetAllExams();
+            var data = ExamRepo.GetAllExams();
             return Ok(data);
         }
 
@@ -50,7 +50,7 @@ namespace SMSystem_Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(ExamModel exam)
         {
-            ExamRepo.Add(exam);
+            await ExamRepo.Add(exam).ConfigureAwait(false);
             return Ok();
         }
 
@@ -58,7 +58,7 @@ namespace SMSystem_Api.Controllers
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] ExamModel exam)
         {
-            ExamRepo.Update(exam);
+            await ExamRepo.Update(exam).ConfigureAwait(false);
             return Ok();
         }
 
@@ -66,7 +66,7 @@ namespace SMSystem_Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            ExamRepo.Delete(id);
+            await ExamRepo.Delete(id).ConfigureAwait(false);
             return Ok();
         }
     }

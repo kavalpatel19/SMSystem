@@ -36,7 +36,7 @@ namespace SMSystem.Repository
 
         public async Task<HolidayPaggedViewModel> GetHolidays(SearchingParaModel para)
         {
-            HolidayPaggedViewModel holidays = new HolidayPaggedViewModel();
+            var holidays = new HolidayPaggedViewModel();
 
             using (var client = new HttpClient())
             {
@@ -46,7 +46,7 @@ namespace SMSystem.Repository
                 para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
                 para.Year = string.IsNullOrEmpty(para.Year) ? string.Empty : para.Year;
 
-                var response = await client.GetAsync($"HolidayApi?pageIndex={para.PageIndex}");
+                var response = await client.GetAsync($"HolidayApi?pageIndex={para.PageIndex}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {

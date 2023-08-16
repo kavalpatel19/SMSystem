@@ -23,7 +23,7 @@ namespace SMSystem_Api.Repository
 
         public List<TeacherModel> GetAllTeachers()
         {
-            List<TeacherModel> teachers = context.Teachers.Where(x => x.IsActive).ToList();
+            var teachers = context.Teachers.Where(x => x.IsActive).ToList();
             return teachers;
         }
 
@@ -31,15 +31,15 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            List<TeacherModel> data = new List<TeacherModel>();
+            var data = new List<TeacherModel>();
 
             const int pagesize = 5;
 
             int totalPage = 0;
 
-            using (SqlConnection con = new SqlConnection(connaction))
+            using (var con = new SqlConnection(connaction))
             {
-                SqlCommand cmd = new SqlCommand("TeacherSearchingPaging", con);
+                var cmd = new SqlCommand("TeacherSearchingPaging", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
 
@@ -56,18 +56,18 @@ namespace SMSystem_Api.Repository
 
                 totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
 
-                using (SqlConnection conn = new SqlConnection(connaction))
+                using (var conn = new SqlConnection(connaction))
                 {
-                    DataSet ds = new DataSet();
+                    var ds = new DataSet();
 
                     conn.Open();
-                    SqlDataAdapter rdr = new SqlDataAdapter();
+                    var rdr = new SqlDataAdapter();
                     rdr.SelectCommand = cmd;
                     rdr.Fill(ds);
 
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
-                        TeacherModel teacher = new TeacherModel();
+                        var teacher = new TeacherModel();
 
                         teacher.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
                         teacher.TeacherId = ds.Tables[0].Rows[i]["TeacherId"].ToString();
@@ -85,7 +85,7 @@ namespace SMSystem_Api.Repository
                 }
             }
 
-            PaggedTeacherModel paggedTeacher = new PaggedTeacherModel()
+            var paggedTeacher = new PaggedTeacherModel()
             {
                 TeacherModel = data,
                 PaggedModel = new PaggedModel()
@@ -100,28 +100,28 @@ namespace SMSystem_Api.Repository
 
         public async Task<TeacherModel> Get(int id)
         {
-            TeacherModel teacher = await context.Teachers.FindAsync(id);
+            var teacher = await context.Teachers.FindAsync(id).ConfigureAwait(false);
             return teacher;
         }
 
         public async Task Add(TeacherModel teacher)
         {
-            await context.Teachers.AddAsync(teacher);
-            await context.SaveChangesAsync();
+            await context.Teachers.AddAsync(teacher).ConfigureAwait(false);
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Update(TeacherModel teacher)
         {
             context.Attach(teacher).State = EntityState.Modified;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Delete(int id)
         {
-            TeacherModel teacher = context.Teachers.Where(x => x.Id == id).FirstOrDefault();
+            var teacher = context.Teachers.Where(x => x.Id == id).FirstOrDefault();
             teacher.IsDelete = true;
             teacher.IsActive = false;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

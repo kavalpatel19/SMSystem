@@ -31,15 +31,15 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            List<SubjectModel> data = new List<SubjectModel>();
+            var data = new List<SubjectModel>();
 
             const int pagesize = 5;
 
             int totalPage = 0;
 
-            using (SqlConnection con = new SqlConnection(connaction))
+            using (var con = new SqlConnection(connaction))
             {
-                SqlCommand cmd = new SqlCommand("SubjetSearchingPaging", con);
+                var cmd = new SqlCommand("SubjetSearchingPaging", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
 
@@ -56,18 +56,18 @@ namespace SMSystem_Api.Repository
 
                 totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
 
-                using (SqlConnection conn = new SqlConnection(connaction))
+                using (var conn = new SqlConnection(connaction))
                 {
-                    DataSet ds = new DataSet();
+                    var ds = new DataSet();
 
                     conn.Open();
-                    SqlDataAdapter rdr = new SqlDataAdapter();
+                    var rdr = new SqlDataAdapter();
                     rdr.SelectCommand = cmd;
                     rdr.Fill(ds);
 
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
-                        SubjectModel subject = new SubjectModel();
+                        var subject = new SubjectModel();
 
                         subject.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
                         subject.SubjectId = ds.Tables[0].Rows[i]["SubjectId"].ToString();
@@ -80,7 +80,7 @@ namespace SMSystem_Api.Repository
                 }
             }
 
-            PaggedSubjectModel paggedSubject = new PaggedSubjectModel()
+            var paggedSubject = new PaggedSubjectModel()
             {
                 SubjectModel = data,
                 PaggedModel = new PaggedModel()
@@ -95,28 +95,28 @@ namespace SMSystem_Api.Repository
 
         public async Task<SubjectModel> Get(int id)
         {
-            SubjectModel subject = await context.Subjects.FindAsync(id);
+            var subject = await context.Subjects.FindAsync(id).ConfigureAwait(false);
             return subject;
         }
 
         public async Task Add(SubjectModel subject)
         {
-            await context.Subjects.AddAsync(subject);
-            await context.SaveChangesAsync();
+            await context.Subjects.AddAsync(subject).ConfigureAwait(false);
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Update(SubjectModel subject)
         {
             context.Attach(subject).State = EntityState.Modified;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Delete(int id)
         {
-            SubjectModel subject = context.Subjects.Find(id);
+            var subject = context.Subjects.Find(id);
             subject.IsDelete = true;
             subject.IsActive = false;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

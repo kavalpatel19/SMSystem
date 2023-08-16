@@ -32,15 +32,15 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            List<ExamModel> data = new List<ExamModel>();
+            var data = new List<ExamModel>();
 
             const int pagesize = 5;
 
             int totalPage = 0;
 
-            using (SqlConnection con = new SqlConnection(connaction))
+            using (var con = new SqlConnection(connaction))
             {
-                SqlCommand cmd = new SqlCommand("ExamPaging", con);
+                var cmd = new SqlCommand("ExamPaging", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
 
@@ -54,18 +54,18 @@ namespace SMSystem_Api.Repository
 
                 totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
 
-                using (SqlConnection conn = new SqlConnection(connaction))
+                using (var conn = new SqlConnection(connaction))
                 {
-                    DataSet ds = new DataSet();
+                    var ds = new DataSet();
 
                     conn.Open();
-                    SqlDataAdapter rdr = new SqlDataAdapter();
+                    var rdr = new SqlDataAdapter();
                     rdr.SelectCommand = cmd;
                     rdr.Fill(ds);
 
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
-                        ExamModel exam = new ExamModel();
+                        var exam = new ExamModel();
 
                         exam.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
                         exam.ExamName = ds.Tables[0].Rows[i]["ExamName"].ToString();
@@ -81,7 +81,7 @@ namespace SMSystem_Api.Repository
                 }
             }
 
-            PaggedExamModel paggedExam = new PaggedExamModel()
+            var paggedExam = new PaggedExamModel()
             {
                 ExamModel = data,
                 PaggedModel = new PaggedModel()
@@ -96,28 +96,28 @@ namespace SMSystem_Api.Repository
 
         public async Task<ExamModel> Get(int id)
         {
-            ExamModel exam = await context.Exams.FindAsync(id);
+            var exam = await context.Exams.FindAsync(id).ConfigureAwait(false);
             return exam;
         }
 
         public async Task Add(ExamModel exam)
         {
-            await context.Exams.AddAsync(exam);
-            await context.SaveChangesAsync();
+            await context.Exams.AddAsync(exam).ConfigureAwait(false);
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Update(ExamModel exam)
         {
             context.Attach(exam).State = EntityState.Modified;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Delete(int id)
         {
-            ExamModel exam = context.Exams.Find(id);
+            var exam = context.Exams.Find(id);
             exam.IsDelete = true;
             exam.IsActive = false;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace SMSystem_Api.Repository
 
         public List<StudentModel> GetAllStudents()
         {
-            List<StudentModel> student = context.Students.Where(x => x.IsActive).ToList();
+            var student = context.Students.Where(x => x.IsActive).ToList();
             return student;
         }
 
@@ -32,15 +32,15 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            List<StudentModel> data = new List<StudentModel>();
+            var data = new List<StudentModel>();
 
             const int pagesize = 5;
 
             int totalPage = 0;
 
-            using (SqlConnection con = new SqlConnection(connaction))
+            using (var con = new SqlConnection(connaction))
             {
-                SqlCommand cmd = new SqlCommand("StudentSearchingPaging", con);
+                var cmd = new SqlCommand("StudentSearchingPaging", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
 
@@ -57,18 +57,18 @@ namespace SMSystem_Api.Repository
 
                 totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
 
-                using (SqlConnection conn = new SqlConnection(connaction))
+                using (var conn = new SqlConnection(connaction))
                 {
-                    DataSet ds = new DataSet();
+                    var ds = new DataSet();
 
                     conn.Open();
-                    SqlDataAdapter rdr = new SqlDataAdapter();
+                    var rdr = new SqlDataAdapter();
                     rdr.SelectCommand = cmd;
                     rdr.Fill(ds);
 
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
-                        StudentModel student = new StudentModel();
+                        var student = new StudentModel();
 
                         student.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
                         student.StudentId = ds.Tables[0].Rows[i]["StudentId"].ToString();
@@ -87,7 +87,7 @@ namespace SMSystem_Api.Repository
                 }
             }
 
-            PaggedStudentModel paggedStudent = new PaggedStudentModel()
+            var paggedStudent = new PaggedStudentModel()
             {
                 StudentModel = data,
                 PaggedModel = new PaggedModel()
@@ -101,28 +101,28 @@ namespace SMSystem_Api.Repository
         }
         public async Task<StudentModel> Get(int id)
         {
-            StudentModel student = await context.Students.FindAsync(id);
+            var student = await context.Students.FindAsync(id).ConfigureAwait(false);
             return student;
         } 
 
         public async Task Add(StudentModel student)
         {
-            await context.Students.AddAsync(student);
-            await context.SaveChangesAsync();
+            await context.Students.AddAsync(student).ConfigureAwait(false);
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Update(StudentModel student)
         {
             context.Attach(student).State = EntityState.Modified;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Delete(int id)
         {
-            StudentModel student = context.Students.Where(x => x.Id == id).FirstOrDefault();
+            var student = context.Students.Where(x => x.Id == id).FirstOrDefault();
             student.IsDelete = true;
             student.IsActive = false;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
     }

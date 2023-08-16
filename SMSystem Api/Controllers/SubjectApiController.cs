@@ -22,14 +22,14 @@ namespace SMSystem_Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(string? sid, string? name, string? clas, int pageIndex)
         {
-            SearchingPara para = new SearchingPara()
+            var para = new SearchingPara()
             {
                 SId = sid,
                 Name = name,
                 Class = clas,
                 PageIndex = pageIndex
             };
-            PaggedSubjectModel subject = await SubRepo.GetAll(para);
+            var subject = await SubRepo.GetAll(para).ConfigureAwait(false);
             return Ok(subject);
         }
 
@@ -37,14 +37,14 @@ namespace SMSystem_Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            SubjectModel subject = await SubRepo.Get(id);
+            var subject = await SubRepo.Get(id).ConfigureAwait(false);
             return Ok(subject);
         }
 
         [HttpGet("Export")]
         public IActionResult GetAllData()
         {
-            List<SubjectModel> data = SubRepo.GetAllSubjects();
+            var data = SubRepo.GetAllSubjects();
             return Ok(data);
         }
 
@@ -52,7 +52,7 @@ namespace SMSystem_Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] SubjectModel subject)
         {
-            SubRepo.Add(subject);
+            await SubRepo.Add(subject).ConfigureAwait(false);
             return Ok();
         }
 
@@ -60,7 +60,7 @@ namespace SMSystem_Api.Controllers
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] SubjectModel subject)
         {
-            SubRepo.Update(subject);
+            await SubRepo.Update(subject).ConfigureAwait(false);
             return Ok();
         }
 
@@ -68,7 +68,7 @@ namespace SMSystem_Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            SubRepo.Delete(id);
+            await SubRepo.Delete(id).ConfigureAwait(false);
             return Ok();
         }
     }

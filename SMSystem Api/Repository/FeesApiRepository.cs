@@ -33,15 +33,15 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            List<FeesModel> data = new List<FeesModel>();
+            var data = new List<FeesModel>();
 
             const int pagesize = 5;
 
             int totalPage = 0;
 
-            using (SqlConnection con = new SqlConnection(connaction))
+            using (var con = new SqlConnection(connaction))
             {
-                SqlCommand cmd = new SqlCommand("FeesPaging", con);
+                var cmd = new SqlCommand("FeesPaging", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
 
@@ -55,18 +55,18 @@ namespace SMSystem_Api.Repository
 
                 totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
 
-                using (SqlConnection conn = new SqlConnection(connaction))
+                using (var conn = new SqlConnection(connaction))
                 {
-                    DataSet ds = new DataSet();
+                    var ds = new DataSet();
 
                     conn.Open();
-                    SqlDataAdapter rdr = new SqlDataAdapter();
+                    var rdr = new SqlDataAdapter();
                     rdr.SelectCommand = cmd;
                     rdr.Fill(ds);
 
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
-                        FeesModel fee = new FeesModel();
+                        var fee = new FeesModel();
 
                         fee.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
                         fee.FeesId = ds.Tables[0].Rows[i]["FeesId"].ToString();
@@ -82,7 +82,7 @@ namespace SMSystem_Api.Repository
                 }
             }
 
-            PaggedFeesModel paggedFees = new PaggedFeesModel()
+            var paggedFees = new PaggedFeesModel()
             {
                 FeesModel = data,
                 PaggedModel = new PaggedModel()
@@ -97,28 +97,28 @@ namespace SMSystem_Api.Repository
 
         public async Task<FeesModel> Get(int id)
         {
-            FeesModel fee = await context.Fees.FindAsync(id);
+            var fee = await context.Fees.FindAsync(id).ConfigureAwait(false);
             return fee;
         }
 
         public async Task Add(FeesModel fee)
         {
-            await context.Fees.AddAsync(fee);
-            await context.SaveChangesAsync();
+            await context.Fees.AddAsync(fee).ConfigureAwait(false);
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Update(FeesModel fee)
         {
             context.Attach(fee).State = EntityState.Modified;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Delete(int id)
         {
-            FeesModel fee = context.Fees.Find(id);
+            var fee = context.Fees.Find(id);
             fee.IsDelete = true;
             fee.IsActive = false;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

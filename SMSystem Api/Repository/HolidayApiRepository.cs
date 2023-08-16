@@ -22,25 +22,25 @@ namespace SMSystem_Api.Repository
             this.Configuration = configuration;
         }
 
-        public async Task<List<HolidayModel>> GetAllHolidays()
+        public List<HolidayModel> GetAllHolidays()
         {
-            var Data = context.Holidays.Where(x => x.IsActive).ToListAsync();
-            return await Data;
+            var Data = context.Holidays.Where(x => x.IsActive).ToList();
+            return Data;
         }
 
         public async Task<PaggedHolidayModel> GetAll(SearchingPara para)
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            List<HolidayModel> data = new List<HolidayModel>();
+            var data = new List<HolidayModel>();
 
             const int pagesize = 5;
 
             int totalPage = 0;
 
-            using (SqlConnection con = new SqlConnection(connaction))
+            using (var con = new SqlConnection(connaction))
             {
-                SqlCommand cmd = new SqlCommand("HolidayPaging", con);
+                var cmd = new SqlCommand("HolidayPaging", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
 
@@ -54,18 +54,18 @@ namespace SMSystem_Api.Repository
 
                 totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
 
-                using (SqlConnection conn = new SqlConnection(connaction))
+                using (var conn = new SqlConnection(connaction))
                 {
-                    DataSet ds = new DataSet();
+                    var ds = new DataSet();
 
                     conn.Open();
-                    SqlDataAdapter rdr = new SqlDataAdapter();
+                    var rdr = new SqlDataAdapter();
                     rdr.SelectCommand = cmd;
                     rdr.Fill(ds);
 
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
-                        HolidayModel holiday = new HolidayModel();
+                        var holiday = new HolidayModel();
 
                         holiday.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
                         holiday.HolidayId = ds.Tables[0].Rows[i]["HolidayId"].ToString();
@@ -80,7 +80,7 @@ namespace SMSystem_Api.Repository
                 }
             }
 
-            PaggedHolidayModel paggedHolidayModel = new PaggedHolidayModel()
+            var paggedHolidayModel = new PaggedHolidayModel()
             {
                 HolidayModel = data,
                 PaggedModel = new PaggedModel()
@@ -95,8 +95,8 @@ namespace SMSystem_Api.Repository
 
         public async Task Add(HolidayModel holiday)
         {
-            await context.Holidays.AddAsync(holiday);
-            await context.SaveChangesAsync();
+            await context.Holidays.AddAsync(holiday).ConfigureAwait(false);
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

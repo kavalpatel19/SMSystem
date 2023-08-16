@@ -19,7 +19,7 @@ namespace SMSystem.Controllers
         // GET: HolidayController
         public async Task<IActionResult> Index()
         {
-            HolidayPaggedViewModel holidays = new HolidayPaggedViewModel();
+            var holidays = new HolidayPaggedViewModel();
 
             return View(holidays);
         }
@@ -27,19 +27,19 @@ namespace SMSystem.Controllers
         // returns partial view of datatable.
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            HolidayPaggedViewModel holidays = await HoliRepo.GetHolidays(para);
+            var holidays = await HoliRepo.GetHolidays(para).ConfigureAwait(false);
             return PartialView("_HolidayData", holidays);
         }
 
         // To Export Data
         public IActionResult ExportExcel()
         {
-            var Data = HoliRepo.GetAllHolidays();
+            var data = HoliRepo.GetAllHolidays();
 
-            using (XLWorkbook wb = new XLWorkbook())
+            using (var wb = new XLWorkbook())
             {
-                wb.Worksheets.Add(ConvertDataTable.Convert(Data.ToList()));
-                using (MemoryStream mstream = new MemoryStream())
+                wb.Worksheets.Add(ConvertDataTable.Convert(data.ToList()));
+                using (var mstream = new MemoryStream())
                 {
                     wb.SaveAs(mstream);
                     return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Holidays.xlsx");
@@ -50,7 +50,7 @@ namespace SMSystem.Controllers
         // GET: HolidayController/Create
         public async Task<IActionResult> Create()
         {
-            HolidayViewModel holiday = new HolidayViewModel();
+            var holiday = new HolidayViewModel();
             var holidays = HoliRepo.GetAllHolidays();
             if (holidays.Count > 0)
             {

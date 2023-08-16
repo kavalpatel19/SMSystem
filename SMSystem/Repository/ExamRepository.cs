@@ -36,13 +36,13 @@ namespace SMSystem.Repository
 
         public async Task<ExamPaggedViewModel> GetExams(SearchingParaModel para)
         {
-            ExamPaggedViewModel exams = new ExamPaggedViewModel();
+            var exams = new ExamPaggedViewModel();
 
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                var response = await client.GetAsync($"ExamApi?pageIndex={para.PageIndex}");
+                var response = await client.GetAsync($"ExamApi?pageIndex={para.PageIndex}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -56,13 +56,13 @@ namespace SMSystem.Repository
 
         public async Task<ExamViewModel> GetExam(int id)
         {
-            ExamViewModel exam = new ExamViewModel();
+            var exam = new ExamViewModel();
 
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                var response = await client.GetAsync($"ExamApi/{id}");
+                var response = await client.GetAsync($"ExamApi/{id}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -76,10 +76,10 @@ namespace SMSystem.Repository
 
         public async Task<bool> Add(ExamViewModel exam)
         {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.PostAsJsonAsync<ExamViewModel>("ExamApi/", exam).Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.PostAsJsonAsync<ExamViewModel>("ExamApi/", exam).Result;
 
                 if (response.IsSuccessStatusCode)
                 {

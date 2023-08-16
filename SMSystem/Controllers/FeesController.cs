@@ -19,25 +19,25 @@ namespace SMSystem.Controllers
 
         public async Task<IActionResult> Index()
         {
-            FeesPaggedViewModel fees = new FeesPaggedViewModel();
+            var fees = new FeesPaggedViewModel();
 
             return View(fees);
         }
 
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            FeesPaggedViewModel fees = await FeesRepo.GetFees(para);
+            var fees = await FeesRepo.GetFees(para).ConfigureAwait(false);
             return PartialView("_FeesData", fees);
         }
 
         public IActionResult ExportExcel()
         {
-            var Data = FeesRepo.GetAllFees();
+            var data = FeesRepo.GetAllFees();
 
-            using (XLWorkbook wb = new XLWorkbook())
+            using (var wb = new XLWorkbook())
             {
-                wb.Worksheets.Add(ConvertDataTable.Convert(Data.ToList()));
-                using (MemoryStream mstream = new MemoryStream())
+                wb.Worksheets.Add(ConvertDataTable.Convert(data.ToList()));
+                using (var mstream = new MemoryStream())
                 {
                     wb.SaveAs(mstream);
                     return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Fees.xlsx");
@@ -46,7 +46,7 @@ namespace SMSystem.Controllers
         }
         public async Task<IActionResult> Create()
         {
-            FeesViewModel fee = new FeesViewModel();
+            var fee = new FeesViewModel();
             var fees = FeesRepo.GetAllFees();
             if (fees.Count > 0)
             {
@@ -86,7 +86,7 @@ namespace SMSystem.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            FeesViewModel fee = await FeesRepo.GetFee(id);
+            var fee = await FeesRepo.GetFee(id).ConfigureAwait(false);
             return View(fee);
         }
 
@@ -115,7 +115,7 @@ namespace SMSystem.Controllers
         {
             try
             {
-                SearchingParaModel para = new SearchingParaModel()
+                var para = new SearchingParaModel()
                 {
                     PageIndex = 1
                 };
@@ -124,7 +124,7 @@ namespace SMSystem.Controllers
 
                 if (response.IsCompletedSuccessfully)
                 {
-                    FeesPaggedViewModel fees = await FeesRepo.GetFees(para);
+                    var fees = await FeesRepo.GetFees(para).ConfigureAwait(false);
                     return PartialView("_FeesData", fees);
                 }
                 return PartialView();

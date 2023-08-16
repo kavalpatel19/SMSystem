@@ -36,7 +36,7 @@ namespace SMSystem.Repository
 
         public async Task<SubjectPaggedViewModel> GetSubjects(SearchingParaModel para)
         {
-            SubjectPaggedViewModel subjects = new SubjectPaggedViewModel();
+            var subjects = new SubjectPaggedViewModel();
 
             using (var client = new HttpClient())
             {
@@ -46,7 +46,7 @@ namespace SMSystem.Repository
                 para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
                 para.Class = string.IsNullOrEmpty(para.Class) ? string.Empty : para.Class;
 
-                var response = await client.GetAsync($"SubjectApi?sid={para.SId}&name={para.Name}&clas={para.Class}&pageIndex={para.PageIndex}");
+                var response = await client.GetAsync($"SubjectApi?sid={para.SId}&name={para.Name}&clas={para.Class}&pageIndex={para.PageIndex}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -60,13 +60,13 @@ namespace SMSystem.Repository
 
         public async Task<SubjectViewModel> GetSubject(int id)
         {
-            SubjectViewModel subject = new SubjectViewModel();
+            var subject = new SubjectViewModel();
 
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                var response = await client.GetAsync($"SubjectApi/{id}");
+                var response = await client.GetAsync($"SubjectApi/{id}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {

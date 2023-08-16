@@ -13,7 +13,7 @@ namespace SMSystem_Api.Controllers
     [ApiController]
     public class DepartmentApiController : ControllerBase
     {
-        IDepartmentApiRepository DepRepo;
+        private readonly IDepartmentApiRepository DepRepo;
         public DepartmentApiController(IDepartmentApiRepository depRepo)
         {
             DepRepo = depRepo;
@@ -23,14 +23,14 @@ namespace SMSystem_Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(string? sid,string? name, string? year,int pageIndex)
         {
-            SearchingPara para = new SearchingPara()
+            var para = new SearchingPara()
             {
                 SId = sid,
                 Name = name,
                 Year = year,
                 PageIndex = pageIndex
             };
-            PaggedDepartmentModel departments = await DepRepo.GetAll(para);
+            var departments = await DepRepo.GetAll(para).ConfigureAwait(false);
             return Ok(departments);
         }
 
@@ -38,14 +38,14 @@ namespace SMSystem_Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {  
-            DepartmentModel department = await DepRepo.Get(id);
+            var department = await DepRepo.Get(id).ConfigureAwait(false);
             return Ok(department);
         }
 
         [HttpGet("Export")]
         public IActionResult GetAllData()
         {
-            List<DepartmentModel> data = DepRepo.GetAllDepartments();
+            var data = DepRepo.GetAllDepartments();
             return Ok(data);
         }
 
@@ -53,7 +53,7 @@ namespace SMSystem_Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] DepartmentModel department)
         {
-            DepRepo.Add(department);
+            await DepRepo.Add(department).ConfigureAwait(false);
             return Ok();
         }
 
@@ -61,7 +61,7 @@ namespace SMSystem_Api.Controllers
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] DepartmentModel department)
         {
-            DepRepo.Update(department);
+            await DepRepo.Update(department).ConfigureAwait(false);
             return Ok();
         }
 
@@ -69,7 +69,7 @@ namespace SMSystem_Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            DepRepo.Delete(id);
+            await DepRepo.Delete(id).ConfigureAwait(false);
             return Ok();
         }
     }

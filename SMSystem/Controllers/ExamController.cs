@@ -1,9 +1,12 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
+using SMSystem.Models;
 using SMSystem.Models.Exam;
 using SMSystem.Models.Fees;
 using SMSystem.Repository.Interfaces;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace SMSystem.Controllers
 {
@@ -18,25 +21,23 @@ namespace SMSystem.Controllers
 
         public async Task<IActionResult> Index()
         {
-            ExamPaggedViewModel exams = new ExamPaggedViewModel();
-
+            var exams = new ExamPaggedViewModel();
             return View(exams);
         }
 
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            ExamPaggedViewModel exams = await ExamRepo.GetExams(para);
+            var exams = await ExamRepo.GetExams(para).ConfigureAwait(false);
             return PartialView("_ExamData", exams);
         }
 
         public IActionResult ExportExcel()
         {
-            var Data = ExamRepo.GetAllExams();
-
-            using (XLWorkbook wb = new XLWorkbook())
+            var data = ExamRepo.GetAllExams();
+            using (var wb = new XLWorkbook())
             {
-                wb.Worksheets.Add(ConvertDataTable.Convert(Data.ToList()));
-                using (MemoryStream mstream = new MemoryStream())
+                wb.Worksheets.Add(ConvertDataTable.Convert(data.ToList()));
+                using (var mstream = new MemoryStream())
                 {
                     wb.SaveAs(mstream);
                     return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Exams.xlsx");
@@ -62,16 +63,16 @@ namespace SMSystem.Controllers
                 {
                     return RedirectToAction(nameof(Create));
                 }
-            }
+                }
             catch
-            {
+                {
                 return View();
             }
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            ExamViewModel exam = await ExamRepo.GetExam(id);
+            var exam = await ExamRepo.GetExam(id).ConfigureAwait(false);
             return View(exam);
         }
 
@@ -100,7 +101,7 @@ namespace SMSystem.Controllers
         {
             try
             {
-                SearchingParaModel para = new SearchingParaModel()
+                var para = new SearchingParaModel()
                 {
                     PageIndex = 1
                 };
@@ -109,15 +110,16 @@ namespace SMSystem.Controllers
 
                 if (response.IsCompletedSuccessfully)
                 {
-                    ExamPaggedViewModel exams = await ExamRepo.GetExams(para);
+                    var exams = await ExamRepo.GetExams(para).ConfigureAwait(false);
                     return PartialView("_ExamData", exams);
                 }
                 return PartialView();
             }
-            catch
+            catch(Exception ex)
             {
-                return View();
+                return View(ex);
             }
         }
+        
     }
 }

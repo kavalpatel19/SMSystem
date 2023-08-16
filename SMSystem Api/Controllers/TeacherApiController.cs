@@ -23,14 +23,14 @@ namespace SMSystem_Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(string? sid, string? name, string? phone, int pageIndex)
         {
-            SearchingPara para = new SearchingPara()
+            var para = new SearchingPara()
             {
                 SId = sid,
                 Name = name,
                 Phone = phone,
                 PageIndex = pageIndex
             };
-            PaggedTeacherModel teachers = await teachRepo.GetAll(para);
+            var teachers = await teachRepo.GetAll(para).ConfigureAwait(false);
             return Ok(teachers);
         }
 
@@ -38,14 +38,14 @@ namespace SMSystem_Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            TeacherModel teacher = await teachRepo.Get(id);
+            var teacher = await teachRepo.Get(id).ConfigureAwait(false);
             return Ok(teacher);
         }
 
         [HttpGet("Export")]
         public IActionResult GetAllTeachers()
         {
-            List<TeacherModel> data = teachRepo.GetAllTeachers();
+            var data = teachRepo.GetAllTeachers();
             return Ok(data);
         }
 
@@ -53,7 +53,7 @@ namespace SMSystem_Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(TeacherModel teacher)
         {
-            teachRepo.Add(teacher);
+            await teachRepo.Add(teacher).ConfigureAwait(false);
             return Ok();
         }
 
@@ -61,7 +61,7 @@ namespace SMSystem_Api.Controllers
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] TeacherModel teacher)
         {
-            teachRepo.Update(teacher);
+            await teachRepo.Update(teacher).ConfigureAwait(false);
             return Ok();
         }
 
@@ -69,7 +69,7 @@ namespace SMSystem_Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            teachRepo.Delete(id);
+            await teachRepo.Delete(id).ConfigureAwait(false);
             return Ok();
         }
     }

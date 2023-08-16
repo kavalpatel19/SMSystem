@@ -20,33 +20,33 @@ namespace SMSystem.Controllers
         // GET: TeacherController
         public async Task<IActionResult> Index(SearchingParaModel para)
         {
-            TeacherPagedViewModel teacherPagedViewModel = new TeacherPagedViewModel();
+            var teacherPagedViewModel = new TeacherPagedViewModel();
 
             return View(teacherPagedViewModel);
         }
 
         public async Task<IActionResult> GridIndex()
         {
-            List<TeacherViewModel> teachers = TeachRepo.GetAllTeachers();
+            var teachers = TeachRepo.GetAllTeachers();
             return View(teachers);
         }
 
         // Returning data to the view
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            TeacherPagedViewModel teachers = await TeachRepo.GetTeachers(para);
+            var teachers = await TeachRepo.GetTeachers(para).ConfigureAwait(false);
 
             return PartialView("_TeacherData", teachers);
         }
 
         public IActionResult ExportExcel()
         {
-            var Data = TeachRepo.GetAllTeachers();
+            var data = TeachRepo.GetAllTeachers();
 
-            using (XLWorkbook wb = new XLWorkbook())
+            using (var wb = new XLWorkbook())
             {
-                wb.Worksheets.Add(ConvertDataTable.Convert(Data.ToList()));
-                using (MemoryStream mstream = new MemoryStream())
+                wb.Worksheets.Add(ConvertDataTable.Convert(data.ToList()));
+                using (var mstream = new MemoryStream())
                 {
                     wb.SaveAs(mstream);
                     return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Teachers.xlsx");
@@ -57,7 +57,7 @@ namespace SMSystem.Controllers
         // GET: TeacherController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            TeacherViewModel teacher = await TeachRepo.GetTeacher(id);
+            var teacher = await TeachRepo.GetTeacher(id).ConfigureAwait(false);
 
             return View(teacher);
         }
@@ -65,7 +65,7 @@ namespace SMSystem.Controllers
         // GET: TeacherController/Create
         public async Task<IActionResult> Create()
         {
-            TeacherViewModel teacher = new TeacherViewModel();
+            var teacher = new TeacherViewModel();
             var teachers = TeachRepo.GetAllTeachers();
             if (teachers.Count > 0)
             {
@@ -101,7 +101,7 @@ namespace SMSystem.Controllers
         // GET: TeacherController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            TeacherViewModel teacher = await TeachRepo.GetTeacher(id);
+            var teacher = await TeachRepo.GetTeacher(id).ConfigureAwait(false);
 
             return View(teacher);
         }
@@ -127,7 +127,7 @@ namespace SMSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            SearchingParaModel para = new SearchingParaModel()
+            var para = new SearchingParaModel()
             {
                 SId = string.Empty,
                 Name = string.Empty,
@@ -139,7 +139,7 @@ namespace SMSystem.Controllers
 
             if (response.IsCompletedSuccessfully)
             {
-                TeacherPagedViewModel teachers = await TeachRepo.GetTeachers(para);
+                var teachers = await TeachRepo.GetTeachers(para).ConfigureAwait(false);
                 return PartialView("_TeacherData", teachers);
             }
             return PartialView();

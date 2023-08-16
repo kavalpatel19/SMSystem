@@ -23,11 +23,11 @@ namespace SMSystem_Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(int pageIndex)
         {
-            SearchingPara para = new SearchingPara()
+            var para = new SearchingPara()
             {
                 PageIndex = pageIndex
             };
-            PaggedFeesModel fees = await FeesRepo.GetAll(para);
+            var fees = await FeesRepo.GetAll(para).ConfigureAwait(false);
             return Ok(fees);
         }
 
@@ -35,7 +35,7 @@ namespace SMSystem_Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            FeesModel fee = await FeesRepo.Get(id);
+            var fee = await FeesRepo.Get(id).ConfigureAwait(false);
             return Ok(fee);
         }
 
@@ -43,7 +43,7 @@ namespace SMSystem_Api.Controllers
         [HttpGet("Export")]
         public IActionResult GetAllFees()
         {
-            List<FeesModel> data = FeesRepo.GetAllFees();
+            var data = FeesRepo.GetAllFees();
             return Ok(data);
         }
 
@@ -51,7 +51,7 @@ namespace SMSystem_Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(FeesModel fee)
         {
-            FeesRepo.Add(fee);
+            await FeesRepo.Add(fee).ConfigureAwait(false);
             return Ok();
         }
 
@@ -59,7 +59,7 @@ namespace SMSystem_Api.Controllers
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] FeesModel fee)
         {
-            FeesRepo.Update(fee);
+            await FeesRepo.Update(fee).ConfigureAwait(false);
             return Ok();
         }
 
@@ -67,7 +67,7 @@ namespace SMSystem_Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            FeesRepo.Delete(id);
+            await FeesRepo.Delete(id).ConfigureAwait(false);
             return Ok();
         }
     }

@@ -10,7 +10,7 @@ namespace SMSystem.Helpers
         //
         public static DataTable Convert<T>(List<T> data)
         {
-            DataTable dt = new DataTable(typeof(T).Name);
+            var dt = new DataTable(typeof(T).Name);
             PropertyInfo[] propinfo = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo prop in propinfo)
             {

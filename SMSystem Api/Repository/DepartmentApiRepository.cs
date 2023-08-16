@@ -32,15 +32,15 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            List<DepartmentModel> data = new List<DepartmentModel>();
+            var data = new List<DepartmentModel>();
 
             const int pagesize = 5;
 
             int totalPage = 0;
 
-            using (SqlConnection con = new SqlConnection(connaction))
+            using (var con = new SqlConnection(connaction))
             {
-                SqlCommand cmd = new SqlCommand("DepartmentSearchingPaging", con);
+                var cmd = new SqlCommand("DepartmentSearchingPaging", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
 
@@ -57,18 +57,18 @@ namespace SMSystem_Api.Repository
 
                 totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
 
-                using (SqlConnection conn = new SqlConnection(connaction))
+                using (var conn = new SqlConnection(connaction))
                 {
-                    DataSet ds = new DataSet();
+                    var ds = new DataSet();
 
                     conn.Open();
-                    SqlDataAdapter rdr = new SqlDataAdapter();
+                    var rdr = new SqlDataAdapter();
                     rdr.SelectCommand = cmd;
                     rdr.Fill(ds);
 
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
-                        DepartmentModel department = new DepartmentModel();
+                        var department = new DepartmentModel();
 
                         department.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
                         department.DepartmentId = ds.Tables[0].Rows[i]["DepartmentId"].ToString();
@@ -83,7 +83,7 @@ namespace SMSystem_Api.Repository
                 }
             }
 
-            PaggedDepartmentModel paggedDepartment = new PaggedDepartmentModel()
+            var paggedDepartment = new PaggedDepartmentModel()
             {
                 DepartmentModel = data,
                 PaggedModel = new PaggedModel()
@@ -97,28 +97,28 @@ namespace SMSystem_Api.Repository
         }
         public async Task<DepartmentModel> Get(int id)
         {
-            DepartmentModel department = await context.Departments.FindAsync(id);
+            var department = await context.Departments.FindAsync(id).ConfigureAwait(false);
             return department;
         }
 
         public async Task Add(DepartmentModel department)
         {
-            await context.Departments.AddAsync(department);
-            await context.SaveChangesAsync();
+            await context.Departments.AddAsync(department).ConfigureAwait(false);
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Update(DepartmentModel department)
         {
             context.Attach(department).State = EntityState.Modified;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task Delete(int id)
         {
-            DepartmentModel department = context.Departments.Find(id);
+            var department = context.Departments.Find(id);
             department.IsDelete = true;
             department.IsActive = false;
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

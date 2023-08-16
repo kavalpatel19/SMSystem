@@ -8,7 +8,7 @@ namespace SMSystem.Repository
 {
     public class DepartmentRepository : IDepartmentRepository
     {
-        private IConfiguration configuration;
+        private readonly IConfiguration configuration;
 
         public DepartmentRepository(IConfiguration configuration)
         {
@@ -36,7 +36,7 @@ namespace SMSystem.Repository
 
         public async Task<DepartmentPaggedViewModel> GetDepartmnets(SearchingParaModel para)
         {
-            DepartmentPaggedViewModel departments = new DepartmentPaggedViewModel();
+            var departments = new DepartmentPaggedViewModel();
 
             using (var client = new HttpClient())
             {
@@ -46,7 +46,7 @@ namespace SMSystem.Repository
                 para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
                 para.Year = string.IsNullOrEmpty(para.Year) ? string.Empty : para.Year;
 
-                var response = await client.GetAsync($"DepartmentApi?sid={para.SId}&name={para.Name}&year={para.Year}&pageIndex={para.PageIndex}");
+                var response = await client.GetAsync($"DepartmentApi?sid={para.SId}&name={para.Name}&year={para.Year}&pageIndex={para.PageIndex}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -60,13 +60,13 @@ namespace SMSystem.Repository
 
         public async Task<DepartmentViewModel> GetDepartment(int id)
         {
-            DepartmentViewModel department = new DepartmentViewModel();
+            var department = new DepartmentViewModel();
 
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                var response = await client.GetAsync($"DepartmentApi/{id}");
+                var response = await client.GetAsync($"DepartmentApi/{id}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {

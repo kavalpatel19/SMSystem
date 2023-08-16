@@ -19,25 +19,25 @@ namespace SMSystem.Controllers
         // GET: DepartmentController
         public async Task<IActionResult> Index(SearchingParaModel para)
         {
-            SubjectPaggedViewModel subjects = new SubjectPaggedViewModel();
+            var subjects = new SubjectPaggedViewModel();
 
             return View(subjects);
         }
 
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            SubjectPaggedViewModel subjects = await SubRepo.GetSubjects(para);
+            var subjects = await SubRepo.GetSubjects(para).ConfigureAwait(false);
             return PartialView("_SubjectData", subjects);
         }
 
         public IActionResult ExportExcel()
         {
-            var Data = SubRepo.GetAllSubjects();
+            var data = SubRepo.GetAllSubjects();
 
-            using (XLWorkbook wb = new XLWorkbook())
+            using (var wb = new XLWorkbook())
             {
-                wb.Worksheets.Add(ConvertDataTable.Convert(Data.ToList()));
-                using (MemoryStream mstream = new MemoryStream())
+                wb.Worksheets.Add(ConvertDataTable.Convert(data.ToList()));
+                using (var mstream = new MemoryStream())
                 {
                     wb.SaveAs(mstream);
                     return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Subjects.xlsx");
@@ -48,7 +48,7 @@ namespace SMSystem.Controllers
         // GET: DepartmentController/Create
         public async Task<IActionResult> Create()
         {
-            SubjectViewModel subject = new SubjectViewModel();
+            var subject = new SubjectViewModel();
             var subjects = SubRepo.GetAllSubjects();
             if (subjects.Count > 0)
             {
@@ -91,7 +91,7 @@ namespace SMSystem.Controllers
         // GET: DepartmentController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            SubjectViewModel subject = await SubRepo.GetSubject(id);
+            var subject = await SubRepo.GetSubject(id).ConfigureAwait(false);
             return View(subject);
         }
 
@@ -123,7 +123,7 @@ namespace SMSystem.Controllers
         {
             try
             {
-                SearchingParaModel para = new SearchingParaModel()
+                var para = new SearchingParaModel()
                 {
                     SId = string.Empty,
                     Name = string.Empty,
@@ -135,7 +135,7 @@ namespace SMSystem.Controllers
 
                 if (response.IsCompletedSuccessfully)
                 {
-                    SubjectPaggedViewModel subjects = await SubRepo.GetSubjects(para);
+                    var subjects = await SubRepo.GetSubjects(para).ConfigureAwait(false);
                     return PartialView("_SubjectData", subjects);
                 }
                 return PartialView();

@@ -6,7 +6,7 @@ namespace SMSystem_Api.Repository.Interfaces
 {
     public interface IHolidayApiRepository
     {
-        Task<List<HolidayModel>> GetAllHolidays();
+        List<HolidayModel> GetAllHolidays();
         Task<PaggedHolidayModel> GetAll(SearchingPara para);
         Task Add(HolidayModel holiday);
     }

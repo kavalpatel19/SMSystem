@@ -38,7 +38,7 @@ namespace SMSystem.Repository
 
         public async Task<TeacherPagedViewModel> GetTeachers(SearchingParaModel para)
         {
-            TeacherPagedViewModel teacherPagedViewModel = new TeacherPagedViewModel();
+            var teacherPagedViewModel = new TeacherPagedViewModel();
 
             using (var client = new HttpClient())
             {
@@ -48,7 +48,7 @@ namespace SMSystem.Repository
                 para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
                 para.Phone = string.IsNullOrEmpty(para.Phone) ? string.Empty : para.Phone;
 
-                var response = await client.GetAsync($"TeacherApi?sid={para.SId}&name={para.Name}&phone={para.Phone}&pageIndex={para.PageIndex}");
+                var response = await client.GetAsync($"TeacherApi?sid={para.SId}&name={para.Name}&phone={para.Phone}&pageIndex={para.PageIndex}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -62,12 +62,12 @@ namespace SMSystem.Repository
 
         public async Task<TeacherViewModel> GetTeacher(int id)
         {
-            TeacherViewModel teacher = new TeacherViewModel();
+            var teacher = new TeacherViewModel();
 
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = await client.GetAsync($"TeacherApi/{id}");
+                var response = await client.GetAsync($"TeacherApi/{id}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -98,7 +98,9 @@ namespace SMSystem.Repository
             {
                 uniqueFileName = UploadImage(teacher);
             }
+
             teacher.Path = uniqueFileName;
+
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);

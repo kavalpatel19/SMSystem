@@ -16,7 +16,7 @@ namespace SMSystem.Controllers
 {
     public class StudentController : Controller
     {
-        IStudentRepository StdRepo;
+        private readonly IStudentRepository StdRepo;
 
         public StudentController(IStudentRepository repository)
         {
@@ -26,32 +26,32 @@ namespace SMSystem.Controllers
         // Index
         public async Task<IActionResult> Index(SearchingParaModel para)
         {
-            StudentPagedViewModel studentPagedViewModel = new StudentPagedViewModel();
-            return View(studentPagedViewModel);
+            var students = new StudentPagedViewModel();
+            return View(students);
         }
 
         public async Task<IActionResult> GridIndex()
         {
-            List<StudentViewModel> Students = StdRepo.GetAllStudents();
+            var Students = StdRepo.GetAllStudents();
             return View(Students);
         }
 
         // Returning data to the view
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            StudentPagedViewModel students = await StdRepo.GetStudents(para);
+            var students = await StdRepo.GetStudents(para).ConfigureAwait(false);
 
             return PartialView("_StudentData", students);
         }
 
         public IActionResult ExportExcel()
         {
-            var Data = StdRepo.GetAllStudents();
+            var data = StdRepo.GetAllStudents();
 
-                using (XLWorkbook wb = new XLWorkbook())
+                using (var wb = new XLWorkbook())
                 {
-                    wb.Worksheets.Add(ConvertDataTable.Convert(Data.ToList()));
-                    using (MemoryStream mstream = new MemoryStream())
+                    wb.Worksheets.Add(ConvertDataTable.Convert(data.ToList()));
+                    using (var mstream = new MemoryStream())
                     {
                         wb.SaveAs(mstream);
                         return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Students.xlsx");
@@ -63,7 +63,7 @@ namespace SMSystem.Controllers
         // GET: StudentController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            StudentViewModel student = await StdRepo.GetStudent(id);
+            var student = await StdRepo.GetStudent(id).ConfigureAwait(false);
 
             return View(student);
         }
@@ -71,7 +71,7 @@ namespace SMSystem.Controllers
         // GET: StudentController/Create
         public async Task<IActionResult> Create()
         {
-            StudentViewModel student = new StudentViewModel();
+            var student = new StudentViewModel();
             var students = StdRepo.GetAllStudents();
             if (students.Count > 0)
             {
@@ -108,7 +108,7 @@ namespace SMSystem.Controllers
         // GET: StudentController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            StudentViewModel student = await StdRepo.GetStudent(id);
+            var student = await StdRepo.GetStudent(id).ConfigureAwait(false);
 
             return View(student);
         }
@@ -134,7 +134,7 @@ namespace SMSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            SearchingParaModel para = new SearchingParaModel()
+            var para = new SearchingParaModel()
             {
                 SId = string.Empty,
                 Name = string.Empty,
@@ -146,7 +146,7 @@ namespace SMSystem.Controllers
 
             if (response.IsCompletedSuccessfully)
             {
-                StudentPagedViewModel students = await StdRepo.GetStudents(para);
+                var students = await StdRepo.GetStudents(para).ConfigureAwait(false);
                 return PartialView("_StudentData", students);
             }
             return PartialView();

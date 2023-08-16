@@ -22,22 +22,22 @@ namespace SMSystem_Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(string? sid, string? name, string? year, int pageIndex)
         {
-            SearchingPara para = new SearchingPara()
+            var para = new SearchingPara()
             {
                 SId = sid,
                 Name = name,
                 Year = year,
                 PageIndex = pageIndex
             };
-            PaggedHolidayModel holidays = await HoliRepo.GetAll(para);
+            var holidays = await HoliRepo.GetAll(para).ConfigureAwait(false);
             return Ok(holidays);
         }
 
         // GET: api/<DepartmentApiController>/Export
         [HttpGet("Export")]
-        public async Task<IActionResult> GetAllData()
+        public IActionResult GetAllData()
         {
-            IList<HolidayModel> data = await HoliRepo.GetAllHolidays();
+            var data = HoliRepo.GetAllHolidays();
             return Ok(data);
         }
 
@@ -45,7 +45,7 @@ namespace SMSystem_Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] HolidayModel holiday)
         {
-            await HoliRepo.Add(holiday);
+            await HoliRepo.Add(holiday).ConfigureAwait(false);
             return Ok();
         }
     }

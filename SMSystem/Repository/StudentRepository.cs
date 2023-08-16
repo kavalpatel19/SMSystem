@@ -11,7 +11,7 @@ namespace SMSystem.Repository
 {
     public class StudentRepository : IStudentRepository
     {
-        private IConfiguration configuration;
+        private readonly IConfiguration configuration;
         private readonly IWebHostEnvironment environment;
 
         public StudentRepository(IConfiguration configuration, IWebHostEnvironment environment)
@@ -41,7 +41,7 @@ namespace SMSystem.Repository
 
         public async Task<StudentPagedViewModel> GetStudents(SearchingParaModel para)
         {
-            StudentPagedViewModel studentPagedViewModel = new StudentPagedViewModel();
+            var studentPagedViewModel = new StudentPagedViewModel();
 
             using (var client = new HttpClient())
             {
@@ -51,7 +51,7 @@ namespace SMSystem.Repository
                 para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
                 para.Phone = string.IsNullOrEmpty(para.Phone) ? string.Empty : para.Phone;
 
-                var response = await client.GetAsync($"StudentApi?sid={para.SId}&name={para.Name}&phone={para.Phone}&pageIndex={para.PageIndex}");
+                var response = await client.GetAsync($"StudentApi?sid={para.SId}&name={para.Name}&phone={para.Phone}&pageIndex={para.PageIndex}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -65,12 +65,12 @@ namespace SMSystem.Repository
 
         public async Task<StudentViewModel> GetStudent(int id)
         {
-            StudentViewModel student = new StudentViewModel();
+            var student = new StudentViewModel();
 
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = await client.GetAsync($"StudentApi/{id}");
+                var response = await client.GetAsync($"StudentApi/{id}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -101,7 +101,9 @@ namespace SMSystem.Repository
             {
                 uniqueFileName = UploadImage(student);
             }
+
             student.Path = uniqueFileName;
+
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);

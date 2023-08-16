@@ -36,13 +36,13 @@ namespace SMSystem.Repository
 
         public async Task<FeesPaggedViewModel> GetFees(SearchingParaModel para)
         {
-            FeesPaggedViewModel Fees = new FeesPaggedViewModel();
+            var Fees = new FeesPaggedViewModel();
 
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                var response = await client.GetAsync($"FeesApi?pageIndex={para.PageIndex}");
+                var response = await client.GetAsync($"FeesApi?pageIndex={para.PageIndex}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -56,13 +56,13 @@ namespace SMSystem.Repository
 
         public async Task<FeesViewModel> GetFee(int id)
         {
-            FeesViewModel fee = new FeesViewModel();
+            var fee = new FeesViewModel();
 
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                var response = await client.GetAsync($"FeesApi/{id}");
+                var response = await client.GetAsync($"FeesApi/{id}").ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {

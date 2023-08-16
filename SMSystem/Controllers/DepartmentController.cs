@@ -11,36 +11,34 @@ namespace SMSystem.Controllers
 {
     public class DepartmentController : Controller
     {
-        IDepartmentRepository DepRepo;
+        private readonly IDepartmentRepository DepRepo;
         public DepartmentController(IDepartmentRepository depRepo)
         {
             DepRepo = depRepo;
         }
 
-
-        //https://localhost:7199/api/DepartmentApi?pageIndex=1
         // GET: DepartmentController
         public async Task<IActionResult> Index(SearchingParaModel para)
         {
-            DepartmentPaggedViewModel departments = new DepartmentPaggedViewModel();
+            var departments = new DepartmentPaggedViewModel();
 
             return View(departments);
         }
 
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            DepartmentPaggedViewModel departments = await DepRepo.GetDepartmnets(para);
+            var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
             return PartialView("_DepartmentData", departments);
         }
 
         public IActionResult ExportExcel()
         {
-            var Data = DepRepo.GetAllDepartments();
+            var data = DepRepo.GetAllDepartments();
 
-            using (XLWorkbook wb = new XLWorkbook())
+            using (var wb = new XLWorkbook())
             {
-                wb.Worksheets.Add(ConvertDataTable.Convert(Data.ToList()));
-                using (MemoryStream mstream = new MemoryStream())
+                wb.Worksheets.Add(ConvertDataTable.Convert(data.ToList()));
+                using (var mstream = new MemoryStream())
                 {
                     wb.SaveAs(mstream);
                     return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Departments.xlsx");
@@ -51,7 +49,7 @@ namespace SMSystem.Controllers
         // GET: DepartmentController/Create
         public async Task<IActionResult> Create()
         {
-            DepartmentViewModel department = new DepartmentViewModel();
+            var department = new DepartmentViewModel();
             var departments = DepRepo.GetAllDepartments();
             if (departments.Count > 0)
             {
@@ -93,7 +91,7 @@ namespace SMSystem.Controllers
         // GET: DepartmentController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            DepartmentViewModel department = await DepRepo.GetDepartment(id);
+            var department = await DepRepo.GetDepartment(id).ConfigureAwait(false);
             return View(department);
         }
 
@@ -125,7 +123,7 @@ namespace SMSystem.Controllers
         {
             try
             {
-                SearchingParaModel para = new SearchingParaModel()
+                var para = new SearchingParaModel()
                 {
                     SId = string.Empty,
                     Name = string.Empty,
@@ -137,7 +135,7 @@ namespace SMSystem.Controllers
 
                 if (response.IsCompletedSuccessfully)
                 {
-                    DepartmentPaggedViewModel departments = await DepRepo.GetDepartmnets(para);
+                    var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
                     return PartialView("_DepartmentData", departments);
                 }
                 return PartialView();

@@ -14,7 +14,7 @@ namespace SMSystem_Api.Controllers
     [ApiController]
     public class StudentApiController : ControllerBase
     {
-        IStudentApiRepository StudentRepo;
+        private readonly IStudentApiRepository StudentRepo;
 
         public StudentApiController(IStudentApiRepository repo) 
         {
@@ -25,14 +25,14 @@ namespace SMSystem_Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(string? sid ,string? name , string? phone , int pageIndex)
         {
-            SearchingPara para = new SearchingPara()
+            var para = new SearchingPara()
             {
                 SId = sid,
                 Name = name,
                 Phone = phone,
                 PageIndex = pageIndex
             };
-            PaggedStudentModel students = await StudentRepo.GetAll(para);
+            var students = await StudentRepo.GetAll(para).ConfigureAwait(false);
             return Ok(students);
         }
 
@@ -40,14 +40,14 @@ namespace SMSystem_Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            StudentModel student = await StudentRepo.Get(id);
+            var student = await StudentRepo.Get(id).ConfigureAwait(false);
             return Ok(student);
         }
 
         [HttpGet("Export")]
         public IActionResult GetAllStudents()
         {
-            List<StudentModel> data= StudentRepo.GetAllStudents();
+            var data= StudentRepo.GetAllStudents();
             return Ok(data);
         }
 
@@ -55,7 +55,7 @@ namespace SMSystem_Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(StudentModel student)
         {
-            StudentRepo.Add(student);
+            await StudentRepo.Add(student).ConfigureAwait(false);
             return Ok();
         }
 
@@ -63,7 +63,7 @@ namespace SMSystem_Api.Controllers
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] StudentModel student)
         {
-            StudentRepo.Update(student);
+            await StudentRepo.Update(student).ConfigureAwait(false);
             return Ok();
         }
 
@@ -71,7 +71,7 @@ namespace SMSystem_Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            StudentRepo.Delete(id);
+            await StudentRepo.Delete(id).ConfigureAwait(false);
             return Ok();
         }
     }
