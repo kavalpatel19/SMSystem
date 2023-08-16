@@ -1,0 +1,89 @@
+﻿@model SMSystem.Models.Exam.ExamViewModel
+@using SMSystem.Helpers.DropdownHelper;
+
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Edit Exam</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="exam.html">Exam</a></li>
+                    <li class="breadcrumb-item active">Edit Exam</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="form-title"><span>Exam Information</span></h5>
+                            </div>
+                            <input asp-for="Id" class="form-control" value="@Model.Id" hidden />
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="ExamName">Exam Name <span class="login-danger">*</span></label>
+                                    <input asp-for="ExamName" class="form-control" type="text" />
+                                    <span asp-validation-for="ExamName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="Class">Class <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="Class" asp-items="EnumHelper.GetEnumSelectList<Class>()">
+                                        <option value="">Select Class</option>
+                                    </select>
+                                    <span asp-validation-for="Class" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="StartTime">Start Time <span class="login-danger">*</span></label>
+                                    <input asp-for="StartTime" class="form-control" type="time" />
+                                    <span asp-validation-for="StartTime" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="EndTime">End Time <span class="login-danger">*</span></label>
+                                    <input asp-for="EndTime" class="form-control" type="time" />
+                                    <span asp-validation-for="EndTime" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="Subject">Subject <span class="login-danger">*</span></label>
+                                    <input asp-for="Subject" class="form-control" type="text" />
+                                    <span asp-validation-for="Subject" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms calendar-icon">
+                                    <label asp-for="ExamDate">Exam Date <span class="login-danger">*</span></label>
+                                    <input asp-for="ExamDate" class="form-control datetimepicker" placeholder="DD-MM-YYYY" type="datetime"/>
+                                    <span asp-validation-for="ExamDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
