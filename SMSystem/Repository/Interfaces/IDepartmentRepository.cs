@@ -10,8 +10,8 @@ namespace SMSystem.Repository.Interfaces
         BaseResponseViewModel<DepartmentViewModel> GetAllDepartments();
         Task<BaseResponseViewModel<DepartmentPaggedViewModel>> GetDepartmnets(SearchingParaModel para);
         Task<BaseResponseViewModel<DepartmentViewModel>> GetDepartment(int id);
-        Task<bool> Add(DepartmentViewModel department);
-        Task<bool> Update(DepartmentViewModel department);
-        Task<bool> Delete(int id);
+        Task<BaseResponseViewModel<DepartmentViewModel>> Add(DepartmentViewModel department);
+        Task<BaseResponseViewModel<DepartmentViewModel>> Update(DepartmentViewModel department);
+        Task<BaseResponseViewModel<DepartmentViewModel>> Delete(int id);
     }
 }

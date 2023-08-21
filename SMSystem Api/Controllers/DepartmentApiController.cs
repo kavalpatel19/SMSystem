@@ -83,7 +83,7 @@ namespace SMSystem_Api.Controllers
             {
                 baseResponse.Message = ex.Message;
                 baseResponse.ResponseCode = 500;
-                baseResponse.Result = new DepartmentModel();
+                baseResponse.Results = new List<DepartmentModel>();
                 return Ok(baseResponse);
             }
         }

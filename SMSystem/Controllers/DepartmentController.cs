@@ -1,4 +1,5 @@
-﻿using ClosedXML.Excel;
+﻿using Azure;
+using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,56 +22,61 @@ namespace SMSystem.Controllers
         // GET: DepartmentController
         public async Task<IActionResult> Index(SearchingParaModel para)
         {
+            var response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
+
             try
             {
-                var response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
-
+                response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
                 return View(response);
             }
             catch (Exception ex)
             {
-                var response = new BaseResponseViewModel<DepartmentPaggedViewModel>
-                {
-                    ResponseCode = 500,
-                    Message = ex.Message,
-                    Result = new DepartmentPaggedViewModel()
-                };
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new DepartmentPaggedViewModel();
                 return View(response);
             }
-            
         }
 
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
+            var response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
+
             try
             {
-                var response = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
+                response = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
                 return PartialView("_DepartmentData", response);
             }
             catch (Exception ex)
             {
-                var response = new BaseResponseViewModel<DepartmentPaggedViewModel>
-                {
-                    ResponseCode = 500,
-                    Message = ex.Message,
-                    Result = new DepartmentPaggedViewModel()
-                };
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new DepartmentPaggedViewModel();
                 return View(response);
             }
         }
 
         public IActionResult ExportExcel()
         {
-            var data = DepRepo.GetAllDepartments().Results;
-
-            using (var wb = new XLWorkbook())
+            var response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
+            try
             {
-                wb.Worksheets.Add(ConvertDataTable.Convert(data.ToList()));
-                using (var mstream = new MemoryStream())
+                var data = DepRepo.GetAllDepartments();
+
+                using (var wb = new XLWorkbook())
                 {
-                    wb.SaveAs(mstream);
-                    return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Departments.xlsx");
+                    wb.Worksheets.Add(ConvertDataTable.Convert(data.Results));
+                    using (var mstream = new MemoryStream())
+                    {
+                        wb.SaveAs(mstream);
+                        return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Departments.xlsx");
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                TempData["Msg"] = ex.Message;
+                return View();
             }
         }
 
@@ -98,22 +104,25 @@ namespace SMSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(DepartmentViewModel department)
         {
+            var response = new BaseResponseViewModel<DepartmentViewModel>();
+
             try
             {
-                var response = DepRepo.Add(department);
-                if (response.IsCompletedSuccessfully)
+                response = await DepRepo.Add(department);
+                if (response.ResponseCode == 200)
                 {
                     TempData["Msg"] = "Record Created Successfully.";
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    TempData["Msg"] = "Something Went Wrong!";
+                    TempData["Msg"] = response.Message;
                     return RedirectToAction(nameof(Create));
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                TempData["Msg"] = ex.Message;
                 return View();
             }
         }

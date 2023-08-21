@@ -103,7 +103,7 @@ namespace SMSystem.Repository
             {
                 baseResponse.ResponseCode = 500;
                 baseResponse.Message = ex.Message;
-                baseResponse.Results = new List<DepartmentViewModel>();
+                baseResponse.Result = new DepartmentViewModel();
                 return baseResponse;
             }
         }
@@ -124,46 +124,63 @@ namespace SMSystem.Repository
                     return baseResponse;
                 }
             }
-            catch
+            catch(Exception ex)
             {
-
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new DepartmentViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Update(DepartmentViewModel department)
+        public async Task<BaseResponseViewModel<DepartmentViewModel>> Update(DepartmentViewModel department)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<DepartmentViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.PutAsJsonAsync<DepartmentViewModel>("DepartmentApi/", department).Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.PutAsJsonAsync<DepartmentViewModel>("DepartmentApi/", department).Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    var data = response.Content.ReadAsStringAsync().Result;
+                    baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentViewModel>>(data);
+
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new DepartmentViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<BaseResponseViewModel<DepartmentViewModel>> Delete(int id)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<DepartmentViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                // To send Delete data request
-                var response = client.DeleteAsync($"DepartmentApi/{id}").Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    // To send Delete data request
+                    var response = client.DeleteAsync($"DepartmentApi/{id}").Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    var data = response.Content.ReadAsStringAsync().Result;
+                    baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentViewModel>>(data);
+
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new DepartmentViewModel();
+                return baseResponse;
             }
         }
     }

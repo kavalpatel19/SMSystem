@@ -117,7 +117,7 @@ namespace SMSystem_Api.Repository
                 {
                     response.ResponseCode = 404;
                     response.Message = "Data not Found!";
-                    response.Results = new List<DepartmentModel>();
+                    response.Result = new DepartmentModel();
                     return response;
                 }
 
@@ -129,7 +129,7 @@ namespace SMSystem_Api.Repository
             {
                 response.ResponseCode = 500;
                 response.Message = ex.Message;
-                response.Results = new List<DepartmentModel>();
+                response.Result = new DepartmentModel();
                 return response;
             }
         }
@@ -143,12 +143,14 @@ namespace SMSystem_Api.Repository
                 await context.SaveChangesAsync().ConfigureAwait(false);
 
                 response.ResponseCode = 200;
+                response.Result = new DepartmentModel();
                 return response;
             }
             catch(Exception ex)
             {
                 response.ResponseCode = 500;
                 response.Message = ex.Message;
+                response.Result = new DepartmentModel();
                 return response;
             }
         }
@@ -162,12 +164,14 @@ namespace SMSystem_Api.Repository
                 await context.SaveChangesAsync().ConfigureAwait(false);
 
                 response.ResponseCode = 200;
+                response.Result = new DepartmentModel();
                 return response;
             }
             catch (Exception ex)
             {
                 response.ResponseCode = 500;
                 response.Message = ex.Message;
+                response.Result = new DepartmentModel();
                 return response;
             }
         }
@@ -183,12 +187,14 @@ namespace SMSystem_Api.Repository
                 await context.SaveChangesAsync().ConfigureAwait(false);
 
                 response.ResponseCode = 200;
+                response.Result = new DepartmentModel();
                 return response;
             }
             catch (Exception ex)
             {
                 response.ResponseCode = 500;
                 response.Message = ex.Message;
+                response.Result = new DepartmentModel();
                 return response;
             }
         }
