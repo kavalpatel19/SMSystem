@@ -1,4 +1,11 @@
-﻿@model SMSystem.Models.Department.DepartmentPaggedViewModel
+﻿@model SMSystem.Models.BaseResponseViewModel<DepartmentPaggedViewModel>
+@using SMSystem.Models.Department;
+@using SMSystem.Models;
+
+@{
+    ViewData["ResponseCode"] = Model.ResponseCode;
+    ViewData["Message"] = Model.Message;
+}
 
 <div class="table-responsive">
     <div class="row">
@@ -20,9 +27,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model.DepartmentModel.Count > 0)
+                    @if (Model.Result.DepartmentModel.Count > 0)
                     {
-                        @foreach (var item in Model.DepartmentModel)
+                        @foreach (var item in Model.Result.DepartmentModel)
                         {
                             <tr>
                                 <td>
@@ -78,3 +85,11 @@
         Html.RenderPartial("_Pagination");
     }
 </div>
+
+<script type="text/javascript">
+    let responseCode = '@Model.ResponseCode';
+    if (responseCode != 200) {
+        $("#exception").append('@Model.Message');
+        $("#exception").addClass("show");
+    }
+</script>

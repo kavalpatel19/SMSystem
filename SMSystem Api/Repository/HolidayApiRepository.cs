@@ -8,6 +8,8 @@ using SMSystem_Api.Repository.Interfaces;
 using System.Configuration;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
+using Dapper;
+using SMSystem_Api.Model.Fees;
 
 namespace SMSystem_Api.Repository
 {
@@ -32,66 +34,35 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            var data = new List<HolidayModel>();
+            string sp = StoredProcedureHelper.HolidayPaging;
 
-            const int pagesize = 5;
+            var parameters = new DynamicParameters();
 
-            int totalPage = 0;
+            parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using (var con = new SqlConnection(connaction))
             {
-                var cmd = new SqlCommand("HolidayPaging", con);
-                cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
+                var holidays = (await con.QueryAsync<HolidayModel>( sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                cmd.Parameters.Add("@PageIndex", SqlDbType.VarChar).Value = para.PageIndex;
-                cmd.Parameters.Add("@PageSize", SqlDbType.VarChar).Value = pagesize;
-                cmd.Parameters.Add("@TotalPages", SqlDbType.Int, 4);
-                cmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
+                var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
 
-                cmd.ExecuteNonQuery();
-                con.Close();
-
-                totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
-
-                using (var conn = new SqlConnection(connaction))
+                var paggedHolidayModel = new PaggedHolidayModel()
                 {
-                    var ds = new DataSet();
-
-                    conn.Open();
-                    var rdr = new SqlDataAdapter();
-                    rdr.SelectCommand = cmd;
-                    rdr.Fill(ds);
-
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    HolidayModel = holidays,
+                    PaggedModel = new PaggedModel()
                     {
-                        var holiday = new HolidayModel();
-
-                        holiday.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
-                        holiday.HolidayId = ds.Tables[0].Rows[i]["HolidayId"].ToString();
-                        holiday.HolidayName = ds.Tables[0].Rows[i]["HolidayName"].ToString();
-                        holiday.HolidayType = ds.Tables[0].Rows[i]["HolidayType"].ToString();
-                        holiday.StartDate = Convert.ToDateTime(ds.Tables[0].Rows[i]["StartDate"]);
-                        holiday.EndDate = Convert.ToDateTime(ds.Tables[0].Rows[i]["EndDate"]);
-
-                        data.Add(holiday);
+                        PageIndex = para.PageIndex,
+                        TotalPage = totalPage
                     }
-                    conn.Close();
-                }
+                };
+
+                return paggedHolidayModel;
             }
-
-            var paggedHolidayModel = new PaggedHolidayModel()
-            {
-                HolidayModel = data,
-                PaggedModel = new PaggedModel()
-                {
-                    PageIndex = para.PageIndex,
-                    TotalPage = totalPage
-                }
-            };
-
-            return paggedHolidayModel;
         }
+    
 
         public async Task Add(HolidayModel holiday)
         {

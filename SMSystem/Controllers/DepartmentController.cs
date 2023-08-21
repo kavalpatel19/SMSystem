@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
+using SMSystem.Models;
 using SMSystem.Models.Department;
 using SMSystem.Models.Students;
 using SMSystem.Repository.Interfaces;
@@ -20,20 +21,47 @@ namespace SMSystem.Controllers
         // GET: DepartmentController
         public async Task<IActionResult> Index(SearchingParaModel para)
         {
-            var departments = new DepartmentPaggedViewModel();
+            try
+            {
+                var response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
 
-            return View(departments);
+                return View(response);
+            }
+            catch (Exception ex)
+            {
+                var response = new BaseResponseViewModel<DepartmentPaggedViewModel>
+                {
+                    ResponseCode = 500,
+                    Message = ex.Message,
+                    Result = new DepartmentPaggedViewModel()
+                };
+                return View(response);
+            }
+            
         }
 
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
-            return PartialView("_DepartmentData", departments);
+            try
+            {
+                var response = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
+                return PartialView("_DepartmentData", response);
+            }
+            catch (Exception ex)
+            {
+                var response = new BaseResponseViewModel<DepartmentPaggedViewModel>
+                {
+                    ResponseCode = 500,
+                    Message = ex.Message,
+                    Result = new DepartmentPaggedViewModel()
+                };
+                return View(response);
+            }
         }
 
         public IActionResult ExportExcel()
         {
-            var data = DepRepo.GetAllDepartments();
+            var data = DepRepo.GetAllDepartments().Results;
 
             using (var wb = new XLWorkbook())
             {
@@ -50,7 +78,7 @@ namespace SMSystem.Controllers
         public async Task<IActionResult> Create()
         {
             var department = new DepartmentViewModel();
-            var departments = DepRepo.GetAllDepartments();
+            var departments = DepRepo.GetAllDepartments().Results;
             if (departments.Count > 0)
             {
                 var lastId = departments.OrderByDescending(x => x.DepartmentId).FirstOrDefault().DepartmentId;
@@ -75,10 +103,12 @@ namespace SMSystem.Controllers
                 var response = DepRepo.Add(department);
                 if (response.IsCompletedSuccessfully)
                 {
-                    return  RedirectToAction(nameof(Index));
+                    TempData["Msg"] = "Record Created Successfully.";
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
+                    TempData["Msg"] = "Something Went Wrong!";
                     return RedirectToAction(nameof(Create));
                 }
             }

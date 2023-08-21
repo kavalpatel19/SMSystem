@@ -1,4 +1,5 @@
 ﻿using SMSystem_Api.Helpers;
+using SMSystem_Api.Model;
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Students;
 
@@ -6,11 +7,11 @@ namespace SMSystem_Api.Repository.Interfaces
 {
     public interface IDepartmentApiRepository
     {
-        List<DepartmentModel> GetAllDepartments();
-        Task<PaggedDepartmentModel> GetAll(SearchingPara para);
-        Task<DepartmentModel> Get(int id);
-        Task Add(DepartmentModel student);
-        Task Update(DepartmentModel student);
-        Task Delete(int id);
+        BaseResponseModel<DepartmentModel> GetAllDepartments();
+        Task<BaseResponseModel<PaggedDepartmentModel>> GetAll(SearchingPara para);
+        Task<BaseResponseModel<DepartmentModel>> Get(int id);
+        Task<BaseResponseModel<DepartmentModel>> Add(DepartmentModel student);
+        Task<BaseResponseModel<DepartmentModel>> Update(DepartmentModel student);
+        Task<BaseResponseModel<DepartmentModel>> Delete(int id);
     }
 }

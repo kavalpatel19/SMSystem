@@ -1,11 +1,12 @@
-﻿@model SMSystem.Models.Department.DepartmentPaggedViewModel
+﻿@model SMSystem.Models.BaseResponseViewModel<DepartmentPaggedViewModel>
+@using SMSystem.Models.Department;
 
 @{
     ViewData["Title"] = "Index";
 }
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 
 <div class="content container-fluid">
-
     <div class="page-header">
         <div class="row align-items-center">
             <div class="col">
@@ -70,6 +71,8 @@
 @{
     Html.RenderPartial("_Footer");
 }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
 <script src="~/js/department.js"></script>
 <script>
     $(document).ready(function () {
@@ -83,4 +86,20 @@
         };
         GetData(obj, url, element);
     });
+
+    var msg = '@TempData["Msg"]';
+    if (msg.length) {
+        Command: toastr["success"](msg, "Success")
+
+        toastr.options = {
+            "closeButton": true,
+            "positionClass": "toast-bottom-right",
+            "onclick": null,
+            "timeOut": "3000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+    }
 </script>

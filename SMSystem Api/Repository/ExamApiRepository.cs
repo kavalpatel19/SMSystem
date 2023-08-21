@@ -1,9 +1,11 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Data;
 using SMSystem_Api.Helpers;
 using SMSystem_Api.Migrations;
 using SMSystem_Api.Model;
+using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Exam;
 using SMSystem_Api.Model.Fees;
 using SMSystem_Api.Repository.Interfaces;
@@ -32,66 +34,32 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            var data = new List<ExamModel>();
+            string sp = StoredProcedureHelper.ExamPaging;
 
-            const int pagesize = 5;
+            var parameters = new DynamicParameters();
 
-            int totalPage = 0;
+            parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using (var con = new SqlConnection(connaction))
             {
-                var cmd = new SqlCommand("ExamPaging", con);
-                cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
+                var exams = (await con.QueryAsync<ExamModel>( sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                cmd.Parameters.Add("@PageIndex", SqlDbType.VarChar).Value = para.PageIndex;
-                cmd.Parameters.Add("@PageSize", SqlDbType.VarChar).Value = pagesize;
-                cmd.Parameters.Add("@TotalPages", SqlDbType.Int, 4);
-                cmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
+                var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
 
-                cmd.ExecuteNonQuery();
-                con.Close();
-
-                totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
-
-                using (var conn = new SqlConnection(connaction))
+                var paggedExam = new PaggedExamModel()
                 {
-                    var ds = new DataSet();
-
-                    conn.Open();
-                    var rdr = new SqlDataAdapter();
-                    rdr.SelectCommand = cmd;
-                    rdr.Fill(ds);
-
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    ExamModel = exams,
+                    PaggedModel = new PaggedModel()
                     {
-                        var exam = new ExamModel();
-
-                        exam.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
-                        exam.ExamName = ds.Tables[0].Rows[i]["ExamName"].ToString();
-                        exam.Class = ds.Tables[0].Rows[i]["Class"].ToString();
-                        exam.Subject = ds.Tables[0].Rows[i]["Subject"].ToString();
-                        exam.StartTime = Convert.ToDateTime(ds.Tables[0].Rows[i]["StartTime"]);
-                        exam.EndTime = Convert.ToDateTime(ds.Tables[0].Rows[i]["EndTime"]);
-                        exam.ExamDate = Convert.ToDateTime(ds.Tables[0].Rows[i]["ExamDate"]);
-
-                        data.Add(exam);
+                        PageIndex = para.PageIndex,
+                        TotalPage = totalPage
                     }
-                    conn.Close();
-                }
+                };
+                return paggedExam;
             }
-
-            var paggedExam = new PaggedExamModel()
-            {
-                ExamModel = data,
-                PaggedModel = new PaggedModel()
-                {
-                    PageIndex = para.PageIndex,
-                    TotalPage = totalPage
-                }
-            };
-
-            return paggedExam;
         }
 
         public async Task<ExamModel> Get(int id)

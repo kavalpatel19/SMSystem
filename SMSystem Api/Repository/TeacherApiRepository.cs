@@ -7,6 +7,8 @@ using SMSystem_Api.Model.Teachers;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Repository.Interfaces;
+using Dapper;
+using SMSystem_Api.Model.Department;
 
 namespace SMSystem_Api.Repository
 {
@@ -31,71 +33,36 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            var data = new List<TeacherModel>();
+            string sp = StoredProcedureHelper.TeacherSearchingPaging;
 
-            const int pagesize = 5;
+            var parameters = new DynamicParameters();
 
-            int totalPage = 0;
+            parameters.Add(FieldHelper.SID, para.SId, dbType: DbType.String, size: 50);
+            parameters.Add(FieldHelper.Name, para.Name, dbType: DbType.String, size: 50);
+            parameters.Add(FieldHelper.Phone, para.Phone, dbType: DbType.String, size: 50);
+            parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using (var con = new SqlConnection(connaction))
             {
-                var cmd = new SqlCommand("TeacherSearchingPaging", con);
-                cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
+                var teachers = (await con.QueryAsync<TeacherModel>( sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                cmd.Parameters.Add("@SID", SqlDbType.VarChar).Value = para.SId;
-                cmd.Parameters.Add("@Name", SqlDbType.VarChar).Value = para.Name;
-                cmd.Parameters.Add("@Phone", SqlDbType.VarChar).Value = para.Phone;
-                cmd.Parameters.Add("@PageIndex", SqlDbType.VarChar).Value = para.PageIndex;
-                cmd.Parameters.Add("@PageSize", SqlDbType.VarChar).Value = pagesize;
-                cmd.Parameters.Add("@TotalPages", SqlDbType.Int, 4);
-                cmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
+                var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
 
-                cmd.ExecuteNonQuery();
-                con.Close();
-
-                totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
-
-                using (var conn = new SqlConnection(connaction))
+                var paggedTeacher = new PaggedTeacherModel()
                 {
-                    var ds = new DataSet();
-
-                    conn.Open();
-                    var rdr = new SqlDataAdapter();
-                    rdr.SelectCommand = cmd;
-                    rdr.Fill(ds);
-
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    TeacherModel = teachers,
+                    PaggedModel = new PaggedModel()
                     {
-                        var teacher = new TeacherModel();
-
-                        teacher.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
-                        teacher.TeacherId = ds.Tables[0].Rows[i]["TeacherId"].ToString();
-                        teacher.Name = ds.Tables[0].Rows[i]["Name"].ToString();
-                        teacher.Path = ds.Tables[0].Rows[i]["Path"].ToString();
-                        teacher.Gender = ds.Tables[0].Rows[i]["Gender"].ToString();
-                        teacher.Subject = ds.Tables[0].Rows[i]["Subject"].ToString();
-                        teacher.PhoneNo = ds.Tables[0].Rows[i]["PhoneNo"].ToString();
-                        teacher.AddressLine1 = ds.Tables[0].Rows[i]["AddressLine1"].ToString();
-                        teacher.Country = ds.Tables[0].Rows[i]["Country"].ToString();
-
-                        data.Add(teacher);
+                        PageIndex = para.PageIndex,
+                        TotalPage = totalPage
                     }
-                    conn.Close();
-                }
+                };
+
+                return paggedTeacher;
             }
-
-            var paggedTeacher = new PaggedTeacherModel()
-            {
-                TeacherModel = data,
-                PaggedModel = new PaggedModel()
-                {
-                    PageIndex = para.PageIndex,
-                    TotalPage = totalPage
-                }
-            };
-
-            return paggedTeacher;
         }
 
         public async Task<TeacherModel> Get(int id)

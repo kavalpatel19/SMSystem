@@ -9,7 +9,7 @@ namespace SMSystem_Api.Model.Department
             DepartmentModel = new List<DepartmentModel>();
             PaggedModel = new PaggedModel();
         }
-        public IList<DepartmentModel> DepartmentModel { get; set; }
+        public List<DepartmentModel> DepartmentModel { get; set; }
         public PaggedModel PaggedModel { get; set; }
     }
 }

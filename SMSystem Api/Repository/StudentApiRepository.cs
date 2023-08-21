@@ -1,8 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Data;
 using SMSystem_Api.Helpers;
 using SMSystem_Api.Model;
+using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Students;
 using SMSystem_Api.Repository.Interfaces;
 using System.Configuration;
@@ -32,72 +34,36 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            var data = new List<StudentModel>();
+            string sp = StoredProcedureHelper.StudentSearchingPaging;
 
-            const int pagesize = 5;
+            var parameters = new DynamicParameters();
 
-            int totalPage = 0;
+            parameters.Add(FieldHelper.SID, para.SId, dbType: DbType.String, size: 50);
+            parameters.Add(FieldHelper.Name, para.Name, dbType: DbType.String, size: 50);
+            parameters.Add(FieldHelper.Phone, para.Phone, dbType: DbType.String, size: 50);
+            parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using (var con = new SqlConnection(connaction))
             {
-                var cmd = new SqlCommand("StudentSearchingPaging", con);
-                cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
+                var students = (await con.QueryAsync<StudentModel>( sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                cmd.Parameters.Add("@SID", SqlDbType.VarChar).Value = para.SId;
-                cmd.Parameters.Add("@Name", SqlDbType.VarChar).Value = para.Name;
-                cmd.Parameters.Add("@Phone", SqlDbType.VarChar).Value = para.Phone;
-                cmd.Parameters.Add("@PageIndex", SqlDbType.VarChar).Value = para.PageIndex;
-                cmd.Parameters.Add("@PageSize", SqlDbType.VarChar).Value = pagesize;
-                cmd.Parameters.Add("@TotalPages", SqlDbType.Int, 4);
-                cmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
+                var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
 
-                cmd.ExecuteNonQuery();
-                con.Close();
-
-                totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
-
-                using (var conn = new SqlConnection(connaction))
+                var paggedStudent = new PaggedStudentModel()
                 {
-                    var ds = new DataSet();
-
-                    conn.Open();
-                    var rdr = new SqlDataAdapter();
-                    rdr.SelectCommand = cmd;
-                    rdr.Fill(ds);
-
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    StudentModel = students,
+                    PaggedModel = new PaggedModel()
                     {
-                        var student = new StudentModel();
-
-                        student.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
-                        student.StudentId = ds.Tables[0].Rows[i]["StudentId"].ToString();
-                        student.FirstName = ds.Tables[0].Rows[i]["FirstName"].ToString();
-                        student.LastName = ds.Tables[0].Rows[i]["LastName"].ToString();
-                        student.Path = ds.Tables[0].Rows[i]["Path"].ToString();
-                        student.ParentName = ds.Tables[0].Rows[i]["ParentName"].ToString();
-                        student.DateOfBirth = Convert.ToDateTime(ds.Tables[0].Rows[i]["DateOfBirth"]);
-                        student.Class = ds.Tables[0].Rows[i]["Class"].ToString();
-                        student.Phone = ds.Tables[0].Rows[i]["Phone"].ToString();
-                        student.Address = ds.Tables[0].Rows[i]["Address"].ToString();
-
-                        data.Add(student);
+                        PageIndex = para.PageIndex,
+                        TotalPage = totalPage
                     }
-                    conn.Close();
-                }
+                };
+
+                return paggedStudent;
             }
-
-            var paggedStudent = new PaggedStudentModel()
-            {
-                StudentModel = data,
-                PaggedModel = new PaggedModel()
-                {
-                    PageIndex = para.PageIndex,
-                    TotalPage = totalPage
-                }
-            };
-
-            return paggedStudent;
         }
         public async Task<StudentModel> Get(int id)
         {

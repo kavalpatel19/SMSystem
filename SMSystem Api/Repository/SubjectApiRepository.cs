@@ -7,6 +7,7 @@ using SMSystem_Api.Model.Subjects;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Repository.Interfaces;
+using Dapper;
 
 namespace SMSystem_Api.Repository
 {
@@ -31,66 +32,36 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            var data = new List<SubjectModel>();
+            string sp = StoredProcedureHelper.SubjetSearchingPaging;
 
-            const int pagesize = 5;
+            var parameters = new DynamicParameters();
 
-            int totalPage = 0;
+            parameters.Add(FieldHelper.SID, para.SId, dbType: DbType.String, size: 50);
+            parameters.Add(FieldHelper.Name, para.Name, dbType: DbType.String, size: 50);
+            parameters.Add(FieldHelper.Class, para.Class, dbType: DbType.String, size: 50);
+            parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using (var con = new SqlConnection(connaction))
             {
-                var cmd = new SqlCommand("SubjetSearchingPaging", con);
-                cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
+                var subjects = (await con.QueryAsync<SubjectModel>( sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                cmd.Parameters.Add("@SID", SqlDbType.VarChar).Value = para.SId;
-                cmd.Parameters.Add("@Name", SqlDbType.VarChar).Value = para.Name;
-                cmd.Parameters.Add("@Class", SqlDbType.VarChar).Value = para.Class;
-                cmd.Parameters.Add("@PageIndex", SqlDbType.VarChar).Value = para.PageIndex;
-                cmd.Parameters.Add("@PageSize", SqlDbType.VarChar).Value = pagesize;
-                cmd.Parameters.Add("@TotalPages", SqlDbType.Int, 4);
-                cmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
+                var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
 
-                cmd.ExecuteNonQuery();
-                con.Close();
-
-                totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
-
-                using (var conn = new SqlConnection(connaction))
+                var paggedSubject = new PaggedSubjectModel()
                 {
-                    var ds = new DataSet();
-
-                    conn.Open();
-                    var rdr = new SqlDataAdapter();
-                    rdr.SelectCommand = cmd;
-                    rdr.Fill(ds);
-
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    SubjectModel = subjects,
+                    PaggedModel = new PaggedModel()
                     {
-                        var subject = new SubjectModel();
-
-                        subject.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
-                        subject.SubjectId = ds.Tables[0].Rows[i]["SubjectId"].ToString();
-                        subject.SubjectName = ds.Tables[0].Rows[i]["SubjectName"].ToString();
-                        subject.Class = ds.Tables[0].Rows[i]["Class"].ToString();
-
-                        data.Add(subject);
+                        PageIndex = para.PageIndex,
+                        TotalPage = totalPage
                     }
-                    conn.Close();
-                }
+                };
+
+                return paggedSubject;
             }
-
-            var paggedSubject = new PaggedSubjectModel()
-            {
-                SubjectModel = data,
-                PaggedModel = new PaggedModel()
-                {
-                    PageIndex = para.PageIndex,
-                    TotalPage = totalPage
-                }
-            };
-
-            return paggedSubject;
         }
 
         public async Task<SubjectModel> Get(int id)

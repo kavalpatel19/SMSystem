@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem_Api.Helpers;
+using SMSystem_Api.Model;
 using SMSystem_Api.Model.Exam;
 using SMSystem_Api.Model.Fees;
 using SMSystem_Api.Repository.Interfaces;
@@ -36,14 +37,23 @@ namespace SMSystem_Api.Controllers
         {
             var exam = await ExamRepo.Get(id).ConfigureAwait(false);
             return Ok(exam);
-            }
+        }
 
         // POST api/<ExamApiController>/Export
         [HttpGet("Export")]
         public IActionResult GetAllFees()
         {
-            var data = ExamRepo.GetAllExams();
-            return Ok(data);
+            try
+            {
+                var data = ExamRepo.GetAllExams();
+                return Ok(data);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
 
         // POST api/<ExamApiController>/model

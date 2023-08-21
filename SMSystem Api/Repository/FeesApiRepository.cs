@@ -1,10 +1,12 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Data;
 using SMSystem_Api.Helpers;
 using SMSystem_Api.Migrations;
 using SMSystem_Api.Model;
 using SMSystem_Api.Model.Department;
+using SMSystem_Api.Model.Exam;
 using SMSystem_Api.Model.Fees;
 using SMSystem_Api.Model.Subjects;
 using SMSystem_Api.Repository.Interfaces;
@@ -33,66 +35,33 @@ namespace SMSystem_Api.Repository
         {
             string connaction = Configuration.GetConnectionString("connaction");
 
-            var data = new List<FeesModel>();
+            string sp = StoredProcedureHelper.FeesPaging;
 
-            const int pagesize = 5;
+            var parameters = new DynamicParameters();
 
-            int totalPage = 0;
+            parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
+            parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             using (var con = new SqlConnection(connaction))
             {
-                var cmd = new SqlCommand("FeesPaging", con);
-                cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
+                var fees = (await con.QueryAsync<FeesModel>( sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                cmd.Parameters.Add("@PageIndex", SqlDbType.VarChar).Value = para.PageIndex;
-                cmd.Parameters.Add("@PageSize", SqlDbType.VarChar).Value = pagesize;
-                cmd.Parameters.Add("@TotalPages", SqlDbType.Int, 4);
-                cmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
+                var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
 
-                cmd.ExecuteNonQuery();
-                con.Close();
-
-                totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
-
-                using (var conn = new SqlConnection(connaction))
+                var paggedFees = new PaggedFeesModel()
                 {
-                    var ds = new DataSet();
-
-                    conn.Open();
-                    var rdr = new SqlDataAdapter();
-                    rdr.SelectCommand = cmd;
-                    rdr.Fill(ds);
-
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    FeesModel = fees,
+                    PaggedModel = new PaggedModel()
                     {
-                        var fee = new FeesModel();
-
-                        fee.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
-                        fee.FeesId = ds.Tables[0].Rows[i]["FeesId"].ToString();
-                        fee.FeesType = ds.Tables[0].Rows[i]["FeesType"].ToString();
-                        fee.Class = ds.Tables[0].Rows[i]["Class"].ToString();
-                        fee.FeesAmount = Convert.ToInt32(ds.Tables[0].Rows[i]["FeesAmount"]);
-                        fee.StartDate = Convert.ToDateTime(ds.Tables[0].Rows[i]["StartDate"]);
-                        fee.EndDate = Convert.ToDateTime(ds.Tables[0].Rows[i]["EndDate"]);
-
-                        data.Add(fee);
+                        PageIndex = para.PageIndex,
+                        TotalPage = totalPage
                     }
-                    conn.Close();
-                }
+                };
+
+                return paggedFees;
             }
-
-            var paggedFees = new PaggedFeesModel()
-            {
-                FeesModel = data,
-                PaggedModel = new PaggedModel()
-                {
-                    PageIndex = para.PageIndex,
-                    TotalPage = totalPage
-                }
-            };
-
-            return paggedFees;
         }
 
         public async Task<FeesModel> Get(int id)

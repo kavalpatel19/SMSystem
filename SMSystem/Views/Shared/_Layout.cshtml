@@ -47,6 +47,9 @@
         }
 
         <div class="page-wrapper">
+            @{
+                Html.RenderPartial("_Notification");
+            }
 
             @RenderBody()
 
@@ -63,7 +66,6 @@
     <script src="~/assets/plugins/apexchart/chart-data.js"></script>
     <script src="https://common.olemiss.edu/_js/sweet-alert/sweet-alert.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.js"></script>
     <script src="~/assets/plugins/moment/moment.min.js"></script>
     <script src="~/assets/plugins/select2/js/select2.min.js"></script>
     <script src="~/assets/js/bootstrap-datetimepicker.min.js"></script> 
