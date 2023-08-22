@@ -12,6 +12,27 @@
         }, 500);
     });
 
+
+
+if (responseCode != 200 && responseCode != '') {
+    $("#exception").append(message);
+    $("#exception").addClass("show");
+}
+if (responseCode == 200) {
+    Command: toastr["success"](message, "Success")
+
+    toastr.options = {
+        "closeButton": true,
+        "positionClass": "toast-bottom-right",
+        "onclick": null,
+        "timeOut": "3000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+}
+
 //To get all list//
 function GetData(obj, url, element) {
     $("#overlay").fadeIn(1)

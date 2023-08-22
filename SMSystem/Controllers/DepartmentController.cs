@@ -33,7 +33,7 @@ namespace SMSystem.Controllers
             {
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
-                return View(response);
+                return RedirectToAction("Index","Home");
             }
         }
 
@@ -236,31 +236,13 @@ namespace SMSystem.Controllers
                     SId = string.Empty,
                     Name = string.Empty,
                     Year = string.Empty,
-                    PageIndex = 0
+                    PageIndex = 1
                 };
 
-                response =await DepRepo.Delete(id);
+                response = await DepRepo.Delete(id);
 
-                if (response.ResponseCode == 200)
-                {
-                    var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
-                    if(departments.ResponseCode == 200)
-                    {
-                        return PartialView("_DepartmentData", departments);
-                    }
-                    else
-                    {
-                        TempData["Message"] = departments.Message;
-                        TempData["ResCode"] = departments.ResponseCode;
-                        return RedirectToAction(nameof(Index));
-                    }
-                }
-                else
-                {
-                    TempData["Message"] = response.Message;
-                    TempData["ResCode"] = response.ResponseCode;
-                    return PartialView();
-                }
+                var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
+                return PartialView("_DepartmentData", departments); 
             }
             catch (Exception ex)
             {
