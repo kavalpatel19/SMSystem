@@ -32,8 +32,10 @@ namespace SMSystem.Repository
                     {
                         var data = response.Content.ReadAsStringAsync().Result;
                         baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentViewModel>>(data);
+                        return baseResponse;
                     }
-
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
                     return baseResponse;
                 }
             }
@@ -65,8 +67,11 @@ namespace SMSystem.Repository
                     {
                         var data = response.Content.ReadAsStringAsync().Result;
                         baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentPaggedViewModel>>(data);
-                    }
+                        return baseResponse;
 
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
                     return baseResponse;
                 }
             }
@@ -95,7 +100,11 @@ namespace SMSystem.Repository
                     {
                         var data = response.Content.ReadAsStringAsync().Result;
                         baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentViewModel>>(data);
+                        return baseResponse;
+
                     }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
                     return baseResponse;
                 }
             }
@@ -117,10 +126,17 @@ namespace SMSystem.Repository
                 {
                     client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
                     var response = await client.PostAsJsonAsync<DepartmentViewModel>("DepartmentApi/", department);
-                    
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentViewModel>>(data);
 
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentViewModel>>(data);
+                        return baseResponse;
+
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
                     return baseResponse;
                 }
             }
@@ -143,9 +159,16 @@ namespace SMSystem.Repository
                     client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
                     var response = client.PutAsJsonAsync<DepartmentViewModel>("DepartmentApi/", department).Result;
 
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentViewModel>>(data);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentViewModel>>(data);
 
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
                     return baseResponse;
                 }
             }
@@ -169,9 +192,16 @@ namespace SMSystem.Repository
                     // To send Delete data request
                     var response = client.DeleteAsync($"DepartmentApi/{id}").Result;
 
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentViewModel>>(data);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<DepartmentViewModel>>(data);
 
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
                     return baseResponse;
                 }
             }

@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.ExtendedProperties;
 using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Data;
@@ -19,11 +20,13 @@ namespace SMSystem_Api.Repository
     {
         private readonly ApplicationDbContext context;
         public readonly IConfiguration Configuration;
+        private readonly string connaction;
 
         public DepartmentApiRepository(ApplicationDbContext context, IConfiguration configuration)
         {
             this.context = context;
             Configuration = configuration;
+            connaction = Configuration.GetConnectionString("connaction");
         }
 
         public BaseResponseModel<DepartmentModel> GetAllDepartments()
@@ -32,17 +35,24 @@ namespace SMSystem_Api.Repository
 
             try
             {
-                var data = context.Departments.Where(x => x.IsActive).ToList();
-                if (data.Count == 0)
+                using (var con = new SqlConnection(connaction))
                 {
-                    response.ResponseCode = 404;
-                    response.Message = "Data not Found!";
-                    response.Results = new List<DepartmentModel>();
+                    con.Open();
+                    var data =  (con.Query<DepartmentModel>("ExportDepartment", commandType: System.Data.CommandType.StoredProcedure)).ToList();
+
+                    if (data.Count == 0)
+                    {
+                        response.ResponseCode = 404;
+                        response.Message = "Data not Found!";
+                        response.Results = new List<DepartmentModel>();
+                        return response;
+                    }
+                    response.ResponseCode = 200;
+                    response.Results = data;
                     return response;
                 }
-                response.ResponseCode = 200;
-                response.Results = data;
-                return response;
+                //var data = context.Departments.Where(x => x.IsActive).ToList();
+                
 
             }
             catch (Exception ex)
@@ -60,9 +70,6 @@ namespace SMSystem_Api.Repository
 
             try
             {
-
-                string connaction = Configuration.GetConnectionString("connaction");
-
                 string sp = StoredProcedureHelper.DepartmentSearchingPaging;
 
                 var parameters = new DynamicParameters();

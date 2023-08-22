@@ -50,7 +50,7 @@
                                 <h3 class="page-title">Departments</h3>
                             </div>
                             <div class="col-auto text-end float-end ms-auto download-grp">
-                                <a asp-action="ExportExcel" asp-controller="Department" id="Export-Dep" class="btn btn-outline-primary me-2"><i class="fas fa-download"></i> Download</a>
+                                <a asp-action="ExportExcel" asp-controller="Department" class="btn btn-outline-primary me-2"><i class="fas fa-download"></i> Download</a>
                                 <a asp-action="Create" asp-controller="Department" class="btn btn-primary"><i class="fas fa-plus"></i></a>
                             </div>
                         </div>
@@ -76,6 +76,7 @@
 <script src="~/js/department.js"></script>
 <script>
     $(document).ready(function () {
+
         let url = "/Department/GetAll";
         let element = "#departmentData";
         let obj = {
@@ -87,9 +88,15 @@
         GetData(obj, url, element);
     });
 
-    var msg = '@TempData["Msg"]';
-    if (msg.length) {
-        Command: toastr["success"](msg, "Success")
+    let responseCode = '@TempData["ResCode"]';
+    var message = '@TempData["Message"]';
+
+    if (responseCode != 200 && responseCode != '') {
+        $("#exception").append(message);
+        $("#exception").addClass("show");
+    }
+    if(responseCode == 200 ){
+        Command: toastr["success"](message, "Success")
 
         toastr.options = {
             "closeButton": true,
@@ -102,4 +109,5 @@
             "hideMethod": "fadeOut"
         }
     }
+
 </script>

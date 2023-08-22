@@ -87,9 +87,11 @@
 </div>
 
 <script type="text/javascript">
-    let responseCode = '@Model.ResponseCode';
-    if (responseCode != 200) {
-        $("#exception").append('@Model.Message');
+    responseCode = '@TempData["ResCode"]';
+    message = '@TempData["Message"]';
+
+    if (responseCode != 200 && responseCode != '') {
+        $("#exception").append(message);
         $("#exception").addClass("show");
     }
 </script>

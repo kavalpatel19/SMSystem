@@ -1,4 +1,4 @@
-﻿using Azure;
+﻿ using Azure;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Http;
@@ -31,13 +31,13 @@ namespace SMSystem.Controllers
             }
             catch (Exception ex)
             {
-                response.ResponseCode = 500;
-                response.Message = ex.Message;
-                response.Result = new DepartmentPaggedViewModel();
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
                 return View(response);
             }
         }
 
+        // returning Partial view
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
             var response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
@@ -45,59 +45,95 @@ namespace SMSystem.Controllers
             try
             {
                 response = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
-                return PartialView("_DepartmentData", response);
+                if(response.ResponseCode == 200)
+                {
+                    return PartialView("_DepartmentData", response);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return PartialView("_DepartmentData", response);
+                }
             }
             catch (Exception ex)
             {
                 response.ResponseCode = 500;
                 response.Message = ex.Message;
                 response.Result = new DepartmentPaggedViewModel();
-                return View(response);
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return PartialView("_DepartmentData", response);
             }
         }
 
+        //To Export Data
         public IActionResult ExportExcel()
         {
-            var response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
+            var response = new BaseResponseViewModel<DepartmentViewModel>();
             try
             {
-                var data = DepRepo.GetAllDepartments();
-
-                using (var wb = new XLWorkbook())
+                response = DepRepo.GetAllDepartments();
+                if (response.ResponseCode == 200)
                 {
-                    wb.Worksheets.Add(ConvertDataTable.Convert(data.Results));
-                    using (var mstream = new MemoryStream())
+                    using (var wb = new XLWorkbook())
                     {
-                        wb.SaveAs(mstream);
-                        return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Departments.xlsx");
+                        wb.Worksheets.Add(ConvertDataTable.Convert(response.Results));
+                        using (var mstream = new MemoryStream())
+                        {
+                            wb.SaveAs(mstream);
+                            TempData["Message"] = "Data Downloaded successfully.";
+                            TempData["ResCode"] = response.ResponseCode;
+                            return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Departments.xlsx");
+                        }
                     }
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction("Index");
                 }
             }
             catch(Exception ex)
             {
-                TempData["Msg"] = ex.Message;
-                return View();
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return View("Index");
             }
         }
 
         // GET: DepartmentController/Create
         public async Task<IActionResult> Create()
         {
-            var department = new DepartmentViewModel();
-            var departments = DepRepo.GetAllDepartments().Results;
-            if (departments.Count > 0)
+            var response = new BaseResponseViewModel<DepartmentViewModel>();
+
+            try
             {
-                var lastId = departments.OrderByDescending(x => x.DepartmentId).FirstOrDefault().DepartmentId;
-                char[] spearator = { '-', ' ' };
-                string[] depId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
-                int id = (Convert.ToInt32(depId[1]))+1;
-                department.DepartmentId = "DEP-" + (id.ToString("0000"));
+                response = DepRepo.GetAllDepartments();
+                var department = new DepartmentViewModel();
+                var departments = response.Results;
+                if (departments.Count > 0)
+                {
+                    var lastId = departments.OrderByDescending(x => x.DepartmentId).FirstOrDefault().DepartmentId;
+                    char[] spearator = { '-', ' ' };
+                    string[] depId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
+                    int id = (Convert.ToInt32(depId[1])) + 1;
+                    department.DepartmentId = "DEP-" + (id.ToString("0000"));
+                }
+                else
+                {
+                    department.DepartmentId = "DEP-0001";
+                }
+
+                return View(department);
             }
-            else
+            catch (Exception ex)
             {
-                department.DepartmentId = "DEP-0001";
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
             }
-            return View(department);
         }
 
         // POST: DepartmentController/Create
@@ -111,18 +147,21 @@ namespace SMSystem.Controllers
                 response = await DepRepo.Add(department);
                 if (response.ResponseCode == 200)
                 {
-                    TempData["Msg"] = "Record Created Successfully.";
+                    TempData["Message"] = "Record Created Successfully.";
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    TempData["Msg"] = response.Message;
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Create));
                 }
             }
             catch(Exception ex)
             {
-                TempData["Msg"] = ex.Message;
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
                 return View();
             }
         }
@@ -130,28 +169,56 @@ namespace SMSystem.Controllers
         // GET: DepartmentController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var department = await DepRepo.GetDepartment(id).ConfigureAwait(false);
-            return View(department);
+            var response = new BaseResponseViewModel<DepartmentViewModel>();
+
+            try
+            {
+                response = await DepRepo.GetDepartment(id).ConfigureAwait(false);
+                if(response.ResponseCode == 200)
+                {
+                    return View(response.Result);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch(Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // POST: DepartmentController/Edit/5
         [HttpPost]
         public async Task<IActionResult> Edit(DepartmentViewModel department)
         {
+            var response = new BaseResponseViewModel<DepartmentViewModel>();
+
             try
             {
-                var response = DepRepo.Update(department);
-                if (response.IsCompletedSuccessfully)
+                response = await DepRepo.Update(department);
+                if (response.ResponseCode == 200)
                 {
+                    TempData["Message"] = "Record Modified Successfully.";
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Edit));
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
                 return View();
             }
         }
@@ -160,6 +227,8 @@ namespace SMSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
+            var response = new BaseResponseViewModel<DepartmentViewModel>();
+
             try
             {
                 var para = new SearchingParaModel()
@@ -167,21 +236,37 @@ namespace SMSystem.Controllers
                     SId = string.Empty,
                     Name = string.Empty,
                     Year = string.Empty,
-                    PageIndex = 1
+                    PageIndex = 0
                 };
 
-                var response = DepRepo.Delete(id);
+                response =await DepRepo.Delete(id);
 
-                if (response.IsCompletedSuccessfully)
+                if (response.ResponseCode == 200)
                 {
                     var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
-                    return PartialView("_DepartmentData", departments);
+                    if(departments.ResponseCode == 200)
+                    {
+                        return PartialView("_DepartmentData", departments);
+                    }
+                    else
+                    {
+                        TempData["Message"] = departments.Message;
+                        TempData["ResCode"] = departments.ResponseCode;
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
-                return PartialView();
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return PartialView();
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
             }
         }
     }

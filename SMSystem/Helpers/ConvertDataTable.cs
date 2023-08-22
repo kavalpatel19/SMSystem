@@ -12,14 +12,16 @@ namespace SMSystem.Helpers
         {
             var dt = new DataTable(typeof(T).Name);
             PropertyInfo[] propinfo = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (PropertyInfo prop in propinfo)
+
+            for (int i = 0 ; i < propinfo.Length - 6 ; i++)
             {
-                dt.Columns.Add(prop.Name);
+                dt.Columns.Add(propinfo[i].Name);
             }
+
             foreach (T item in data)
             {
-                var values = new Object[propinfo.Length];
-                for (int i = 0; i < propinfo.Length; i++)
+                var values = new Object[propinfo.Length - 6];
+                for (int i = 0; i < propinfo.Length - 6 ; i++)
                 {
                     values[i] = propinfo[i].GetValue(item, null);
                 }

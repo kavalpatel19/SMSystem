@@ -62,7 +62,7 @@
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
                                     <label asp-for="NoOfStudents">No of Students <span class="login-danger">*</span></label>
-                                    <input asp-for="NoOfStudents" type="text" class="form-control" />
+                                    <input asp-for="NoOfStudents" type="text" class="form-control" value=""/>
                                     <span asp-validation-for="NoOfStudents" class="text-danger"></span>
                                 </div>
                             </div>
@@ -86,17 +86,8 @@
     <script>
         var msg = '@TempData["Msg"]';
         if (msg.length) {
-            Command: toastr["error"](msg, "Error")
-
-            toastr.options = {
-                "closeButton": true,
-                "positionClass": "toast-bottom-right",
-                "timeOut": "1500",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            }
+            $("#exception").append('@TempData["Msg"]');
+            $("#exception").addClass("show");
         }
     </script>
 }

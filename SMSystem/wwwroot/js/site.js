@@ -34,7 +34,7 @@ function ExportData(url) {
     $.ajax({
         type: "GET",
         url: url,
-        success: function () {
+        success: function (fn) {
             $("#overlay").fadeOut();
 
             Command: toastr["success"]("Data Exported Successfully.", "Success")
