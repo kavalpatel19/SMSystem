@@ -74,7 +74,7 @@ namespace SMSystem_Api.Controllers
             var baseResponse = new BaseResponseModel<ExamModel>();
             try
             {
-                baseResponse = ExamRepo.GetAllExams(); ;
+                baseResponse = ExamRepo.GetAllExams();
                 return Ok(baseResponse);
             }
             catch (Exception ex)

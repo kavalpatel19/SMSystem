@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem_Api.Helpers;
+using SMSystem_Api.Migrations;
+using SMSystem_Api.Model;
 using SMSystem_Api.Model.Department;
+using SMSystem_Api.Model.Exam;
 using SMSystem_Api.Model.Fees;
 using SMSystem_Api.Model.Students;
 using SMSystem_Api.Repository.Interfaces;
@@ -23,52 +26,122 @@ namespace SMSystem_Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(int pageIndex)
         {
-            var para = new SearchingPara()
+            var baseResponse = new BaseResponseModel<PaggedFeesModel>();
+            try
             {
-                PageIndex = pageIndex
-            };
-            var fees = await FeesRepo.GetAll(para).ConfigureAwait(false);
-            return Ok(fees);
+                var para = new SearchingPara()
+                {
+                    PageIndex = pageIndex
+                };
+
+                baseResponse = await FeesRepo.GetAll(para).ConfigureAwait(false);
+
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new PaggedFeesModel();
+                return Ok(baseResponse);
+            }
         }
 
         // GET api/<FeesApiController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var fee = await FeesRepo.Get(id).ConfigureAwait(false);
-            return Ok(fee);
+            var baseResponse = new BaseResponseModel<FeesModel>();
+            try
+            {
+                baseResponse = await FeesRepo.Get(id).ConfigureAwait(false);
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new FeesModel();
+                return Ok(baseResponse);
+            }
         }
 
         // POST api/<FeesApiController>/Export
         [HttpGet("Export")]
         public IActionResult GetAllFees()
         {
-            var data = FeesRepo.GetAllFees();
-            return Ok(data);
+            var baseResponse = new BaseResponseModel<FeesModel>();
+            try
+            {
+                baseResponse = FeesRepo.GetAllFees();
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Results = new List<FeesModel>();
+                return Ok(baseResponse);
+            }
         }
 
         // POST api/<FeesApiController>/model
         [HttpPost]
         public async Task<IActionResult> Post(FeesModel fee)
         {
-            await FeesRepo.Add(fee).ConfigureAwait(false);
-            return Ok();
+            var baseResponse = new BaseResponseModel<FeesModel>();
+            try
+            {
+                baseResponse = await FeesRepo.Add(fee).ConfigureAwait(false);
+
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new FeesModel();
+                return Ok(baseResponse);
+            }
         }
 
         // PUT api/<FeesApiController>/model
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] FeesModel fee)
         {
-            await FeesRepo.Update(fee).ConfigureAwait(false);
-            return Ok();
+            var baseResponse = new BaseResponseModel<FeesModel>();
+            try
+            {
+                baseResponse = await FeesRepo.Update(fee).ConfigureAwait(false);
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new FeesModel();
+                return Ok(baseResponse);
+            }
         }
 
         // DELETE api/<FeesApiController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await FeesRepo.Delete(id).ConfigureAwait(false);
-            return Ok();
+            var baseResponse = new BaseResponseModel<FeesModel>();
+            try
+            {
+                baseResponse = await FeesRepo.Delete(id).ConfigureAwait(false);
+
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new FeesModel();
+                return Ok(baseResponse);
+            }
         }
     }
 }

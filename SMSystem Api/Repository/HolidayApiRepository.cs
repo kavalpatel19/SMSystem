@@ -10,6 +10,8 @@ using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
 using SMSystem_Api.Model.Fees;
+using SMSystem_Api.Model.Exam;
+using SMSystem_Api.Migrations;
 
 namespace SMSystem_Api.Repository
 {
@@ -24,50 +26,107 @@ namespace SMSystem_Api.Repository
             this.Configuration = configuration;
         }
 
-        public List<HolidayModel> GetAllHolidays()
+        public BaseResponseModel<HolidayModel> GetAllHolidays()
         {
-            var Data = context.Holidays.Where(x => x.IsActive).ToList();
-            return Data;
+            var response = new BaseResponseModel<HolidayModel>();
+
+            try
+            {
+                var data = context.Holidays.Where(x => x.IsActive).ToList();
+
+                if (data.Count == 0)
+                {
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Results = new List<HolidayModel>();
+                    return response;
+                }
+                response.ResponseCode = 200;
+                response.Results = data;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Results = new List<HolidayModel>();
+                return response;
+            }
         }
 
-        public async Task<PaggedHolidayModel> GetAll(SearchingPara para)
+        public async Task<BaseResponseModel<PaggedHolidayModel>> GetAll(SearchingPara para)
         {
-            string connaction = Configuration.GetConnectionString("connaction");
+            var response = new BaseResponseModel<PaggedHolidayModel>();
 
-            string sp = StoredProcedureHelper.HolidayPaging;
-
-            var parameters = new DynamicParameters();
-
-            parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
-            parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
-            parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            using (var con = new SqlConnection(connaction))
+            try
             {
-                con.Open();
-                var holidays = (await con.QueryAsync<HolidayModel>( sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
+                string connaction = Configuration.GetConnectionString("connaction");
 
-                var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
+                string sp = StoredProcedureHelper.HolidayPaging;
 
-                var paggedHolidayModel = new PaggedHolidayModel()
+                var parameters = new DynamicParameters();
+
+                parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
+                parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
+                parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+                using (var con = new SqlConnection(connaction))
                 {
-                    HolidayModel = holidays,
-                    PaggedModel = new PaggedModel()
-                    {
-                        PageIndex = para.PageIndex,
-                        TotalPage = totalPage
-                    }
-                };
+                    con.Open();
+                    var holidays = (await con.QueryAsync<HolidayModel>(sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                return paggedHolidayModel;
+                    var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
+
+                    var paggedHolidayModel = new PaggedHolidayModel()
+                    {
+                        HolidayModel = holidays,
+                        PaggedModel = new PaggedModel()
+                        {
+                            PageIndex = para.PageIndex,
+                            TotalPage = totalPage
+                        }
+                    };
+                    if (holidays.Count == 0)
+                    {
+                        response.ResponseCode = 404;
+                        response.Message = "Data not Found!";
+                        response.Result = new PaggedHolidayModel();
+                        return response;
+                    }
+                    response.ResponseCode = 200;
+                    response.Result = paggedHolidayModel;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new PaggedHolidayModel();
+                return response;
             }
         }
     
 
-        public async Task Add(HolidayModel holiday)
+        public async Task<BaseResponseModel<HolidayModel>> Add(HolidayModel holiday)
         {
-            await context.Holidays.AddAsync(holiday).ConfigureAwait(false);
-            await context.SaveChangesAsync().ConfigureAwait(false);
+            var response = new BaseResponseModel<HolidayModel>();
+            try
+            {
+                await context.Holidays.AddAsync(holiday).ConfigureAwait(false);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+
+                response.ResponseCode = 200;
+                response.Result = new HolidayModel();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new HolidayModel();
+                return response;
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SMSystem.Helpers;
+using SMSystem.Models;
 using SMSystem.Models.Department;
 using SMSystem.Models.Fees;
 using SMSystem.Repository.Interfaces;
@@ -15,7 +16,7 @@ namespace SMSystem.Repository
             this.configuration = configuration;
         }
 
-        public List<FeesViewModel> GetAllFees()
+        public BaseResponseViewModel<FeesViewModel> GetAllFees()
         {
             var fees = new List<FeesViewModel>();
 
@@ -34,7 +35,7 @@ namespace SMSystem.Repository
             }
         }
 
-        public async Task<FeesPaggedViewModel> GetFees(SearchingParaModel para)
+        public async Task<BaseResponseViewModel<FeesPaggedViewModel>> GetFees(SearchingParaModel para)
         {
             var Fees = new FeesPaggedViewModel();
 
@@ -54,7 +55,7 @@ namespace SMSystem.Repository
             }
         }
 
-        public async Task<FeesViewModel> GetFee(int id)
+        public async Task<BaseResponseViewModel<FeesViewModel>> GetFee(int id)
         {
             var fee = new FeesViewModel();
 
@@ -74,7 +75,7 @@ namespace SMSystem.Repository
             }
         }
 
-        public async Task<bool> Add(FeesViewModel fee)
+        public async Task<BaseResponseViewModel<FeesViewModel>> Add(FeesViewModel fee)
         {
             using (var client = new HttpClient())
             {
@@ -92,7 +93,7 @@ namespace SMSystem.Repository
             }
         }
 
-        public async Task<bool> Update(FeesViewModel fee)
+        public async Task<BaseResponseViewModel<FeesViewModel>> Update(FeesViewModel fee)
         {
             using (var client = new HttpClient())
             {
@@ -110,7 +111,7 @@ namespace SMSystem.Repository
             }
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<BaseResponseViewModel<FeesViewModel>> Delete(int id)
         {
             using (var client = new HttpClient())
             {

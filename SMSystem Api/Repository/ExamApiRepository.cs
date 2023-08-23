@@ -27,7 +27,6 @@ namespace SMSystem_Api.Repository
         public BaseResponseModel<ExamModel> GetAllExams()
         {
             var response = new BaseResponseModel<ExamModel>();
-
             try
             {
                 var data = context.Exams.Where(x => x.IsActive).ToList();
@@ -55,7 +54,6 @@ namespace SMSystem_Api.Repository
         public async Task<BaseResponseModel<PaggedExamModel>> GetAll(SearchingPara para)
         {
             var response = new BaseResponseModel<PaggedExamModel>();
-
             try
             {
                 string connaction = Configuration.GetConnectionString("connaction");
@@ -108,7 +106,6 @@ namespace SMSystem_Api.Repository
         public async Task<BaseResponseModel<ExamModel>> Get(int id)
         {
             var response = new BaseResponseModel<ExamModel>();
-
             try
             {
                 var exam = await context.Exams.FindAsync(id).ConfigureAwait(false);
@@ -153,7 +150,6 @@ namespace SMSystem_Api.Repository
                 response.Result = new ExamModel();
                 return response;
             }
-            
         }
 
         public async Task<BaseResponseModel<ExamModel>> Update(ExamModel exam)
@@ -175,7 +171,6 @@ namespace SMSystem_Api.Repository
                 response.Result = new ExamModel();
                 return response;
             }
-            
         }
 
         public async Task<BaseResponseModel<ExamModel>> Delete(int id)
