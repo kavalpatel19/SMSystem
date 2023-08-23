@@ -52,11 +52,27 @@ $(document).on('click', '#dlt_departmnet', function (e) {
                     url: "/Department/Delete/",
                     data: { id: dlt_id },
                     success: function (response) {
-                        swal("Deleted!", "Your file has been deleted.", "success");
-                        $("#departmentData").html(response);
+                        if (response.responseCode == 500) {
+                            $("#exception").append(response.message);
+                            $(".sa-button-container").find("button.cancel").trigger("click")
+                            $("#exception").addClass("show");
+                        }
+                        else {
+                            swal("Deleted!", "Your file has been deleted.", "success");
+                            $("#departmentData").html(response);
+                        }
+                       
+                    },
+                    error: function (xhr) {
+                        alert('Request Status: ' + xhr.status + ' Status Text: ' + xhr.statusText + ' ' + xhr.responseText);
                     }
                 });
             }
         });
+});
+
+$("#Export-Dep").on('click', function () {
+    var url = "/Department/ExportExcel";
+    ExportData(url);
 });
 

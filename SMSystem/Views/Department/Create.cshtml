@@ -83,11 +83,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        var msg = '@TempData["Msg"]';
-        if (msg.length) {
-            $("#exception").append('@TempData["Msg"]');
-            $("#exception").addClass("show");
-        }
-    </script>
 }

@@ -1,11 +1,5 @@
-﻿@model SMSystem.Models.BaseResponseViewModel<DepartmentPaggedViewModel>
-@using SMSystem.Models.Department;
-@using SMSystem.Models;
+﻿@model SMSystem.Models.Department.DepartmentPaggedViewModel
 
-@{
-    ViewData["ResponseCode"] = Model.ResponseCode;
-    ViewData["Message"] = Model.Message;
-}
 
 <div class="table-responsive">
     <div class="row">
@@ -27,9 +21,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model.Result.DepartmentModel.Count > 0)
+                    @if (Model.DepartmentModel.Count > 0)
                     {
-                        @foreach (var item in Model.Result.DepartmentModel)
+                        @foreach (var item in Model.DepartmentModel)
                         {
                             <tr>
                                 <td>

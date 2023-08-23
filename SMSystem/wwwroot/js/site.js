@@ -51,47 +51,35 @@ function GetData(obj, url, element) {
 
 function ExportData(url) {
     $("#overlay").fadeIn(1)
+   
+    if (responseCode != 200 && responseCode != '') {
+        $("#exception").append(message);
+        $("#exception").addClass("show");
+    }
+    else {
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function (fn) {
+                $("#overlay").fadeOut();
 
-    $.ajax({
-        type: "GET",
-        url: url,
-        success: function (fn) {
-            $("#overlay").fadeOut();
+                Command: toastr["success"]("Data Exported Successfully.", "Success")
 
-            Command: toastr["success"]("Data Exported Successfully.", "Success")
-
-            toastr.options = {
-                "closeButton": true,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": false,
-                "positionClass": "toast-bottom-right",
-                "preventDuplicates": false,
-                "onclick": null,
-                "timeOut": "1500",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": false,
+                    "positionClass": "toast-bottom-right",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "timeOut": "1500",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                }
             }
-        },
-        Error: function () {
-            Command: toastr["error"]("Something's Wrong", "Error")
-
-            toastr.options = {
-                "closeButton": true,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": false,
-                "positionClass": "toast-bottom-right",
-                "preventDuplicates": false,
-                "onclick": null,
-                "timeOut": "1500",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            }
-        }
-    });
+        });
+    }
 };

@@ -1,12 +1,12 @@
 ﻿
 @{
-    var preDisable = !Model.Result.PaggedModel.PreviousPage ? "disabled" : "";
-    var nextDisable = !Model.Result.PaggedModel.NextPage ? "disabled" : "";
-    var pageIndex = Model.Result.PaggedModel.PageIndex;
-    var totalPage = Model.Result.PaggedModel.TotalPage;
+    var preDisable = !Model.PaggedModel.PreviousPage ? "disabled" : "";
+    var nextDisable = !Model.PaggedModel.NextPage ? "disabled" : "";
+    var pageIndex = Model.PaggedModel.PageIndex;
+    var totalPage = Model.PaggedModel.TotalPage;
 }
 <div class="col-sm-12 col-md-5">
-    <div class="mt-4">Showing @pageIndex of @totalPage Pages.</div>
+    <div class="mt-4">Showing page @pageIndex of @totalPage Pages.</div>
 </div>
 <div class="col-sm-12 col-md-7 ">
 @using (Html.BeginForm())

@@ -22,11 +22,11 @@ namespace SMSystem.Controllers
         // GET: DepartmentController
         public async Task<IActionResult> Index(SearchingParaModel para)
         {
-            var response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
+            var response = new DepartmentPaggedViewModel();
 
             try
             {
-                response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
+                response = new DepartmentPaggedViewModel();
                 return View(response);
             }
             catch (Exception ex)
@@ -47,7 +47,7 @@ namespace SMSystem.Controllers
                 response = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
                 if(response.ResponseCode == 200)
                 {
-                    return PartialView("_DepartmentData", response);
+                    return PartialView("_DepartmentData", response.Result);
                 }
                 else
                 {
@@ -63,7 +63,7 @@ namespace SMSystem.Controllers
                 response.Result = new DepartmentPaggedViewModel();
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
-                return PartialView("_DepartmentData", response);
+                return PartialView("_DepartmentData", response.Result);
             }
         }
 
@@ -82,8 +82,7 @@ namespace SMSystem.Controllers
                         using (var mstream = new MemoryStream())
                         {
                             wb.SaveAs(mstream);
-                            TempData["Message"] = "Data Downloaded successfully.";
-                            TempData["ResCode"] = response.ResponseCode;
+                            
                             return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Departments.xlsx");
                         }
                     }
@@ -204,7 +203,7 @@ namespace SMSystem.Controllers
                 response = await DepRepo.Update(department);
                 if (response.ResponseCode == 200)
                 {
-                    TempData["Message"] = "Record Modified Successfully.";
+                    TempData["Message"] = "Department has been saved successfully.";
                     TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }
@@ -231,6 +230,7 @@ namespace SMSystem.Controllers
 
             try
             {
+                throw new Exception();
                 var para = new SearchingParaModel()
                 {
                     SId = string.Empty,
@@ -242,13 +242,11 @@ namespace SMSystem.Controllers
                 response = await DepRepo.Delete(id);
 
                 var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
-                return PartialView("_DepartmentData", departments); 
+                return PartialView("_DepartmentData", departments.Result); 
             }
             catch (Exception ex)
             {
-                TempData["Message"] = ex.Message;
-                TempData["ResCode"] = 500;
-                return RedirectToAction(nameof(Index));
+                return Json(new { message = ex.Message , responseCode = 500});
             }
         }
     }
