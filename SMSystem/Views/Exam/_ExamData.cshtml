@@ -77,3 +77,12 @@
         Html.RenderPartial("_Pagination");
     }
 </div>
+<script type="text/javascript">
+    responseCode = '@TempData["ResCode"]';
+    message = '@TempData["Message"]';
+
+    if (responseCode != 200 && responseCode != '') {
+        $("#exception").append(message);
+        $("#exception").addClass("show");
+    }
+</script>

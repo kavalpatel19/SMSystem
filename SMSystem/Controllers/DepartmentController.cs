@@ -22,11 +22,9 @@ namespace SMSystem.Controllers
         // GET: DepartmentController
         public async Task<IActionResult> Index(SearchingParaModel para)
         {
-            var response = new DepartmentPaggedViewModel();
-
             try
             {
-                response = new DepartmentPaggedViewModel();
+                var response = new DepartmentPaggedViewModel();
                 return View(response);
             }
             catch (Exception ex)
@@ -58,8 +56,6 @@ namespace SMSystem.Controllers
             }
             catch (Exception ex)
             {
-                response.ResponseCode = 500;
-                response.Message = ex.Message;
                 response.Result = new DepartmentPaggedViewModel();
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
@@ -70,10 +66,9 @@ namespace SMSystem.Controllers
         //To Export Data
         public IActionResult ExportExcel()
         {
-            var response = new BaseResponseViewModel<DepartmentViewModel>();
             try
             {
-                response = DepRepo.GetAllDepartments();
+                var response = DepRepo.GetAllDepartments();
                 if (response.ResponseCode == 200)
                 {
                     using (var wb = new XLWorkbook())
@@ -98,7 +93,7 @@ namespace SMSystem.Controllers
             {
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
-                return View("Index");
+                return RedirectToAction("Index");
             }
         }
 
@@ -226,11 +221,8 @@ namespace SMSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var response = new BaseResponseViewModel<DepartmentViewModel>();
-
             try
             {
-                throw new Exception();
                 var para = new SearchingParaModel()
                 {
                     SId = string.Empty,
@@ -239,7 +231,7 @@ namespace SMSystem.Controllers
                     PageIndex = 1
                 };
 
-                response = await DepRepo.Delete(id);
+                var response = await DepRepo.Delete(id);
 
                 var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
                 return PartialView("_DepartmentData", departments.Result); 

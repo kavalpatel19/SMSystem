@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SMSystem.Helpers;
+using SMSystem.Models;
+using SMSystem.Models.Department;
 using SMSystem.Models.Exam;
 using SMSystem.Models.Fees;
 using SMSystem.Repository.Interfaces;
@@ -15,117 +17,196 @@ namespace SMSystem.Repository
             this.configuration = configuration;
         }
 
-        public List<ExamViewModel> GetAllExams()
+        public BaseResponseViewModel<ExamViewModel> GetAllExams()
         {
-            var exams = new List<ExamViewModel>();
+            var baseResponse = new BaseResponseViewModel<ExamViewModel>();
 
-            using (var client = new HttpClient())
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.GetAsync($"ExamApi/Export").Result;
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    exams = JsonConvert.DeserializeObject<List<ExamViewModel>>(data);
-                }
-
-                return exams;
-            }
-        }
-
-        public async Task<ExamPaggedViewModel> GetExams(SearchingParaModel para)
-        {
-            var exams = new ExamPaggedViewModel();
-
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-
-                var response = await client.GetAsync($"ExamApi?pageIndex={para.PageIndex}").ConfigureAwait(false);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    exams = JsonConvert.DeserializeObject<ExamPaggedViewModel>(data);
-                }
-
-                return exams;
-            }
-        }
-
-        public async Task<ExamViewModel> GetExam(int id)
-        {
-            var exam = new ExamViewModel();
-
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-
-                var response = await client.GetAsync($"ExamApi/{id}").ConfigureAwait(false);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    exam = JsonConvert.DeserializeObject<ExamViewModel>(data);
-                }
-
-                return exam;
-            }
-        }
-
-        public async Task<bool> Add(ExamViewModel exam)
-        {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                    var response = client.PostAsJsonAsync<ExamViewModel>("ExamApi/", exam).Result;
+                    var response = client.GetAsync($"ExamApi/Export").Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<ExamViewModel>>(data);
+                        return baseResponse;
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Results = new List<ExamViewModel>();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Update(ExamViewModel exam)
+        public async Task<BaseResponseViewModel<ExamPaggedViewModel>> GetExams(SearchingParaModel para)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<ExamPaggedViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.PutAsJsonAsync<ExamViewModel>("ExamApi/", exam).Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    var response = await client.GetAsync($"ExamApi?pageIndex={para.PageIndex}").ConfigureAwait(false);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<ExamPaggedViewModel>>(data);
+                        return baseResponse;
+
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new ExamPaggedViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<BaseResponseViewModel<ExamViewModel>> GetExam(int id)
         {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                // To send Delete data request
-                var response = client.DeleteAsync($"ExamApi/{id}").Result;
+            var baseResponse = new BaseResponseViewModel<ExamViewModel>();
 
-                if (response.IsSuccessStatusCode)
+            try
+            {
+                using (var client = new HttpClient())
                 {
-                    return true;
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+
+                    var response = await client.GetAsync($"ExamApi/{id}").ConfigureAwait(false);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<ExamViewModel>>(data);
+                        return baseResponse;
+
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new ExamViewModel();
+                return baseResponse;
+            }
+        }
+
+        public async Task<BaseResponseViewModel<ExamViewModel>> Add(ExamViewModel exam)
+        {
+            var baseResponse = new BaseResponseViewModel<ExamViewModel>();
+            try
+            {
+                using (var client = new HttpClient())
                 {
-                    return false;
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = await client.PostAsJsonAsync<ExamViewModel>("ExamApi/", exam);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<ExamViewModel>>(data);
+                        return baseResponse;
+
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new ExamViewModel();
+                return baseResponse;
+            }
+        }
+
+        public async Task<BaseResponseViewModel<ExamViewModel>> Update(ExamViewModel exam)
+        {
+            var baseResponse = new BaseResponseViewModel<ExamViewModel>();
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = await client.PutAsJsonAsync<ExamViewModel>("ExamApi/", exam);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<ExamViewModel>>(data);
+
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new ExamViewModel();
+                return baseResponse;
+            }
+        }
+
+        public async Task<BaseResponseViewModel<ExamViewModel>> Delete(int id)
+        {
+            var baseResponse = new BaseResponseViewModel<ExamViewModel>();
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    // To send Delete data request
+                    var response = client.DeleteAsync($"ExamApi/{id}").Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<ExamViewModel>>(data);
+
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new ExamViewModel();
+                return baseResponse;
             }
         }
     }

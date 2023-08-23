@@ -31,8 +31,15 @@ $(document).on('click', '#dlt_exam', function (e) {
                     url: "/Exam/Delete/",
                     data: { id: dlt_id },
                     success: function (response) {
-                        swal("Deleted!", "Your file has been deleted.", "success");
-                        $("#examData").html(response);
+                        if (response.responseCode == 500) {
+                            $(".sa-button-container").find("button.cancel").trigger("click")
+                            $("#exception").append(response.message);
+                            $("#exception").addClass("show");
+                        }
+                        else {
+                            swal("Deleted!", "Your file has been deleted.", "success");
+                            $("#examData").html(response);
+                        }
                     }
                 });
             }

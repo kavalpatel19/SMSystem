@@ -10,6 +10,7 @@ using SMSystem_Api.Helpers;
 using SMSystem_Api.Migrations;
 using SMSystem_Api.Model;
 using SMSystem_Api.Model.Department;
+using SMSystem_Api.Model.Exam;
 using SMSystem_Api.Model.Students;
 using SMSystem_Api.Repository.Interfaces;
 using System.Data;
@@ -35,25 +36,18 @@ namespace SMSystem_Api.Repository
 
             try
             {
-                using (var con = new SqlConnection(connaction))
-                {
-                    con.Open();
-                    var data =  (con.Query<DepartmentModel>("ExportDepartment", commandType: System.Data.CommandType.StoredProcedure)).ToList();
+                var data = context.Departments.Where(x => x.IsActive).ToList();
 
-                    if (data.Count == 0)
-                    {
-                        response.ResponseCode = 404;
-                        response.Message = "Data not Found!";
-                        response.Results = new List<DepartmentModel>();
-                        return response;
-                    }
-                    response.ResponseCode = 200;
-                    response.Results = data;
+                if (data.Count == 0)
+                {
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Results = new List<DepartmentModel>();
                     return response;
                 }
-                //var data = context.Departments.Where(x => x.IsActive).ToList();
-                
-
+                response.ResponseCode = 200;
+                response.Results = data;
+                return response;
             }
             catch (Exception ex)
             {
@@ -97,7 +91,13 @@ namespace SMSystem_Api.Repository
                             TotalPage = totalPage
                         }
                     };
-
+                    if (departments.Count == 0)
+                    {
+                        response.ResponseCode = 404;
+                        response.Message = "Data not Found!";
+                        response.Result = new PaggedDepartmentModel();
+                        return response;
+                    }
                     response.ResponseCode = 200;
                     response.Result = paggedDepartment;
                     return response;
@@ -189,6 +189,13 @@ namespace SMSystem_Api.Repository
             try
             {
                 var department = context.Departments.Find(id);
+                if (department == null)
+                {
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Result = new DepartmentModel();
+                    return response;
+                }
                 department.IsDelete = true;
                 department.IsActive = false;
                 await context.SaveChangesAsync().ConfigureAwait(false);
