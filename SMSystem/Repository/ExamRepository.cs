@@ -20,7 +20,6 @@ namespace SMSystem.Repository
         public BaseResponseViewModel<ExamViewModel> GetAllExams()
         {
             var baseResponse = new BaseResponseViewModel<ExamViewModel>();
-
             try
             {
                 using (var client = new HttpClient())
@@ -83,7 +82,6 @@ namespace SMSystem.Repository
         public async Task<BaseResponseViewModel<ExamViewModel>> GetExam(int id)
         {
             var baseResponse = new BaseResponseViewModel<ExamViewModel>();
-
             try
             {
                 using (var client = new HttpClient())

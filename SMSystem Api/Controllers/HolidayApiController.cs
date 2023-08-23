@@ -22,16 +22,13 @@ namespace SMSystem_Api.Controllers
 
         // GET: api/<DepartmentApiController>
         [HttpGet]
-        public async Task<IActionResult> Get(string? sid, string? name, string? year, int pageIndex)
+        public async Task<IActionResult> Get(int pageIndex)
         {
             var baseResponse = new BaseResponseModel<PaggedHolidayModel>();
             try
             {
                 var para = new SearchingPara()
                 {
-                    SId = sid,
-                    Name = name,
-                    Year = year,
                     PageIndex = pageIndex
                 };
 
