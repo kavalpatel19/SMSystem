@@ -1,16 +1,18 @@
 ﻿using SMSystem_Api.Helpers;
+using SMSystem_Api.Model;
 using SMSystem_Api.Model.Department;
+using SMSystem_Api.Model.Students;
 using SMSystem_Api.Model.Subjects;
 
 namespace SMSystem_Api.Repository.Interfaces
 {
     public interface ISubjectApiRepository
     {
-        List<SubjectModel> GetAllSubjects();
-        Task<PaggedSubjectModel> GetAll(SearchingPara para);
-        Task<SubjectModel> Get(int id);
-        Task Add(SubjectModel subject);
-        Task Update(SubjectModel subject);
-        Task Delete(int id);
+        BaseResponseModel<SubjectModel> GetAllSubjects();
+        Task<BaseResponseModel<PaggedSubjectModel>> GetAll(SearchingPara para);
+        Task<BaseResponseModel<SubjectModel>> Get(int id);
+        Task<BaseResponseModel<SubjectModel>> Add(SubjectModel subject);
+        Task<BaseResponseModel<SubjectModel>> Update(SubjectModel subject);
+        Task<BaseResponseModel<SubjectModel>> Delete(int id);
     }
 }

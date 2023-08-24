@@ -1,8 +1,12 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Data;
 using SMSystem_Api.Helpers;
+using SMSystem_Api.Migrations;
 using SMSystem_Api.Model;
+using SMSystem_Api.Model.Department;
+using SMSystem_Api.Model.Exam;
 using SMSystem_Api.Model.Students;
 using SMSystem_Api.Repository.Interfaces;
 using System.Configuration;
@@ -22,107 +26,189 @@ namespace SMSystem_Api.Repository
             Configuration = configuration;
         }
 
-        public List<StudentModel> GetAllStudents()
+        public BaseResponseModel<StudentModel> GetAllStudents()
         {
-            List<StudentModel> student = context.Students.Where(x => x.IsActive).ToList();
-            return student;
+            var response = new BaseResponseModel<StudentModel>();
+
+            try
+            {
+                var data = context.Students.Where(x => x.IsActive).ToList();
+
+                if (data.Count == 0)
+                {
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Results = new List<StudentModel>();
+                    return response;
+                }
+                response.ResponseCode = 200;
+                response.Results = data;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Results = new List<StudentModel>();
+                return response;
+            }
         }
 
-        public async Task<PaggedStudentModel> GetAll(SearchingPara para)
+        public async Task<BaseResponseModel<PaggedStudentModel>> GetAll(SearchingPara para)
         {
-            string connaction = Configuration.GetConnectionString("connaction");
+            var response = new BaseResponseModel<PaggedStudentModel>();
 
-            List<StudentModel> data = new List<StudentModel>();
-
-            const int pagesize = 5;
-
-            int totalPage = 0;
-
-            using (SqlConnection con = new SqlConnection(connaction))
+            try
             {
-                SqlCommand cmd = new SqlCommand("StudentSearchingPaging", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
+                string connaction = Configuration.GetConnectionString("connaction");
 
-                cmd.Parameters.Add("@SID", SqlDbType.VarChar).Value = para.SId;
-                cmd.Parameters.Add("@Name", SqlDbType.VarChar).Value = para.Name;
-                cmd.Parameters.Add("@Phone", SqlDbType.VarChar).Value = para.Phone;
-                cmd.Parameters.Add("@PageIndex", SqlDbType.VarChar).Value = para.PageIndex;
-                cmd.Parameters.Add("@PageSize", SqlDbType.VarChar).Value = pagesize;
-                cmd.Parameters.Add("@TotalPages", SqlDbType.Int, 4);
-                cmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
+                string sp = StoredProcedureHelper.StudentSearchingPaging;
 
-                cmd.ExecuteNonQuery();
-                con.Close();
+                var parameters = new DynamicParameters();
 
-                totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
+                parameters.Add(FieldHelper.SID, para.SId, dbType: DbType.String, size: 50);
+                parameters.Add(FieldHelper.Name, para.Name, dbType: DbType.String, size: 50);
+                parameters.Add(FieldHelper.Phone, para.Phone, dbType: DbType.String, size: 50);
+                parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
+                parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
+                parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-                using (SqlConnection conn = new SqlConnection(connaction))
+                using (var con = new SqlConnection(connaction))
                 {
-                    DataSet ds = new DataSet();
+                    con.Open();
+                    var students = (await con.QueryAsync<StudentModel>(sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                    conn.Open();
-                    SqlDataAdapter rdr = new SqlDataAdapter();
-                    rdr.SelectCommand = cmd;
-                    rdr.Fill(ds);
+                    var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
 
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    var paggedStudent = new PaggedStudentModel()
                     {
-                        StudentModel student = new StudentModel();
-
-                        student.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
-                        student.StudentId = ds.Tables[0].Rows[i]["StudentId"].ToString();
-                        student.FirstName = ds.Tables[0].Rows[i]["FirstName"].ToString();
-                        student.LastName = ds.Tables[0].Rows[i]["LastName"].ToString();
-                        student.Path = ds.Tables[0].Rows[i]["Path"].ToString();
-                        student.ParentName = ds.Tables[0].Rows[i]["ParentName"].ToString();
-                        student.DateOfBirth = Convert.ToDateTime(ds.Tables[0].Rows[i]["DateOfBirth"]);
-                        student.Class = ds.Tables[0].Rows[i]["Class"].ToString();
-                        student.Phone = ds.Tables[0].Rows[i]["Phone"].ToString();
-                        student.Address = ds.Tables[0].Rows[i]["Address"].ToString();
-
-                        data.Add(student);
+                        StudentModel = students,
+                        PaggedModel = new PaggedModel()
+                        {
+                            PageIndex = para.PageIndex,
+                            TotalPage = totalPage
+                        }
+                    };
+                    if (students.Count == 0)
+                    {
+                        response.ResponseCode = 404;
+                        response.Message = "Data not Found!";
+                        response.Result = new PaggedStudentModel();
+                        return response;
                     }
-                    conn.Close();
+                    response.ResponseCode = 200;
+                    response.Result = paggedStudent;
+                    return response;
                 }
             }
-
-            PaggedStudentModel paggedStudent = new PaggedStudentModel()
+            catch (Exception ex)
             {
-                StudentModel = data,
-                PaggedModel = new PaggedModel()
-                {
-                    PageIndex = para.PageIndex,
-                    TotalPage = totalPage
-                }
-            };
-
-            return paggedStudent;
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new PaggedStudentModel();
+                return response;
+            }
         }
-        public async Task<StudentModel> Get(int id)
+        public async Task<BaseResponseModel<StudentModel>> Get(int id)
         {
-            StudentModel student = await context.Students.FindAsync(id);
-            return student;
+            var response = new BaseResponseModel<StudentModel>();
+
+            try
+            {
+                var student = await context.Students.FindAsync(id).ConfigureAwait(false);
+
+                if (student == null)
+                {
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Result = new StudentModel();
+                    return response;
+                }
+
+                response.ResponseCode = 200;
+                response.Result = student;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new StudentModel();
+                return response;
+            }
         } 
 
-        public async Task Add(StudentModel student)
+        public async Task<BaseResponseModel<StudentModel>> Add(StudentModel student)
         {
-            await context.Students.AddAsync(student);
-            await context.SaveChangesAsync();
+            var response = new BaseResponseModel<StudentModel>();
+            try
+            {
+                await context.Students.AddAsync(student).ConfigureAwait(false);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+
+                response.ResponseCode = 200;
+                response.Result = new StudentModel();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new StudentModel();
+                return response;
+            }
         }
 
-        public async Task Update(StudentModel student)
+        public async Task<BaseResponseModel<StudentModel>> Update(StudentModel student)
         {
-            context.Attach(student).State = EntityState.Modified;
-            await context.SaveChangesAsync();
+            var response = new BaseResponseModel<StudentModel>();
+            try
+            {
+                context.Attach(student).State = EntityState.Modified;
+                await context.SaveChangesAsync().ConfigureAwait(false);
+
+                response.ResponseCode = 200;
+                response.Result = new StudentModel();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new StudentModel();
+                return response;
+            }
         }
 
-        public async Task Delete(int id)
+        public async Task<BaseResponseModel<StudentModel>> Delete(int id)
         {
-            StudentModel student = context.Students.Where(x => x.Id == id).FirstOrDefault();
-            student.IsDelete = true;
-            student.IsActive = false;
-            await context.SaveChangesAsync();
+            var response = new BaseResponseModel<StudentModel>();
+            try
+            {
+                var student = context.Students.Find(id);
+                if (student == null)
+                {
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Result = new StudentModel();
+                    return response;
+                }
+                student.IsDelete = true;
+                student.IsActive = false;
+                await context.SaveChangesAsync().ConfigureAwait(false);
+
+                response.ResponseCode = 200;
+                response.Result = new StudentModel();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new StudentModel();
+                return response;
+            }
+            
         }
 
     }

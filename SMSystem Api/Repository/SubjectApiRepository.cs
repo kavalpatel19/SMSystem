@@ -7,6 +7,9 @@ using SMSystem_Api.Model.Subjects;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Repository.Interfaces;
+using Dapper;
+using SMSystem_Api.Model.Exam;
+using SMSystem_Api.Migrations;
 
 namespace SMSystem_Api.Repository
 {
@@ -21,102 +24,189 @@ namespace SMSystem_Api.Repository
             Configuration = configuration;
         }
 
-        public List<SubjectModel> GetAllSubjects()
+        public BaseResponseModel<SubjectModel> GetAllSubjects()
         {
-            var Data = context.Subjects.Where(x => x.IsActive).ToList();
-            return Data;
+            var response = new BaseResponseModel<SubjectModel>();
+
+            try
+            {
+                var data = context.Subjects.Where(x => x.IsActive).ToList();
+
+                if (data.Count == 0)
+                {
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Results = new List<SubjectModel>();
+                    return response;
+                }
+                response.ResponseCode = 200;
+                response.Results = data;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Results = new List<SubjectModel>();
+                return response;
+            }
         }
 
-        public async Task<PaggedSubjectModel> GetAll(SearchingPara para)
+        public async Task<BaseResponseModel<PaggedSubjectModel>> GetAll(SearchingPara para)
         {
-            string connaction = Configuration.GetConnectionString("connaction");
+            var response = new BaseResponseModel<PaggedSubjectModel>();
 
-            List<SubjectModel> data = new List<SubjectModel>();
-
-            const int pagesize = 5;
-
-            int totalPage = 0;
-
-            using (SqlConnection con = new SqlConnection(connaction))
+            try
             {
-                SqlCommand cmd = new SqlCommand("SubjetSearchingPaging", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
+                string connaction = Configuration.GetConnectionString("connaction");
 
-                cmd.Parameters.Add("@SID", SqlDbType.VarChar).Value = para.SId;
-                cmd.Parameters.Add("@Name", SqlDbType.VarChar).Value = para.Name;
-                cmd.Parameters.Add("@Class", SqlDbType.VarChar).Value = para.Class;
-                cmd.Parameters.Add("@PageIndex", SqlDbType.VarChar).Value = para.PageIndex;
-                cmd.Parameters.Add("@PageSize", SqlDbType.VarChar).Value = pagesize;
-                cmd.Parameters.Add("@TotalPages", SqlDbType.Int, 4);
-                cmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
+                string sp = StoredProcedureHelper.SubjetSearchingPaging;
 
-                cmd.ExecuteNonQuery();
-                con.Close();
+                var parameters = new DynamicParameters();
 
-                totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
+                parameters.Add(FieldHelper.SID, para.SId, dbType: DbType.String, size: 50);
+                parameters.Add(FieldHelper.Name, para.Name, dbType: DbType.String, size: 50);
+                parameters.Add(FieldHelper.Class, para.Class, dbType: DbType.String, size: 50);
+                parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
+                parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
+                parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-                using (SqlConnection conn = new SqlConnection(connaction))
+                using (var con = new SqlConnection(connaction))
                 {
-                    DataSet ds = new DataSet();
+                    con.Open();
+                    var subjects = (await con.QueryAsync<SubjectModel>(sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                    conn.Open();
-                    SqlDataAdapter rdr = new SqlDataAdapter();
-                    rdr.SelectCommand = cmd;
-                    rdr.Fill(ds);
+                    var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
 
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    var paggedSubject = new PaggedSubjectModel()
                     {
-                        SubjectModel subject = new SubjectModel();
-
-                        subject.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
-                        subject.SubjectId = ds.Tables[0].Rows[i]["SubjectId"].ToString();
-                        subject.SubjectName = ds.Tables[0].Rows[i]["SubjectName"].ToString();
-                        subject.Class = ds.Tables[0].Rows[i]["Class"].ToString();
-
-                        data.Add(subject);
+                        SubjectModel = subjects,
+                        PaggedModel = new PaggedModel()
+                        {
+                            PageIndex = para.PageIndex,
+                            TotalPage = totalPage
+                        }
+                    };
+                    if (subjects.Count == 0)
+                    {
+                        response.ResponseCode = 404;
+                        response.Message = "Data not Found!";
+                        response.Result = new PaggedSubjectModel();
+                        return response;
                     }
-                    conn.Close();
+                    response.ResponseCode = 200;
+                    response.Result = paggedSubject;
+                    return response;
                 }
             }
-
-            PaggedSubjectModel paggedSubject = new PaggedSubjectModel()
+            catch (Exception ex)
             {
-                SubjectModel = data,
-                PaggedModel = new PaggedModel()
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new PaggedSubjectModel();
+                return response;
+            }
+        }
+
+        public async Task<BaseResponseModel<SubjectModel>> Get(int id)
+        {
+            var response = new BaseResponseModel<SubjectModel>();
+
+            try
+            {
+                var subject = await context.Subjects.FindAsync(id).ConfigureAwait(false);
+
+                if (subject == null)
                 {
-                    PageIndex = para.PageIndex,
-                    TotalPage = totalPage
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Result = new SubjectModel();
+                    return response;
                 }
-            };
 
-            return paggedSubject;
+                response.ResponseCode = 200;
+                response.Result = subject;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new SubjectModel();
+                return response;
+            }
         }
 
-        public async Task<SubjectModel> Get(int id)
+        public async Task<BaseResponseModel<SubjectModel>> Add(SubjectModel subject)
         {
-            SubjectModel subject = await context.Subjects.FindAsync(id);
-            return subject;
+            var response = new BaseResponseModel<SubjectModel>();
+            try
+            {
+                await context.Subjects.AddAsync(subject).ConfigureAwait(false);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+
+                response.ResponseCode = 200;
+                response.Result = new SubjectModel();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new SubjectModel();
+                return response;
+            }
         }
 
-        public async Task Add(SubjectModel subject)
+        public async Task<BaseResponseModel<SubjectModel>> Update(SubjectModel subject)
         {
-            await context.Subjects.AddAsync(subject);
-            await context.SaveChangesAsync();
+            var response = new BaseResponseModel<SubjectModel>();
+            try
+            {
+                context.Attach(subject).State = EntityState.Modified;
+                await context.SaveChangesAsync().ConfigureAwait(false);
+
+                response.ResponseCode = 200;
+                response.Result = new SubjectModel();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new SubjectModel();
+                return response;
+            }
         }
 
-        public async Task Update(SubjectModel subject)
+        public async Task<BaseResponseModel<SubjectModel>> Delete(int id)
         {
-            context.Attach(subject).State = EntityState.Modified;
-            await context.SaveChangesAsync();
-        }
+            var response = new BaseResponseModel<SubjectModel>();
+            try
+            {
+                var subject = context.Subjects.Find(id);
+                if (subject == null)
+                {
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Result = new SubjectModel();
+                    return response;
+                }
+                subject.IsDelete = true;
+                subject.IsActive = false;
+                await context.SaveChangesAsync().ConfigureAwait(false);
 
-        public async Task Delete(int id)
-        {
-            SubjectModel subject = context.Subjects.Find(id);
-            subject.IsDelete = true;
-            subject.IsActive = false;
-            await context.SaveChangesAsync();
+                response.ResponseCode = 200;
+                response.Result = new SubjectModel();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new SubjectModel();
+                return response;
+            }
         }
     }
 }

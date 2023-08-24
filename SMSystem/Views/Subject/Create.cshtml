@@ -27,8 +27,11 @@
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
                                     <label asp-for="SubjectId">Subject ID <span class="login-danger">*</span></label>
-                                    <input asp-for="SubjectId" type="text" class="form-control" value="@Model.SubjectId" disabled />
-                                    <input asp-for="SubjectId" type="text" class="form-control" value="@Model.SubjectId" hidden />
+                                    <div class="input-group">
+                                        <span class="input-group-text"></span>
+                                        <input class="form-control" value="@Model.SubjectId" disabled />
+                                    </div>
+                                        <input asp-for="SubjectId" class="form-control" value="@Model.SubjectId" hidden />
                                     <span asp-validation-for="SubjectId" class="text-danger"></span>
                                 </div>
                             </div>

@@ -2,13 +2,6 @@
 {
     public class BaseEntityViewModel
     {
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public bool? IsActive { get; set; }
-        public bool? IsDelete { get; set; }
-
         public BaseEntityViewModel()
         {
             CreatedBy = 0;
@@ -18,5 +11,11 @@
             IsActive = true;
             IsDelete = false;
         }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public bool? IsActive { get; set; }
+        public bool? IsDelete { get; set; }
     }
 }

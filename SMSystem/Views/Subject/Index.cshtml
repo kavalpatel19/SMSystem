@@ -20,12 +20,12 @@
 
     <div class="student-group-form">
         <div class="row">
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-4 col-md-6">
                 <div class="form-group">
                     <input type="text" id="sub_Id" class="form-control" onkeyup="searchingSub()" placeholder="Search by ID ...">
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-4 col-md-6">
                 <div class="form-group">
                     <input type="text" id="sub_Name" class="form-control" onkeyup="searchingSub()" placeholder="Search by Name ...">
                 </div>
@@ -73,7 +73,7 @@
         let obj = {
             SId: $("#sub_Id").val(),
             Name: $("#sub_Name").val(),
-            Year: $("#sub_Class").val(),
+            Class: $("#sub_Class").val(),
             PageIndex: 1
         };
         GetData(obj, url, element);

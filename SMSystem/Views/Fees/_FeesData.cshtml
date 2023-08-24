@@ -1,0 +1,111 @@
+﻿@model SMSystem.Models.Fees.FeesPaggedViewModel
+
+
+
+<div class="table-responsive">
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table border-0 star-student table-hover table-center mb-0 datatable table-striped">
+                <thead class="student-thread">
+                    <tr>
+                        <th>ID</th>
+                        <th>Fees Name</th>
+                        <th>Class</th>
+                        <th><i class="fas fa-rupee-sign"></i> Amount</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.FeesModel.Count > 0)
+                    {
+                        @foreach (var item in Model.FeesModel)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FeesId)
+                                </td>
+                                <td>
+                                    <h2>
+                                        <a>
+                                            @Html.DisplayFor(modelItem => item.FeesType)
+                                        </a>
+                                    </h2>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Class)
+                                </td>
+                                <td>
+                                    <i class="fas fa-rupee-sign"></i> @Html.DisplayFor(modelItem => item.FeesAmount)/-
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.StartDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.EndDate)
+                                </td>
+                                <td class="text-end">
+                                    <div class="actions">
+                                        <a asp-controller="Fees" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm bg-danger-light me-2 loader">
+                                            <i class="feather-edit"></i>
+                                        </a>
+                                        <a value="@item.Id" id="dlt_fees" class="btn btn-sm bg-success-light me-2">
+                                            <i class="feather-trash-2"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                <h3 style="color:red;">
+                                    No Data Found!
+                                </h3>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="paginationData" class="row">
+    @{
+        Html.RenderPartial("_Pagination");
+    }
+</div>
+<script type="text/javascript">
+    responseCode = '@TempData["ResCode"]';
+    message = '@TempData["Message"]';
+
+    if (responseCode != 200 && responseCode != '') {
+        $("#ExcMsg").append(message);
+        $("#exception").addClass("show");
+        setTimeout("$('#exception').removeClass('show');", 4000);
+        setTimeout("$('#ExcMsg').removeText();", 4000);
+
+        $.fn.removeText = function () {
+            this.each(function () {
+
+                // Get elements contents
+                var $cont = $(this).contents();
+
+                // Loop through the contents
+                $cont.each(function () {
+                    var $this = $(this);
+
+                    // If it's a text node
+                    if (this.nodeType == 3) {
+                        $this.remove(); // Remove it
+                    } else if (this.nodeType == 1) { // If its an element node
+                        $this.removeText(); //Recurse
+                    }
+                });
+            });
+        }
+    }
+</script>

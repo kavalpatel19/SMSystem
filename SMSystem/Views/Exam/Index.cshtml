@@ -1,0 +1,58 @@
+﻿<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Exam</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller ="Home" asp-action="Index" class="loader">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Exam</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card card-table">
+                <div class="card-body">
+
+                    <div class="page-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="page-title">Exam</h3>
+                            </div>
+                            <div class="col-auto text-end float-end ms-auto download-grp">
+                                <a asp-action="ExportExcel" asp-controller="Exam" id="Export-Exam" class="btn btn-outline-primary me-2"><i class="fas fa-download"></i> Download</a>
+                                <a asp-action="Create" asp-controller="Exam" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="examData">
+                        <div id="overlay">
+                            <div class="cv-spinner">
+                                <span class="spinner"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    Html.RenderPartial("_Footer");
+}
+
+<script src="~/js/exam.js"></script>
+<script>
+    $(document).ready(function () {
+        let url = "/Exam/GetAll";
+        let element = "#examData";
+        let obj = {
+            PageIndex: 1
+        };
+        GetData(obj, url, element);
+    });
+</script>

@@ -1,0 +1,97 @@
+﻿@model SMSystem.Models.Fees.FeesViewModel
+@using SMSystem.Helpers.DropdownHelper;
+
+
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Add Fees</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="loader">Fees</a></li>
+                    <li class="breadcrumb-item active">Add Fees</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="form-title"><span>Fees Information</span></h5>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="FeesId">Fees ID</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"></span>
+                                        <input class="form-control" value="@Model.FeesId" disabled />
+                                    </div>
+                                        <input asp-for="FeesId" class="form-control" value="@Model.FeesId" hidden />
+                                    <span asp-validation-for="FeesId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="FeesType">Fees Type <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="FeesType" asp-items="EnumHelper.GetEnumSelectList<FeesType>()">
+                                        <option value="">Select Type</option>
+                                    </select>
+                                    <span asp-validation-for="FeesType" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="Class">Class <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="Class" asp-items="EnumHelper.GetEnumSelectList<Class>()">
+                                        <option value="">Select Class</option>
+                                    </select>
+                                    <span asp-validation-for="Class" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="FeesAmount">Fees Amount <span class="login-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-rupee-sign"></i></span>
+                                        <input asp-for="FeesAmount" class="form-control" type="text" placeholder="Enter Fees Amount..." value="" />
+                                    </div>
+                                    <span asp-validation-for="FeesAmount" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms calendar-icon">
+                                    <label asp-for="StartDate">Start Date <span class="login-danger">*</span></label>
+                                    <input asp-for="StartDate" class="form-control datetimepicker" placeholder="DD-MM-YYYY" type="datetime" autocomplete="off" value="" />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms calendar-icon">
+                                    <label asp-for="EndDate">End Date <span class="login-danger">*</span></label>
+                                    <input asp-for="EndDate" class="form-control datetimepicker" placeholder="DD-MM-YYYY" type="datetime" autocomplete="off" value="" />
+                                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
