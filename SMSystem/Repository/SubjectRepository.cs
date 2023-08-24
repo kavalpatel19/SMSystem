@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using SMSystem.Helpers;
+using SMSystem.Models;
 using SMSystem.Models.Department;
+using SMSystem.Models.Exam;
 using SMSystem.Models.Subject;
 using SMSystem.Repository.Interfaces;
 
@@ -15,121 +17,199 @@ namespace SMSystem.Repository
             this.configuration = configuration;
         }
 
-        public List<SubjectViewModel> GetAllSubjects()
+        public BaseResponseViewModel<SubjectViewModel> GetAllSubjects()
         {
-            var subjects = new List<SubjectViewModel>();
-
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<SubjectViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.GetAsync($"SubjectApi/Export").Result;
-
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    subjects = JsonConvert.DeserializeObject<List<SubjectViewModel>>(data);
-                }
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.GetAsync($"SubjectApi/Export").Result;
 
-                return subjects;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<SubjectViewModel>>(data);
+                        return baseResponse;
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Results = new List<SubjectViewModel>();
+                return baseResponse;
             }
         }
 
-        public async Task<SubjectPaggedViewModel> GetSubjects(SearchingParaModel para)
+        public async Task<BaseResponseViewModel<SubjectPaggedViewModel>> GetSubjects(SearchingParaModel para)
         {
-            SubjectPaggedViewModel subjects = new SubjectPaggedViewModel();
-
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<SubjectPaggedViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-
-                para.SId = string.IsNullOrEmpty(para.SId) ? string.Empty : para.SId;
-                para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
-                para.Class = string.IsNullOrEmpty(para.Class) ? string.Empty : para.Class;
-
-                var response = await client.GetAsync($"SubjectApi?sid={para.SId}&name={para.Name}&clas={para.Class}&pageIndex={para.PageIndex}");
-
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    subjects = JsonConvert.DeserializeObject<SubjectPaggedViewModel>(data);
-                }
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                return subjects;
+                    para.SId = string.IsNullOrEmpty(para.SId) ? string.Empty : para.SId;
+                    para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
+                    para.Class = string.IsNullOrEmpty(para.Class) ? string.Empty : para.Class;
+
+                    var response = await client.GetAsync($"SubjectApi?sid={para.SId}&name={para.Name}&clas={para.Class}&pageIndex={para.PageIndex}").ConfigureAwait(false);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<SubjectPaggedViewModel>>(data);
+                        return baseResponse;
+
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new SubjectPaggedViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<SubjectViewModel> GetSubject(int id)
+        public async Task<BaseResponseViewModel<SubjectViewModel>> GetSubject(int id)
         {
-            SubjectViewModel subject = new SubjectViewModel();
-
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<SubjectViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-
-                var response = await client.GetAsync($"SubjectApi/{id}");
-
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    subject = JsonConvert.DeserializeObject<SubjectViewModel>(data);
-                }
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                return subject;
+                    var response = await client.GetAsync($"SubjectApi/{id}").ConfigureAwait(false);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<SubjectViewModel>>(data);
+                        return baseResponse;
+
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new SubjectViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Add(SubjectViewModel subject)
+        public async Task<BaseResponseViewModel<SubjectViewModel>> Add(SubjectViewModel subject)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<SubjectViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.PostAsJsonAsync<SubjectViewModel>("SubjectApi/", subject).Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.PostAsJsonAsync<SubjectViewModel>("SubjectApi/", subject).Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<SubjectViewModel>>(data);
+                        return baseResponse;
+
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new SubjectViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Update(SubjectViewModel subject)
+        public async Task<BaseResponseViewModel<SubjectViewModel>> Update(SubjectViewModel subject)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<SubjectViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.PutAsJsonAsync<SubjectViewModel>("SubjectApi/", subject).Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.PutAsJsonAsync<SubjectViewModel>("SubjectApi/", subject).Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<SubjectViewModel>>(data);
+
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new SubjectViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<BaseResponseViewModel<SubjectViewModel>> Delete(int id)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<SubjectViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                // To send Delete data request
-                var response = client.DeleteAsync($"SubjectApi/{id}").Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    // To send Delete data request
+                    var response = client.DeleteAsync($"SubjectApi/{id}").Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<SubjectViewModel>>(data);
+
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new SubjectViewModel();
+                return baseResponse;
             }
         }
     }

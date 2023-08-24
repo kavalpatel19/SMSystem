@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SMSystem_Api.Helpers;
+using SMSystem_Api.Model.Exam;
+using SMSystem_Api.Model;
 using SMSystem_Api.Model.Students;
 using SMSystem_Api.Model.Teachers;
 using SMSystem_Api.Repository.Interfaces;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -23,54 +26,122 @@ namespace SMSystem_Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(string? sid, string? name, string? phone, int pageIndex)
         {
-            SearchingPara para = new SearchingPara()
+            var baseResponse = new BaseResponseModel<PaggedTeacherModel>();
+            try
             {
-                SId = sid,
-                Name = name,
-                Phone = phone,
-                PageIndex = pageIndex
-            };
-            PaggedTeacherModel teachers = await teachRepo.GetAll(para);
-            return Ok(teachers);
+                var para = new SearchingPara()
+                {
+                    SId = sid,
+                    Name = name,
+                    Phone = phone,
+                    PageIndex = pageIndex
+                };
+
+                baseResponse = await teachRepo.GetAll(para).ConfigureAwait(false);
+
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new PaggedTeacherModel();
+                return Ok(baseResponse);
+            }
         }
 
         // GET api/<TeacherApiController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            TeacherModel teacher = await teachRepo.Get(id);
-            return Ok(teacher);
+            var baseResponse = new BaseResponseModel<TeacherModel>();
+            try
+            {
+                baseResponse = await teachRepo.Get(id).ConfigureAwait(false);
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new TeacherModel();
+                return Ok(baseResponse);
+            }
         }
 
         [HttpGet("Export")]
         public IActionResult GetAllTeachers()
         {
-            List<TeacherModel> data = teachRepo.GetAllTeachers();
-            return Ok(data);
+            var baseResponse = new BaseResponseModel<TeacherModel>();
+            try
+            {
+                baseResponse = teachRepo.GetAllTeachers();
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new TeacherModel();
+                return Ok(baseResponse);
+            }
         }
 
         // POST api/<TeacherApiController>
         [HttpPost]
         public async Task<IActionResult> Post(TeacherModel teacher)
         {
-            teachRepo.Add(teacher);
-            return Ok();
+            var baseResponse = new BaseResponseModel<TeacherModel>();
+            try
+            {
+                baseResponse = await teachRepo.Add(teacher).ConfigureAwait(false);
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new TeacherModel();
+                return Ok(baseResponse);
+            }
         }
 
         // PUT api/<TeacherApiController>/5
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] TeacherModel teacher)
         {
-            teachRepo.Update(teacher);
-            return Ok();
+            var baseResponse = new BaseResponseModel<TeacherModel>();
+            try
+            {
+                baseResponse = await teachRepo.Update(teacher).ConfigureAwait(false);
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new TeacherModel();
+                return Ok(baseResponse);
+            }
         }
 
         // DELETE api/<TeacherApiController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            teachRepo.Delete(id);
-            return Ok();
+            var baseResponse = new BaseResponseModel<TeacherModel>();
+            try
+            {
+                baseResponse = await teachRepo.Delete(id).ConfigureAwait(false);
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new TeacherModel();
+                return Ok(baseResponse);
+            }
         }
     }
 }

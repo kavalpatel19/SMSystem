@@ -1,10 +1,12 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Data;
 using SMSystem_Api.Helpers;
 using SMSystem_Api.Migrations;
 using SMSystem_Api.Model;
 using SMSystem_Api.Model.Department;
+using SMSystem_Api.Model.Exam;
 using SMSystem_Api.Model.Fees;
 using SMSystem_Api.Model.Subjects;
 using SMSystem_Api.Repository.Interfaces;
@@ -23,102 +25,186 @@ namespace SMSystem_Api.Repository
             this.Configuration = configuration;
         }
 
-        public List<FeesModel> GetAllFees()
+        public BaseResponseModel<FeesModel> GetAllFees()
         {
-            var Data = context.Fees.Where(x => x.IsActive).ToList();
-            return Data;
+            var response = new BaseResponseModel<FeesModel>();
+
+            try
+            {
+                var data = context.Fees.Where(x => x.IsActive).ToList();
+
+                if (data.Count == 0)
+                {
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Results = new List<FeesModel>();
+                    return response;
+                }
+                response.ResponseCode = 200;
+                response.Results = data;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Results = new List<FeesModel>();
+                return response;
+            }
         }
 
-        public async Task<PaggedFeesModel> GetAll(SearchingPara para)
+        public async Task<BaseResponseModel<PaggedFeesModel>> GetAll(SearchingPara para)
         {
-            string connaction = Configuration.GetConnectionString("connaction");
+            var response = new BaseResponseModel<PaggedFeesModel>();
 
-            List<FeesModel> data = new List<FeesModel>();
-
-            const int pagesize = 5;
-
-            int totalPage = 0;
-
-            using (SqlConnection con = new SqlConnection(connaction))
+            try
             {
-                SqlCommand cmd = new SqlCommand("FeesPaging", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
+                string connaction = Configuration.GetConnectionString("connaction");
 
-                cmd.Parameters.Add("@PageIndex", SqlDbType.VarChar).Value = para.PageIndex;
-                cmd.Parameters.Add("@PageSize", SqlDbType.VarChar).Value = pagesize;
-                cmd.Parameters.Add("@TotalPages", SqlDbType.Int, 4);
-                cmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
+                string sp = StoredProcedureHelper.FeesPaging;
 
-                cmd.ExecuteNonQuery();
-                con.Close();
+                var parameters = new DynamicParameters();
 
-                totalPage = Convert.ToInt32(cmd.Parameters["@TotalPages"].Value);
+                parameters.Add(FieldHelper.PageIndex, para.PageIndex, dbType: DbType.Int32);
+                parameters.Add(FieldHelper.PageSize, para.pagesize, dbType: DbType.Int32);
+                parameters.Add(FieldHelper.TotalPages, dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-                using (SqlConnection conn = new SqlConnection(connaction))
+                using (var con = new SqlConnection(connaction))
                 {
-                    DataSet ds = new DataSet();
+                    con.Open();
+                    var fees = (await con.QueryAsync<FeesModel>(sp, parameters, commandType: System.Data.CommandType.StoredProcedure)).ToList();
 
-                    conn.Open();
-                    SqlDataAdapter rdr = new SqlDataAdapter();
-                    rdr.SelectCommand = cmd;
-                    rdr.Fill(ds);
+                    var totalPage = parameters.Get<int>(FieldHelper.TotalPages);
 
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    var paggedFees = new PaggedFeesModel()
                     {
-                        FeesModel fee = new FeesModel();
-
-                        fee.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
-                        fee.FeesId = ds.Tables[0].Rows[i]["FeesId"].ToString();
-                        fee.FeesType = ds.Tables[0].Rows[i]["FeesType"].ToString();
-                        fee.Class = ds.Tables[0].Rows[i]["Class"].ToString();
-                        fee.FeesAmount = Convert.ToInt32(ds.Tables[0].Rows[i]["FeesAmount"]);
-                        fee.StartDate = Convert.ToDateTime(ds.Tables[0].Rows[i]["StartDate"]);
-                        fee.EndDate = Convert.ToDateTime(ds.Tables[0].Rows[i]["EndDate"]);
-
-                        data.Add(fee);
+                        FeesModel = fees,
+                        PaggedModel = new PaggedModel()
+                        {
+                            PageIndex = para.PageIndex,
+                            TotalPage = totalPage
+                        }
+                    };
+                    if (fees.Count == 0)
+                    {
+                        response.ResponseCode = 404;
+                        response.Message = "Data not Found!";
+                        response.Result = new PaggedFeesModel();
+                        return response;
                     }
-                    conn.Close();
+                    response.ResponseCode = 200;
+                    response.Result = paggedFees;
+                    return response;
                 }
             }
-
-            PaggedFeesModel paggedFees = new PaggedFeesModel()
+            catch (Exception ex)
             {
-                FeesModel = data,
-                PaggedModel = new PaggedModel()
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new PaggedFeesModel();
+                return response;
+            }
+        }
+
+        public async Task<BaseResponseModel<FeesModel>> Get(int id)
+        {
+            var response = new BaseResponseModel<FeesModel>();
+
+            try
+            {
+                var fee = await context.Fees.FindAsync(id).ConfigureAwait(false);
+
+                if (fee == null)
                 {
-                    PageIndex = para.PageIndex,
-                    TotalPage = totalPage
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Result = new FeesModel();
+                    return response;
                 }
-            };
 
-            return paggedFees;
+                response.ResponseCode = 200;
+                response.Result = fee;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new FeesModel();
+                return response;
+            }
         }
 
-        public async Task<FeesModel> Get(int id)
+        public async Task<BaseResponseModel<FeesModel>> Add(FeesModel fee)
         {
-            FeesModel fee = await context.Fees.FindAsync(id);
-            return fee;
+            var response = new BaseResponseModel<FeesModel>();
+            try
+            {
+                await context.Fees.AddAsync(fee).ConfigureAwait(false);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+
+                response.ResponseCode = 200;
+                response.Result = new FeesModel();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new FeesModel();
+                return response;
+            }
         }
 
-        public async Task Add(FeesModel fee)
+        public async Task<BaseResponseModel<FeesModel>> Update(FeesModel fee)
         {
-            await context.Fees.AddAsync(fee);
-            await context.SaveChangesAsync();
+            var response = new BaseResponseModel<FeesModel>();
+            try
+            {
+                context.Attach(fee).State = EntityState.Modified;
+                await context.SaveChangesAsync().ConfigureAwait(false);
+
+                response.ResponseCode = 200;
+                response.Result = new FeesModel();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new FeesModel();
+                return response;
+            }
         }
 
-        public async Task Update(FeesModel fee)
+        public async Task<BaseResponseModel<FeesModel>> Delete(int id)
         {
-            context.Attach(fee).State = EntityState.Modified;
-            await context.SaveChangesAsync();
-        }
+            var response = new BaseResponseModel<FeesModel>();
+            try
+            {
+                var fee = context.Fees.Find(id);
+                if (fee == null)
+                {
+                    response.ResponseCode = 404;
+                    response.Message = "Data not Found!";
+                    response.Result = new FeesModel();
+                    return response;
+                }
+                fee.IsDelete = true;
+                fee.IsActive = false;
+                await context.SaveChangesAsync().ConfigureAwait(false);
 
-        public async Task Delete(int id)
-        {
-            FeesModel fee = context.Fees.Find(id);
-            fee.IsDelete = true;
-            fee.IsActive = false;
-            await context.SaveChangesAsync();
+                response.ResponseCode = 200;
+                response.Result = new FeesModel();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                response.Result = new FeesModel();
+                return response;
+            }
         }
     }
 }

@@ -1,9 +1,13 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
+using SMSystem.Models;
+using SMSystem.Models.Department;
 using SMSystem.Models.Exam;
 using SMSystem.Models.Fees;
 using SMSystem.Repository.Interfaces;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace SMSystem.Controllers
 {
@@ -18,34 +22,88 @@ namespace SMSystem.Controllers
 
         public async Task<IActionResult> Index()
         {
-            ExamPaggedViewModel exams = new ExamPaggedViewModel();
-
-            return View(exams);
+            try
+            {
+                var response = new ExamPaggedViewModel();
+                return View(response);
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            ExamPaggedViewModel exams = await ExamRepo.GetExams(para);
-            return PartialView("_ExamData", exams);
+            var response = new BaseResponseViewModel<ExamPaggedViewModel>();
+            try
+            {
+                response = await ExamRepo.GetExams(para).ConfigureAwait(false);
+                if (response.ResponseCode == 200)
+                {
+                    return PartialView("_ExamData", response.Result);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return PartialView("_ExamData", response.Result);
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Result = new ExamPaggedViewModel();
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return PartialView("_ExamData", response.Result);
+            }
         }
 
         public IActionResult ExportExcel()
         {
-            var Data = ExamRepo.GetAllExams();
-
-            using (XLWorkbook wb = new XLWorkbook())
+            try
             {
-                wb.Worksheets.Add(ConvertDataTable.Convert(Data.ToList()));
-                using (MemoryStream mstream = new MemoryStream())
+                var response = ExamRepo.GetAllExams();
+                if (response.ResponseCode == 200)
                 {
-                    wb.SaveAs(mstream);
-                    return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Exams.xlsx");
+                    using (var wb = new XLWorkbook())
+                    {
+                        wb.Worksheets.Add(ConvertDataTable.Convert(response.Results));
+                        using (var mstream = new MemoryStream())
+                        {
+                            wb.SaveAs(mstream);
+                            return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Exams.xlsx");
+                        }
+                    }
                 }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return View("Index");
             }
         }
         public async Task<IActionResult> Create()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch(Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
@@ -53,26 +111,50 @@ namespace SMSystem.Controllers
         {
             try
             {
-                var response = ExamRepo.Add(exam);
-                if (response.IsCompletedSuccessfully)
+                var response = await ExamRepo.Add(exam);
+                if (response.ResponseCode == 200)
                 {
+                    TempData["Message"] = "Record Created Successfully.";
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Create));
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Create));
             }
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            ExamViewModel exam = await ExamRepo.GetExam(id);
-            return View(exam);
+            try
+            {
+                var response = await ExamRepo.GetExam(id).ConfigureAwait(false);
+                if (response.ResponseCode == 200)
+                {
+                    return View(response.Result);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpPost]
@@ -80,18 +162,24 @@ namespace SMSystem.Controllers
         {
             try
             {
-                var response = ExamRepo.Update(exam);
-                if (response.IsCompletedSuccessfully)
+                var response = await ExamRepo.Update(exam);
+                if (response.ResponseCode == 200)
                 {
+                    TempData["Message"] = "Exam has been saved successfully.";
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Edit));
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
                 return View();
             }
         }
@@ -100,24 +188,21 @@ namespace SMSystem.Controllers
         {
             try
             {
-                SearchingParaModel para = new SearchingParaModel()
+                var para = new SearchingParaModel()
                 {
                     PageIndex = 1
                 };
 
-                var response = ExamRepo.Delete(id);
+                var response = await ExamRepo.Delete(id);
 
-                if (response.IsCompletedSuccessfully)
-                {
-                    ExamPaggedViewModel exams = await ExamRepo.GetExams(para);
-                    return PartialView("_ExamData", exams);
-                }
-                return PartialView();
+                var exams = await ExamRepo.GetExams(para).ConfigureAwait(false);
+                return PartialView("_ExamData", exams.Result);
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return Json(new { message = ex.Message, responseCode = 500 });
             }
         }
+        
     }
 }

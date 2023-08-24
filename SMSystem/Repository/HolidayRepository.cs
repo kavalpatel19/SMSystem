@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using SMSystem.Helpers;
+using SMSystem.Models;
 using SMSystem.Models.Department;
+using SMSystem.Models.Exam;
 using SMSystem.Models.Holiday;
 using SMSystem.Repository.Interfaces;
 
@@ -15,64 +17,97 @@ namespace SMSystem.Repository
             this.configuration = configuration;
         }
 
-        public List<HolidayViewModel> GetAllHolidays()
+        public BaseResponseViewModel<HolidayViewModel> GetAllHolidays()
         {
-            var holidays = new List<HolidayViewModel>();
-
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<HolidayViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.GetAsync($"HolidayApi/Export").Result;
-
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    holidays = JsonConvert.DeserializeObject<List<HolidayViewModel>>(data);
-                }
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.GetAsync($"HolidayApi/Export").Result;
 
-                return holidays;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<HolidayViewModel>>(data);
+                        return baseResponse;
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Results = new List<HolidayViewModel>();
+                return baseResponse;
             }
         }
 
-        public async Task<HolidayPaggedViewModel> GetHolidays(SearchingParaModel para)
+        public async Task<BaseResponseViewModel<HolidayPaggedViewModel>> GetHolidays(SearchingParaModel para)
         {
-            HolidayPaggedViewModel holidays = new HolidayPaggedViewModel();
-
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<HolidayPaggedViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-
-                para.SId = string.IsNullOrEmpty(para.SId) ? string.Empty : para.SId;
-                para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
-                para.Year = string.IsNullOrEmpty(para.Year) ? string.Empty : para.Year;
-
-                var response = await client.GetAsync($"HolidayApi?pageIndex={para.PageIndex}");
-
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    holidays = JsonConvert.DeserializeObject<HolidayPaggedViewModel>(data);
-                }
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                return holidays;
+                    var response = await client.GetAsync($"HolidayApi?pageIndex={para.PageIndex}").ConfigureAwait(false);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<HolidayPaggedViewModel>>(data);
+                        return baseResponse;
+
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new HolidayPaggedViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Add(HolidayViewModel holiday)
+        public async Task<BaseResponseViewModel<HolidayViewModel>> Add(HolidayViewModel holiday)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<HolidayViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.PostAsJsonAsync<HolidayViewModel>("HolidayApi/", holiday).Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.PostAsJsonAsync<HolidayViewModel>("HolidayApi/", holiday).Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<HolidayViewModel>>(data);
+                        return baseResponse;
+
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new HolidayViewModel();
+                return baseResponse;
             }
         }
     }

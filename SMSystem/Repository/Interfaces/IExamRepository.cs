@@ -1,4 +1,6 @@
 ﻿using SMSystem.Helpers;
+using SMSystem.Models.Department;
+using SMSystem.Models;
 using SMSystem.Models.Exam;
 using SMSystem.Models.Fees;
 
@@ -6,11 +8,11 @@ namespace SMSystem.Repository.Interfaces
 {
     public interface IExamRepository
     {
-        List<ExamViewModel> GetAllExams();
-        Task<ExamPaggedViewModel> GetExams(SearchingParaModel para);
-        Task<ExamViewModel> GetExam(int id);
-        Task<bool> Add(ExamViewModel exam);
-        Task<bool> Update(ExamViewModel exam);
-        Task<bool> Delete(int id);
+        BaseResponseViewModel<ExamViewModel> GetAllExams();
+        Task<BaseResponseViewModel<ExamPaggedViewModel>> GetExams(SearchingParaModel para);
+        Task<BaseResponseViewModel<ExamViewModel>> GetExam(int id);
+        Task<BaseResponseViewModel<ExamViewModel>> Add(ExamViewModel exam);
+        Task<BaseResponseViewModel<ExamViewModel>> Update(ExamViewModel exam);
+        Task<BaseResponseViewModel<ExamViewModel>> Delete(int id);
     }
 }

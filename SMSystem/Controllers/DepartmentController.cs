@@ -1,8 +1,10 @@
-﻿using ClosedXML.Excel;
+﻿ using Azure;
+using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
+using SMSystem.Models;
 using SMSystem.Models.Department;
 using SMSystem.Models.Students;
 using SMSystem.Repository.Interfaces;
@@ -11,61 +13,119 @@ namespace SMSystem.Controllers
 {
     public class DepartmentController : Controller
     {
-        IDepartmentRepository DepRepo;
+        private readonly IDepartmentRepository DepRepo;
         public DepartmentController(IDepartmentRepository depRepo)
         {
             DepRepo = depRepo;
         }
 
-
-        //https://localhost:7199/api/DepartmentApi?pageIndex=1
         // GET: DepartmentController
         public async Task<IActionResult> Index(SearchingParaModel para)
         {
-            DepartmentPaggedViewModel departments = new DepartmentPaggedViewModel();
+            try
+            {
+                //throw new Exception();
 
-            return View(departments);
+                var response = new DepartmentPaggedViewModel();
+                return View(response);
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index","Home");
+            }
         }
 
+        // returning Partial view
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            DepartmentPaggedViewModel departments = await DepRepo.GetDepartmnets(para);
-            return PartialView("_DepartmentData", departments);
+            var response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
+            try
+            {
+                response = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
+                if(response.ResponseCode == 200)
+                {
+                    return PartialView("_DepartmentData", response.Result);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return PartialView("_DepartmentData", response.Result);
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Result = new DepartmentPaggedViewModel();
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return PartialView("_DepartmentData", response.Result);
+            }
         }
 
+        //To Export Data
         public IActionResult ExportExcel()
         {
-            var Data = DepRepo.GetAllDepartments();
-
-            using (XLWorkbook wb = new XLWorkbook())
+            try
             {
-                wb.Worksheets.Add(ConvertDataTable.Convert(Data.ToList()));
-                using (MemoryStream mstream = new MemoryStream())
+                var response = DepRepo.GetAllDepartments();
+                if (response.ResponseCode == 200)
                 {
-                    wb.SaveAs(mstream);
-                    return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Departments.xlsx");
+                    using (var wb = new XLWorkbook())
+                    {
+                        wb.Worksheets.Add(ConvertDataTable.Convert(response.Results));
+                        using (var mstream = new MemoryStream())
+                        {
+                            wb.SaveAs(mstream);
+                            
+                            return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Departments.xlsx");
+                        }
+                    }
                 }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction("Index");
+                }
+            }
+            catch(Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index");
             }
         }
 
         // GET: DepartmentController/Create
         public async Task<IActionResult> Create()
         {
-            DepartmentViewModel department = new DepartmentViewModel();
-            var departments = DepRepo.GetAllDepartments();
-            if (departments.Count > 0)
+            try
             {
-                var lastId = departments.OrderByDescending(x => x.DepartmentId).FirstOrDefault().DepartmentId;
-                char[] spearator = { '-', ' ' };
-                string[] depId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
-                int id = (Convert.ToInt32(depId[1]))+1;
-                department.DepartmentId = "DEP-" + (id.ToString("0000"));
+                var department = new DepartmentViewModel();
+                var departments = DepRepo.GetAllDepartments().Results;
+                if (departments.Count > 0)
+                {
+                    var lastId = departments.OrderByDescending(x => x.DepartmentId).FirstOrDefault().DepartmentId;
+                    char[] spearator = { '-', ' ' };
+                    string[] depId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
+                    int id = (Convert.ToInt32(depId[1])) + 1;
+                    department.DepartmentId = "DEP-" + (id.ToString("0000"));
+                }
+                else
+                {
+                    department.DepartmentId = "DEP-0001";
+                }
+
+                return View(department);
             }
-            else
+            catch (Exception ex)
             {
-                department.DepartmentId = "DEP-0001";
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
             }
-            return View(department);
         }
 
         // POST: DepartmentController/Create
@@ -74,18 +134,24 @@ namespace SMSystem.Controllers
         {
             try
             {
-                var response = DepRepo.Add(department);
-                if (response.IsCompletedSuccessfully)
+                var response = await DepRepo.Add(department);
+                if (response.ResponseCode == 200)
                 {
-                    return  RedirectToAction(nameof(Index));
+                    TempData["Message"] = "Record Created Successfully.";
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Create));
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
                 return View();
             }
         }
@@ -93,8 +159,26 @@ namespace SMSystem.Controllers
         // GET: DepartmentController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            DepartmentViewModel department = await DepRepo.GetDepartment(id);
-            return View(department);
+            try
+            {
+                var response = await DepRepo.GetDepartment(id).ConfigureAwait(false);
+                if(response.ResponseCode == 200)
+                {
+                    return View(response.Result);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch(Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // POST: DepartmentController/Edit/5
@@ -103,18 +187,24 @@ namespace SMSystem.Controllers
         {
             try
             {
-                var response = DepRepo.Update(department);
-                if (response.IsCompletedSuccessfully)
+                var response = await DepRepo.Update(department);
+                if (response.ResponseCode == 200)
                 {
+                    TempData["Message"] = "Department has been saved successfully.";
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Edit));
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
                 return View();
             }
         }
@@ -125,7 +215,8 @@ namespace SMSystem.Controllers
         {
             try
             {
-                SearchingParaModel para = new SearchingParaModel()
+                throw new Exception();
+                var para = new SearchingParaModel()
                 {
                     SId = string.Empty,
                     Name = string.Empty,
@@ -133,18 +224,14 @@ namespace SMSystem.Controllers
                     PageIndex = 1
                 };
 
-                var response = DepRepo.Delete(id);
+                var response = await DepRepo.Delete(id);
 
-                if (response.IsCompletedSuccessfully)
-                {
-                    DepartmentPaggedViewModel departments = await DepRepo.GetDepartmnets(para);
-                    return PartialView("_DepartmentData", departments);
-                }
-                return PartialView();
+                var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
+                return PartialView("_DepartmentData", departments.Result); 
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return Json(new { message = ex.Message , responseCode = 500});
             }
         }
     }

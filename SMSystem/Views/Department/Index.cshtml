@@ -3,9 +3,9 @@
 @{
     ViewData["Title"] = "Index";
 }
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 
 <div class="content container-fluid">
-
     <div class="page-header">
         <div class="row align-items-center">
             <div class="col">
@@ -70,9 +70,12 @@
 @{
     Html.RenderPartial("_Footer");
 }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
 <script src="~/js/department.js"></script>
 <script>
     $(document).ready(function () {
+
         let url = "/Department/GetAll";
         let element = "#departmentData";
         let obj = {

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SMSystem_Api;
 using SMSystem_Api.Data;
 using SMSystem_Api.Repository;
 using SMSystem_Api.Repository.Interfaces;

@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using SMSystem.Helpers;
+using SMSystem.Models;
 using SMSystem.Models.Department;
+using SMSystem.Models.Exam;
 using SMSystem.Models.Fees;
 using SMSystem.Repository.Interfaces;
 
@@ -15,117 +17,194 @@ namespace SMSystem.Repository
             this.configuration = configuration;
         }
 
-        public List<FeesViewModel> GetAllFees()
+        public BaseResponseViewModel<FeesViewModel> GetAllFees()
         {
-            var fees = new List<FeesViewModel>();
-
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<FeesViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.GetAsync($"FeesApi/Export").Result;
-
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    fees = JsonConvert.DeserializeObject<List<FeesViewModel>>(data);
-                }
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.GetAsync($"FeesApi/Export").Result;
 
-                return fees;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<FeesViewModel>>(data);
+                        return baseResponse;
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Results = new List<FeesViewModel>();
+                return baseResponse;
             }
         }
 
-        public async Task<FeesPaggedViewModel> GetFees(SearchingParaModel para)
+        public async Task<BaseResponseViewModel<FeesPaggedViewModel>> GetFees(SearchingParaModel para)
         {
-            FeesPaggedViewModel Fees = new FeesPaggedViewModel();
-
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<FeesPaggedViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-
-                var response = await client.GetAsync($"FeesApi?pageIndex={para.PageIndex}");
-
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    Fees = JsonConvert.DeserializeObject<FeesPaggedViewModel>(data);
-                }
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                return Fees;
+                    var response = await client.GetAsync($"FeesApi?pageIndex={para.PageIndex}").ConfigureAwait(false);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<FeesPaggedViewModel>>(data);
+                        return baseResponse;
+
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new FeesPaggedViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<FeesViewModel> GetFee(int id)
+        public async Task<BaseResponseViewModel<FeesViewModel>> GetFee(int id)
         {
-            FeesViewModel fee = new FeesViewModel();
-
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<FeesViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-
-                var response = await client.GetAsync($"FeesApi/{id}");
-
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    fee = JsonConvert.DeserializeObject<FeesViewModel>(data);
-                }
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
 
-                return fee;
+                    var response = await client.GetAsync($"FeesApi/{id}").ConfigureAwait(false);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<FeesViewModel>>(data);
+                        return baseResponse;
+
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new FeesViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Add(FeesViewModel fee)
+        public async Task<BaseResponseViewModel<FeesViewModel>> Add(FeesViewModel fee)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<FeesViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.PostAsJsonAsync<FeesViewModel>("FeesApi/", fee).Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.PostAsJsonAsync<FeesViewModel>("FeesApi/", fee).Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<FeesViewModel>>(data);
+                        return baseResponse;
+
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new FeesViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Update(FeesViewModel fee)
+        public async Task<BaseResponseViewModel<FeesViewModel>> Update(FeesViewModel fee)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<FeesViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.PutAsJsonAsync<FeesViewModel>("FeesApi/", fee).Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.PutAsJsonAsync<FeesViewModel>("FeesApi/", fee).Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<FeesViewModel>>(data);
+
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new FeesViewModel();
+                return baseResponse;
             }
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<BaseResponseViewModel<FeesViewModel>> Delete(int id)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<FeesViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                // To send Delete data request
-                var response = client.DeleteAsync($"FeesApi/{id}").Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    // To send Delete data request
+                    var response = client.DeleteAsync($"FeesApi/{id}").Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<FeesViewModel>>(data);
+
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new FeesViewModel();
+                return baseResponse;
             }
         }
     }

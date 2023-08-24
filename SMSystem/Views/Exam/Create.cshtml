@@ -34,11 +34,9 @@
                             </div>
                             <div class="col-12 col-sm-6">
                                 <div class="form-group local-forms">
-                                    <label asp-for="Class">Class <span class="login-danger">*</span></label>
-                                    <select class="form-control select" asp-for="Class" asp-items="EnumHelper.GetEnumSelectList<Class>()">
-                                        <option value="">Select Class</option>
-                                    </select>
-                                    <span asp-validation-for="Class" class="text-danger"></span>
+                                    <label asp-for="Subject">Subject <span class="login-danger">*</span></label>
+                                    <input asp-for="Subject" class="form-control" type="text" />
+                                    <span asp-validation-for="Subject" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6">
@@ -57,9 +55,11 @@
                             </div>
                             <div class="col-12 col-sm-6">
                                 <div class="form-group local-forms">
-                                    <label asp-for="Subject">Subject <span class="login-danger">*</span></label>
-                                    <input asp-for="Subject" class="form-control" type="text" />
-                                    <span asp-validation-for="Subject" class="text-danger"></span>
+                                    <label asp-for="Class">Class <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="Class" asp-items="EnumHelper.GetEnumSelectList<Class>()">
+                                        <option value="">Select Class</option>
+                                    </select>
+                                    <span asp-validation-for="Class" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6">

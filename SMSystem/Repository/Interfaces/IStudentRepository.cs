@@ -1,15 +1,17 @@
 ﻿using SMSystem.Helpers;
+using SMSystem.Models.Holiday;
+using SMSystem.Models;
 using SMSystem.Models.Students;
 
 namespace SMSystem.Repository.Interfaces
 {
     public interface IStudentRepository
     {
-        List<StudentViewModel> GetAllStudents();
-        Task<StudentPagedViewModel> GetStudents(SearchingParaModel para);
-        Task<StudentViewModel> GetStudent(int id);
-        Task<bool> Add(StudentViewModel student);
-        Task<bool> Update(StudentViewModel student);
-        Task<bool> Delete(int id);
+        BaseResponseViewModel<StudentViewModel> GetAllStudents();
+        Task<BaseResponseViewModel<StudentPagedViewModel>> GetStudents(SearchingParaModel para);
+        Task<BaseResponseViewModel<StudentViewModel>> GetStudent(int id);
+        Task<BaseResponseViewModel<StudentViewModel>> Add(StudentViewModel student);
+        Task<BaseResponseViewModel<StudentViewModel>> Update(StudentViewModel student);
+        Task<BaseResponseViewModel<StudentViewModel>> Delete(int id);
     }
 }

@@ -1,16 +1,18 @@
 ﻿using SMSystem.Helpers;
+using SMSystem.Models;
 using SMSystem.Models.Students;
+using SMSystem.Models.Subject;
 using SMSystem.Models.Teacher;
 
 namespace SMSystem.Repository.Interfaces
 {
     public interface ITeacherRepository
     {
-        List<TeacherViewModel> GetAllTeachers();
-        Task<TeacherPagedViewModel> GetTeachers(SearchingParaModel para);
-        Task<TeacherViewModel> GetTeacher(int id);
-        Task<bool> Add(TeacherViewModel teacher);
-        Task<bool> Update(TeacherViewModel teacher);
-        Task<bool> Delete(int id);
+        BaseResponseViewModel<TeacherViewModel> GetAllTeachers();
+        Task<BaseResponseViewModel<TeacherPagedViewModel>> GetTeachers(SearchingParaModel para);
+        Task<BaseResponseViewModel<TeacherViewModel>> GetTeacher(int id);
+        Task<BaseResponseViewModel<TeacherViewModel>> Add(TeacherViewModel teacher);
+        Task<BaseResponseViewModel<TeacherViewModel>> Update(TeacherViewModel teacher);
+        Task<BaseResponseViewModel<TeacherViewModel>> Delete(int id);
     }
 }

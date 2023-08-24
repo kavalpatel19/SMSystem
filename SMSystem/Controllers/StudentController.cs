@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using SMSystem.Helpers;
+using SMSystem.Models;
+using SMSystem.Models.Department;
 using SMSystem.Models.Students;
 using SMSystem.Repository.Interfaces;
 using System.Collections;
@@ -16,7 +18,7 @@ namespace SMSystem.Controllers
 {
     public class StudentController : Controller
     {
-        IStudentRepository StdRepo;
+        private readonly IStudentRepository StdRepo;
 
         public StudentController(IStudentRepository repository)
         {
@@ -26,91 +28,208 @@ namespace SMSystem.Controllers
         // Index
         public async Task<IActionResult> Index(SearchingParaModel para)
         {
-            StudentPagedViewModel studentPagedViewModel = new StudentPagedViewModel();
-            return View(studentPagedViewModel);
+            try
+            {
+                var response = new StudentPagedViewModel();
+                return View(response);
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         public async Task<IActionResult> GridIndex()
         {
-            List<StudentViewModel> Students = StdRepo.GetAllStudents();
-            return View(Students);
+            try
+            {
+                var response = StdRepo.GetAllStudents();
+                if (response.ResponseCode == 200)
+                {
+                    return View(response.Results);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index");
+            }
         }
 
         // Returning data to the view
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            StudentPagedViewModel students = await StdRepo.GetStudents(para);
-
-            return PartialView("_StudentData", students);
+            var response = new BaseResponseViewModel<StudentPagedViewModel>();
+            try
+            {
+                response = await StdRepo.GetStudents(para).ConfigureAwait(false);
+                if (response.ResponseCode == 200)
+                {
+                    return PartialView("_StudentData", response.Result);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return PartialView("_StudentData", response.Result);
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Result = new StudentPagedViewModel();
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return PartialView("_StudentData", response.Result);
+            }
         }
 
         public IActionResult ExportExcel()
         {
-            var Data = StdRepo.GetAllStudents();
-
-                using (XLWorkbook wb = new XLWorkbook())
+            try
+            {
+                var response = StdRepo.GetAllStudents();
+                if (response.ResponseCode == 200)
                 {
-                    wb.Worksheets.Add(ConvertDataTable.Convert(Data.ToList()));
-                    using (MemoryStream mstream = new MemoryStream())
+                    using (var wb = new XLWorkbook())
                     {
-                        wb.SaveAs(mstream);
-                        return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Students.xlsx");
+                        wb.Worksheets.Add(ConvertDataTable.Convert(response.Results));
+                        using (var mstream = new MemoryStream())
+                        {
+                            wb.SaveAs(mstream);
+                            return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Students.xlsx");
+                        }
                     }
                 }
-
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index");
+            }
         }
 
         // GET: StudentController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            StudentViewModel student = await StdRepo.GetStudent(id);
-
-            return View(student);
+            try
+            {
+                var response = await StdRepo.GetStudent(id).ConfigureAwait(false);
+                if (response.ResponseCode == 200)
+                {
+                    return View(response.Result);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // GET: StudentController/Create
         public async Task<IActionResult> Create()
         {
-            StudentViewModel student = new StudentViewModel();
-            var students = StdRepo.GetAllStudents();
-            if (students.Count > 0)
+            try
             {
-                var lastId = students.OrderByDescending(x => x.StudentId).FirstOrDefault().StudentId;
-                char[] spearator = { '-', ' ' };
-                string[] stdId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
-                int id = (Convert.ToInt32(stdId[1])) + 1;
-                student.StudentId = "STD-" + (id.ToString("0000"));
+                var student = new StudentViewModel();
+                var students = StdRepo.GetAllStudents().Results;
+                if (students.Count > 0)
+                {
+                    var lastId = students.OrderByDescending(x => x.StudentId).FirstOrDefault().StudentId;
+                    char[] spearator = { '-', ' ' };
+                    string[] stdId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
+                    int id = (Convert.ToInt32(stdId[1])) + 1;
+                    student.StudentId = "STD-" + (id.ToString("0000"));
+                }
+                else
+                {
+                    student.StudentId = "STD-0001";
+                }
+
+                return View(student);
             }
-            else
+            catch (Exception ex)
             {
-                student.StudentId = "STD-0001";
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
             }
-            
-            return View(student);
         }
 
         // POST: StudentController/Create
         [HttpPost]
         public async Task<IActionResult> Create(StudentViewModel student)
         {
-            var res = StdRepo.Add(student);
-
-            if (res.IsCompletedSuccessfully)
+            try
             {
-                return RedirectToAction(nameof(Index));
+                var response = await StdRepo.Add(student);
+                if (response.ResponseCode == 200)
+                {
+                    TempData["Message"] = "Record Created Successfully.";
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Create));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return RedirectToAction("Create");
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return View();
             }
         }
 
         // GET: StudentController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            StudentViewModel student = await StdRepo.GetStudent(id);
-
-            return View(student);
+            try
+            {
+                var response = await StdRepo.GetStudent(id).ConfigureAwait(false);
+                if (response.ResponseCode == 200)
+                {
+                    return View(response.Result);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // POST: StudentController/Edit/5
@@ -118,15 +237,27 @@ namespace SMSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(StudentViewModel student)
         {
-            var response = StdRepo.Update(student);
-
-            if (response.IsCompletedSuccessfully)
+            try
             {
-                return RedirectToAction(nameof(Index));
+                var response = await StdRepo.Update(student);
+                if (response.ResponseCode == 200)
+                {
+                    TempData["Message"] = "Department has been saved successfully.";
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Edit));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return RedirectToAction("Edit");
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return View();
             }
         }
 
@@ -134,29 +265,30 @@ namespace SMSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            SearchingParaModel para = new SearchingParaModel()
+            try
             {
-                SId = string.Empty,
-                Name = string.Empty,
-                Phone = string.Empty,
-                PageIndex = 1
-            };
+                var para = new SearchingParaModel()
+                {
+                    SId = string.Empty,
+                    Name = string.Empty,
+                    Year = string.Empty,
+                    PageIndex = 1
+                };
 
-            var response = StdRepo.Delete(id);
+                var response = await StdRepo.Delete(id);
 
-            if (response.IsCompletedSuccessfully)
-            {
-                StudentPagedViewModel students = await StdRepo.GetStudents(para);
-                return PartialView("_StudentData", students);
+                var students = await StdRepo.GetStudents(para).ConfigureAwait(false);
+                return PartialView("_StudentData", students.Result);
             }
-            return PartialView();
+            catch (Exception ex)
+            {
+                return Json(new { message = ex.Message, responseCode = 500 });
+            }
         }
 
         public IActionResult EmailExist(string email ,int id)
         {
-            var Students = StdRepo.GetAllStudents().Where(x => x.Email == email).FirstOrDefault();
-            
-
+            var Students = StdRepo.GetAllStudents().Results.Where(x => x.Email == email).FirstOrDefault();
             if(Students != null)
             {
                 if (id > 0 && id == Students.Id)
@@ -166,7 +298,6 @@ namespace SMSystem.Controllers
                 return Json("Email Already Exist!");
             }
             return Json(true);
-            
         }
     }
 }
