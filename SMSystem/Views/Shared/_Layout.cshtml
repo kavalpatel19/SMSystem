@@ -19,9 +19,16 @@
     <link rel="stylesheet" href="~/assets/plugins/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="~/assets/css/style.css">
     <link rel="stylesheet" type="text/css" href="https://common.olemiss.edu/_js/sweet-alert/sweet-alert.css">
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="~/assets/js/jquery-3.6.0.min.js"></script>
+    <script>
+        
+        //$("#exception").addClass("show");
+        
+
+
+    </script>
 </head>
 <body>
 
@@ -50,13 +57,13 @@
             @{
                 Html.RenderPartial("_Notification");
             }
-
             @RenderBody()
 
         </div>
 
     </div>
     <script>
+        
         let responseCode = '@TempData["ResCode"]';
         var message = '@TempData["Message"]';
     </script>

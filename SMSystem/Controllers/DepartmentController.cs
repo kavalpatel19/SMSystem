@@ -24,6 +24,8 @@ namespace SMSystem.Controllers
         {
             try
             {
+                //throw new Exception();
+
                 var response = new DepartmentPaggedViewModel();
                 return View(response);
             }
@@ -39,7 +41,6 @@ namespace SMSystem.Controllers
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
             var response = new BaseResponseViewModel<DepartmentPaggedViewModel>();
-
             try
             {
                 response = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
@@ -51,7 +52,7 @@ namespace SMSystem.Controllers
                 {
                     TempData["Message"] = response.Message;
                     TempData["ResCode"] = response.ResponseCode;
-                    return PartialView("_DepartmentData", response);
+                    return PartialView("_DepartmentData", response.Result);
                 }
             }
             catch (Exception ex)
@@ -100,13 +101,10 @@ namespace SMSystem.Controllers
         // GET: DepartmentController/Create
         public async Task<IActionResult> Create()
         {
-            var response = new BaseResponseViewModel<DepartmentViewModel>();
-
             try
             {
-                response = DepRepo.GetAllDepartments();
                 var department = new DepartmentViewModel();
-                var departments = response.Results;
+                var departments = DepRepo.GetAllDepartments().Results;
                 if (departments.Count > 0)
                 {
                     var lastId = departments.OrderByDescending(x => x.DepartmentId).FirstOrDefault().DepartmentId;
@@ -134,11 +132,9 @@ namespace SMSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(DepartmentViewModel department)
         {
-            var response = new BaseResponseViewModel<DepartmentViewModel>();
-
             try
             {
-                response = await DepRepo.Add(department);
+                var response = await DepRepo.Add(department);
                 if (response.ResponseCode == 200)
                 {
                     TempData["Message"] = "Record Created Successfully.";
@@ -163,11 +159,9 @@ namespace SMSystem.Controllers
         // GET: DepartmentController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var response = new BaseResponseViewModel<DepartmentViewModel>();
-
             try
             {
-                response = await DepRepo.GetDepartment(id).ConfigureAwait(false);
+                var response = await DepRepo.GetDepartment(id).ConfigureAwait(false);
                 if(response.ResponseCode == 200)
                 {
                     return View(response.Result);
@@ -191,11 +185,9 @@ namespace SMSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(DepartmentViewModel department)
         {
-            var response = new BaseResponseViewModel<DepartmentViewModel>();
-
             try
             {
-                response = await DepRepo.Update(department);
+                var response = await DepRepo.Update(department);
                 if (response.ResponseCode == 200)
                 {
                     TempData["Message"] = "Department has been saved successfully.";
@@ -223,6 +215,7 @@ namespace SMSystem.Controllers
         {
             try
             {
+                throw new Exception();
                 var para = new SearchingParaModel()
                 {
                     SId = string.Empty,

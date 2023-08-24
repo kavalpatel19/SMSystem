@@ -27,6 +27,7 @@
     <PackageReference Include="ServiceStack.Interfaces" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="System.Data.OleDb" Version="7.0.0" />
+    <PackageReference Include="toastr" Version="2.1.1" />
   </ItemGroup>
 
 </Project>

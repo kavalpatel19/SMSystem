@@ -38,7 +38,6 @@ namespace SMSystem.Controllers
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
             var response = new BaseResponseViewModel<ExamPaggedViewModel>();
-
             try
             {
                 response = await ExamRepo.GetExams(para).ConfigureAwait(false);
@@ -64,10 +63,9 @@ namespace SMSystem.Controllers
 
         public IActionResult ExportExcel()
         {
-            var response = new BaseResponseViewModel<ExamViewModel>();
             try
             {
-                response = ExamRepo.GetAllExams();
+                var response = ExamRepo.GetAllExams();
                 if (response.ResponseCode == 200)
                 {
                     using (var wb = new XLWorkbook())
@@ -111,11 +109,9 @@ namespace SMSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(ExamViewModel exam)
         {
-            var response = new BaseResponseViewModel<ExamViewModel>();
-
             try
             {
-                response = await ExamRepo.Add(exam);
+                var response = await ExamRepo.Add(exam);
                 if (response.ResponseCode == 200)
                 {
                     TempData["Message"] = "Record Created Successfully.";
@@ -139,11 +135,9 @@ namespace SMSystem.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            var response = new BaseResponseViewModel<ExamViewModel>();
-
             try
             {
-                response = await ExamRepo.GetExam(id).ConfigureAwait(false);
+                var response = await ExamRepo.GetExam(id).ConfigureAwait(false);
                 if (response.ResponseCode == 200)
                 {
                     return View(response.Result);
@@ -166,11 +160,9 @@ namespace SMSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(ExamViewModel exam)
         {
-            var response = new BaseResponseViewModel<ExamViewModel>();
-
             try
             {
-                response = await ExamRepo.Update(exam);
+                var response = await ExamRepo.Update(exam);
                 if (response.ResponseCode == 200)
                 {
                     TempData["Message"] = "Exam has been saved successfully.";
@@ -194,8 +186,6 @@ namespace SMSystem.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var response = new BaseResponseViewModel<ExamViewModel>();
-
             try
             {
                 var para = new SearchingParaModel()
@@ -203,7 +193,7 @@ namespace SMSystem.Controllers
                     PageIndex = 1
                 };
 
-                response = await ExamRepo.Delete(id);
+                var response = await ExamRepo.Delete(id);
 
                 var exams = await ExamRepo.GetExams(para).ConfigureAwait(false);
                 return PartialView("_ExamData", exams.Result);

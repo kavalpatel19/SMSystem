@@ -2,7 +2,9 @@
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
+using SMSystem.Models;
 using SMSystem.Models.Department;
+using SMSystem.Models.Exam;
 using SMSystem.Models.Fees;
 using SMSystem.Repository.Interfaces;
 
@@ -19,48 +21,102 @@ namespace SMSystem.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var fees = new FeesPaggedViewModel();
-
-            return View(fees);
+            try
+            {
+                var response = new FeesPaggedViewModel();
+                return View(response);
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         public async Task<IActionResult> GetAll(SearchingParaModel para)
         {
-            var fees = await FeesRepo.GetFees(para).ConfigureAwait(false);
-            return PartialView("_FeesData", fees);
+            var response = new BaseResponseViewModel<FeesPaggedViewModel>();
+            try
+            {
+                response = await FeesRepo.GetFees(para).ConfigureAwait(false);
+                if (response.ResponseCode == 200)
+                {
+                    return PartialView("_FeesData", response.Result);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return PartialView("_FeesData", response.Result);
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Result = new FeesPaggedViewModel();
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return PartialView("_FeesData", response.Result);
+            }
         }
 
         public IActionResult ExportExcel()
         {
-            var data = FeesRepo.GetAllFees();
-
-            using (var wb = new XLWorkbook())
+            try
             {
-                wb.Worksheets.Add(ConvertDataTable.Convert(data.ToList()));
-                using (var mstream = new MemoryStream())
+                var response = FeesRepo.GetAllFees();
+                if (response.ResponseCode == 200)
                 {
-                    wb.SaveAs(mstream);
-                    return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Fees.xlsx");
+                    using (var wb = new XLWorkbook())
+                    {
+                        wb.Worksheets.Add(ConvertDataTable.Convert(response.Results));
+                        using (var mstream = new MemoryStream())
+                        {
+                            wb.SaveAs(mstream);
+                            return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Fees.xlsx");
+                        }
+                    }
                 }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return View("Index");
             }
         }
         public async Task<IActionResult> Create()
         {
-            var fee = new FeesViewModel();
-            var fees = FeesRepo.GetAllFees();
-            if (fees.Count > 0)
+            try
             {
-                var lastId = fees.OrderByDescending(x => x.FeesId).FirstOrDefault().FeesId;
-                char[] spearator = { '-', ' ' };
-                string[] feeId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
-                int id = (Convert.ToInt32(feeId[1])) + 1;
-                fee.FeesId = "FEES-" + (id.ToString("0000"));
+                var fee = new FeesViewModel();
+                var fees = FeesRepo.GetAllFees().Results;
+                if (fees.Count > 0)
+                {
+                    var lastId = fees.OrderByDescending(x => x.FeesId).FirstOrDefault().FeesId;
+                    char[] spearator = { '-', ' ' };
+                    string[] feeId = lastId.Split(spearator, 2, StringSplitOptions.RemoveEmptyEntries);
+                    int id = (Convert.ToInt32(feeId[1])) + 1;
+                    fee.FeesId = "FEES-" + (id.ToString("0000"));
+                }
+                else
+                {
+                    fee.FeesId = "DEP-0001";
+                }
+                return View(fee);
             }
-            else
+            catch (Exception ex)
             {
-                fee.FeesId = "DEP-0001";
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
             }
-            return View(fee);
         }
 
         [HttpPost]
@@ -68,26 +124,50 @@ namespace SMSystem.Controllers
         {
             try
             {
-                var response = FeesRepo.Add(fee);
-                if (response.IsCompletedSuccessfully)
+                var response = await FeesRepo.Add(fee);
+                if (response.ResponseCode == 200)
                 {
+                    TempData["Message"] = "Record Created Successfully.";
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Create));
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Create));
             }
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var fee = await FeesRepo.GetFee(id).ConfigureAwait(false);
-            return View(fee);
+            try
+            {
+                var response = await FeesRepo.GetFee(id).ConfigureAwait(false);
+                if (response.ResponseCode == 200)
+                {
+                    return View(response.Result);
+                }
+                else
+                {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpPost]
@@ -95,18 +175,24 @@ namespace SMSystem.Controllers
         {
             try
             {
-                var response = FeesRepo.Update(fee);
-                if (response.IsCompletedSuccessfully)
+                var response = await FeesRepo.Update(fee);
+                if (response.ResponseCode == 200)
                 {
+                    TempData["Message"] = "Exam has been saved successfully.";
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
+                    TempData["Message"] = response.Message;
+                    TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Edit));
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
                 return View();
             }
         }
@@ -120,18 +206,14 @@ namespace SMSystem.Controllers
                     PageIndex = 1
                 };
 
-                var response = FeesRepo.Delete(id);
+                var response = await FeesRepo.Delete(id);
 
-                if (response.IsCompletedSuccessfully)
-                {
-                    var fees = await FeesRepo.GetFees(para).ConfigureAwait(false);
-                    return PartialView("_FeesData", fees);
-                }
-                return PartialView();
+                var fees = await FeesRepo.GetFees(para).ConfigureAwait(false);
+                return PartialView("_ExamData", fees.Result);
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return Json(new { message = ex.Message, responseCode = 500 });
             }
         }
     }

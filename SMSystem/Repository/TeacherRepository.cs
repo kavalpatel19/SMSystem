@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SMSystem.Helpers;
+using SMSystem.Models;
+using SMSystem.Models.Exam;
 using SMSystem.Models.Students;
 using SMSystem.Models.Teacher;
 using SMSystem.Repository.Interfaces;
@@ -17,163 +19,239 @@ namespace SMSystem.Repository
             this.environment = environment;
         }
 
-        public List<TeacherViewModel> GetAllTeachers()
+        public BaseResponseViewModel<TeacherViewModel> GetAllTeachers()
         {
-            var teachers = new List<TeacherViewModel>();
-
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<TeacherViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = client.GetAsync($"TeacherApi/Export").Result;
-
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    teachers = JsonConvert.DeserializeObject<List<TeacherViewModel>>(data);
-                }
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.GetAsync($"TeacherApi/Export").Result;
 
-                return teachers;
-            }
-        }
-
-        public async Task<TeacherPagedViewModel> GetTeachers(SearchingParaModel para)
-        {
-            var teacherPagedViewModel = new TeacherPagedViewModel();
-
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-
-                para.SId = string.IsNullOrEmpty(para.SId) ? string.Empty : para.SId;
-                para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
-                para.Phone = string.IsNullOrEmpty(para.Phone) ? string.Empty : para.Phone;
-
-                var response = await client.GetAsync($"TeacherApi?sid={para.SId}&name={para.Name}&phone={para.Phone}&pageIndex={para.PageIndex}").ConfigureAwait(false);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    teacherPagedViewModel = JsonConvert.DeserializeObject<TeacherPagedViewModel>(data);
-                }
-
-                return teacherPagedViewModel;
-            }
-        }
-
-        public async Task<TeacherViewModel> GetTeacher(int id)
-        {
-            var teacher = new TeacherViewModel();
-
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                var response = await client.GetAsync($"TeacherApi/{id}").ConfigureAwait(false);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var data = response.Content.ReadAsStringAsync().Result;
-                    teacher = JsonConvert.DeserializeObject<TeacherViewModel>(data);
-                }
-
-                return teacher;
-            }
-        }
-
-        public async Task<bool> Add(TeacherViewModel teacher)
-        {
-            string uniqueFileName = string.Empty;
-
-            if (teacher.ImagePath == null)
-            {
-                if (teacher.Gender.Equals("Male"))
-                {
-                    uniqueFileName = "/images/Default/MaleAvatar.png";
-                }
-                else
-                {
-                    uniqueFileName = "/images/Default/FemaleAvatqar.jfif";
-                }
-            }
-            else
-            {
-                uniqueFileName = UploadImage(teacher);
-            }
-
-            teacher.Path = uniqueFileName;
-
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-
-                var response = client.PostAsJsonAsync<TeacherViewModel>("TeacherApi", teacher).Result;
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-        public async Task<bool> Update(TeacherViewModel teacher)
-        {
-            if (teacher.ImagePath != null)
-            {
-                if (teacher.Path == null)
-                {
-                    teacher.Path = UploadImage(teacher);
-                }
-                else if (teacher.Path.Contains("/Default/"))
-                {
-                    teacher.Path = UploadImage(teacher);
-                }
-                else
-                {
-                    string FilePath = $"{environment.WebRootPath}{teacher.Path}";
-                    if (System.IO.File.Exists(FilePath))
+                    if (response.IsSuccessStatusCode)
                     {
-                        System.IO.File.Delete(FilePath);
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<TeacherViewModel>>(data);
+                        return baseResponse;
                     }
-                    teacher.Path = UploadImage(teacher);
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
             }
-
-            using (var client = new HttpClient())
+            catch (Exception ex)
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Results = new List<TeacherViewModel>();
+                return baseResponse;
+            }
+        }
 
-                var response = client.PutAsJsonAsync<TeacherViewModel>("TeacherApi", teacher).Result;
-
-                if (response.IsSuccessStatusCode)
+        public async Task<BaseResponseViewModel<TeacherPagedViewModel>> GetTeachers(SearchingParaModel para)
+        {
+            var baseResponse = new BaseResponseViewModel<TeacherPagedViewModel>();
+            try
+            {
+                using (var client = new HttpClient())
                 {
-                    return true;
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+
+                    para.SId = string.IsNullOrEmpty(para.SId) ? string.Empty : para.SId;
+                    para.Name = string.IsNullOrEmpty(para.Name) ? string.Empty : para.Name;
+                    para.Phone = string.IsNullOrEmpty(para.Phone) ? string.Empty : para.Phone;
+
+                    var response = await client.GetAsync($"TeacherApi?sid={para.SId}&name={para.Name}&phone={para.Phone}&pageIndex={para.PageIndex}").ConfigureAwait(false);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<TeacherPagedViewModel>>(data);
+                        return baseResponse;
+
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new TeacherPagedViewModel();
+                return baseResponse;
+            }
+        }
+
+        public async Task<BaseResponseViewModel<TeacherViewModel>> GetTeacher(int id)
+        {
+            var baseResponse = new BaseResponseViewModel<TeacherViewModel>();
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+
+                    var response = await client.GetAsync($"TeacherApi/{id}").ConfigureAwait(false);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<TeacherViewModel>>(data);
+                        return baseResponse;
+
+                    }
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new TeacherViewModel();
+                return baseResponse;
+            }
+        }
+
+        public async Task<BaseResponseViewModel<TeacherViewModel>> Add(TeacherViewModel teacher)
+        {
+            var baseResponse = new BaseResponseViewModel<TeacherViewModel>();
+            try
+            {
+                string uniqueFileName = string.Empty;
+
+                if (teacher.ImagePath == null)
+                {
+                    if (teacher.Gender.Equals("Male"))
+                    {
+                        uniqueFileName = "/images/Default/MaleAvatar.png";
+                    }
+                    else
+                    {
+                        uniqueFileName = "/images/Default/FemaleAvatqar.jfif";
+                    }
                 }
                 else
                 {
-                    return false;
+                    uniqueFileName = UploadImage(teacher);
                 }
+
+                teacher.Path = uniqueFileName;
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.PostAsJsonAsync<TeacherViewModel>("TeacherApi", teacher).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<TeacherViewModel>>(data);
+                        return baseResponse;
+
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new TeacherViewModel();
+                return baseResponse;
+            }
+        }
+        public async Task<BaseResponseViewModel<TeacherViewModel>> Update(TeacherViewModel teacher)
+        {
+            var baseResponse = new BaseResponseViewModel<TeacherViewModel>();
+            try
+            {
+                if (teacher.ImagePath != null)
+                {
+                    if (teacher.Path == null)
+                    {
+                        teacher.Path = UploadImage(teacher);
+                    }
+                    else if (teacher.Path.Contains("/Default/"))
+                    {
+                        teacher.Path = UploadImage(teacher);
+                    }
+                    else
+                    {
+                        string FilePath = $"{environment.WebRootPath}{teacher.Path}";
+                        if (System.IO.File.Exists(FilePath))
+                        {
+                            System.IO.File.Delete(FilePath);
+                        }
+                        teacher.Path = UploadImage(teacher);
+                    }
+                }
+
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.PutAsJsonAsync<TeacherViewModel>("TeacherApi", teacher).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<TeacherViewModel>>(data);
+
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new TeacherViewModel();
+                return baseResponse;
             }
         }
 
 
-        public async Task<bool> Delete(int id)
+        public async Task<BaseResponseViewModel<TeacherViewModel>> Delete(int id)
         {
-            using (var client = new HttpClient())
+            var baseResponse = new BaseResponseViewModel<TeacherViewModel>();
+            try
             {
-                client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                // To send Delete data request
-                var response = client.DeleteAsync($"TeacherApi/{id}").Result;
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    // To send Delete data request
+                    var response = client.DeleteAsync($"TeacherApi/{id}").Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<TeacherViewModel>>(data);
+
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
                 }
-                else
-                {
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new TeacherViewModel();
+                return baseResponse;
             }
         }
 
