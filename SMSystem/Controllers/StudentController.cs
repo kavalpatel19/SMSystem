@@ -242,7 +242,7 @@ namespace SMSystem.Controllers
                 var response = await StdRepo.Update(student);
                 if (response.ResponseCode == 200)
                 {
-                    TempData["Message"] = "Department has been saved successfully.";
+                    TempData["Message"] = "Data saved successfully.";
                     TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }

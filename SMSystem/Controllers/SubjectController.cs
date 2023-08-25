@@ -184,7 +184,7 @@ namespace SMSystem.Controllers
                 var response = await SubRepo.Update(subject);
                 if (response.ResponseCode == 200)
                 {
-                    TempData["Message"] = "Department has been saved successfully.";
+                    TempData["Message"] = "Data saved successfully.";
                     TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }

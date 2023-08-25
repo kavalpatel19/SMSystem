@@ -178,7 +178,7 @@ namespace SMSystem.Controllers
                 var response = await FeesRepo.Update(fee);
                 if (response.ResponseCode == 200)
                 {
-                    TempData["Message"] = "Exam has been saved successfully.";
+                    TempData["Message"] = "Data saved successfully.";
                     TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }
