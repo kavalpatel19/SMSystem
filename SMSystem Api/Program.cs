@@ -17,6 +17,7 @@ builder.Services.AddScoped<ISubjectApiRepository,SubjectApiRepository>();
 builder.Services.AddScoped<IHolidayApiRepository,HolidayApiRepository>();
 builder.Services.AddScoped<IFeesApiRepository,FeesApiRepository>();
 builder.Services.AddScoped<IExamApiRepository,ExamApiRepository>();
+builder.Services.AddScoped<IAuthenticationApiRepository,AuthenticationApiRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

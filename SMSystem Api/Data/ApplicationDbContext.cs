@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Model;
+using SMSystem_Api.Model.Auth;
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Exam;
 using SMSystem_Api.Model.Fees;
@@ -40,5 +41,6 @@ namespace SMSystem_Api.Data
         public DbSet<HolidayModel>  Holidays { get; set; }
         public DbSet<FeesModel> Fees { get; set; }
         public DbSet<ExamModel> Exams { get; set; }
+        public DbSet<ApplicationUser> User { get; set; }
     }
 }
