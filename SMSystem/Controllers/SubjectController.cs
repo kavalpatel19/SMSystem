@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
 using SMSystem.Models;
@@ -9,6 +10,7 @@ using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds;
 
 namespace SMSystem.Controllers
 {
+    [Authorize]
     public class SubjectController : Controller
     {
         private readonly ISubjectRepository SubRepo;

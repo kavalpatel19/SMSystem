@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace SMSystem.Controllers
 {
-    [Authorize(Roles = "admin")]
+    [Authorize]
     public class HomeController : Controller
     {
         public IActionResult Index()

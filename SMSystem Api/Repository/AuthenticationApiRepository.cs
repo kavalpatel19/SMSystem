@@ -19,19 +19,13 @@ namespace SMSystem_Api.Repository
             var response = new BaseResponseModel<ApplicationUser>();
             try
             {
-                var user = context.User.Where( x => x.Username == model.Username ).FirstOrDefault();
+                var user = context.User.Where( x => x.Username == model.Username || x.Email == model.Username).FirstOrDefault();
                 if(user != null)
                 {
-                    if(model.Username != user.Username)
-                    {
-                        response.ResponseCode = 500;
-                        response.Message = "Invalid Username!";
-                        return response;
-                    }
                     if(model.Password != user.Password)
                     {
                         response.ResponseCode = 500;
-                        response.Message = "Invalid Password!";
+                        response.Message = "Invalid Password for this username!";
                         return response;
                     }
 
@@ -40,7 +34,7 @@ namespace SMSystem_Api.Repository
                     return response;
                 }
                 response.ResponseCode = 500;
-                response.Message = "User Does not Exist!";
+                response.Message = "Username does not Exist!";
                 return response;
             }
             catch(Exception ex)

@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
@@ -9,6 +10,7 @@ using SMSystem.Repository.Interfaces;
 
 namespace SMSystem.Controllers
 {
+    [Authorize(Roles ="admin")]
     public class TeacherController : Controller
     {
         private readonly ITeacherRepository TeachRepo;

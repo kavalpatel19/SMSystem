@@ -1,6 +1,7 @@
 ﻿ using Azure;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
@@ -11,6 +12,7 @@ using SMSystem.Repository.Interfaces;
 
 namespace SMSystem.Controllers
 {
+    [Authorize]
     public class DepartmentController : Controller
     {
         private readonly IDepartmentRepository DepRepo;

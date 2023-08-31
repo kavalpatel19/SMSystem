@@ -1,5 +1,6 @@
 ﻿using Azure;
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
@@ -16,6 +17,7 @@ using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds;
 
 namespace SMSystem.Controllers
 {
+    [Authorize(Roles ="admin")]
     public class StudentController : Controller
     {
         private readonly IStudentRepository StdRepo;
