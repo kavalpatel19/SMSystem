@@ -24,7 +24,7 @@ namespace SMSystem.Repository
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                    var response = client.PostAsJsonAsync<LoginViewModel>("AccountApi/", model).Result;
+                    var response = client.PostAsJsonAsync<LoginViewModel>("AccountApi/Login", model).Result;
 
                     if (response.IsSuccessStatusCode)
                     {

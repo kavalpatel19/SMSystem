@@ -2,11 +2,15 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.CodeAnalysis.Differencing;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using SMSystem.Helpers;
 using SMSystem.Models;
+using SMSystem.Models.Auth;
 using SMSystem.Models.Exam;
+using SMSystem.Models.Student;
 using SMSystem.Models.Students;
+using SMSystem.Models.Teacher;
 using SMSystem.Repository.Interfaces;
 
 namespace SMSystem.Repository
@@ -120,12 +124,13 @@ namespace SMSystem.Repository
             }
         }
 
-        public async Task<BaseResponseViewModel<StudentViewModel>> Add(StudentViewModel student)
+        public async Task<BaseResponseViewModel<StudentRegisterViewModel>> Add(StudentRegisterViewModel register)
         {
-            var baseResponse = new BaseResponseViewModel<StudentViewModel>();
+            var baseResponse = new BaseResponseViewModel<StudentRegisterViewModel>();
             try
             {
                 string uniqueFileName = string.Empty;
+                var student = register.StudentModel;
 
                 if (student.ImagePath == null)
                 {
@@ -148,18 +153,28 @@ namespace SMSystem.Repository
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
-                    var response = client.PostAsJsonAsync<StudentViewModel>("StudentApi", student).Result;
+                    var studentResponse = client.PostAsJsonAsync<StudentViewModel>("StudentApi", register.StudentModel).Result;
+                    var userResponse = client.PostAsJsonAsync<ApplicationUser>("AccountApi/Register", register.UserModel).Result;
 
-                    if (response.IsSuccessStatusCode)
+                    if (studentResponse.IsSuccessStatusCode && userResponse.IsSuccessStatusCode)
                     {
-                        var data = response.Content.ReadAsStringAsync().Result;
-                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<StudentViewModel>>(data);
+                        var sdata = studentResponse.Content.ReadAsStringAsync().Result;
+                        var sr = JsonConvert.DeserializeObject<BaseResponseViewModel<StudentViewModel>>(sdata);
+                        var udata = userResponse.Content.ReadAsStringAsync().Result;
+                        var ur = JsonConvert.DeserializeObject<BaseResponseViewModel<ApplicationUser>>(udata);
+                        if (sr.ResponseCode == 200 && ur.ResponseCode == 200)
+                        {
+                            baseResponse.ResponseCode = 200;
+                            return baseResponse;
+                        }
+                        baseResponse.ResponseCode = 500;
+                        baseResponse.Message = "Internal serrver error!";
                         return baseResponse;
 
                     }
 
-                    baseResponse.ResponseCode = (int)response.StatusCode;
-                    baseResponse.Message = response.ReasonPhrase;
+                    baseResponse.ResponseCode = 400;
+                    baseResponse.Message = "Bad Request";
                     return baseResponse;
                 }
             }
@@ -167,7 +182,7 @@ namespace SMSystem.Repository
             {
                 baseResponse.ResponseCode = 500;
                 baseResponse.Message = ex.Message;
-                baseResponse.Result = new StudentViewModel();
+                baseResponse.Result = new StudentRegisterViewModel();
                 return baseResponse;
             }
         }

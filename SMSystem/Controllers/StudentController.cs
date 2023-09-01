@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using SMSystem.Helpers;
 using SMSystem.Models;
 using SMSystem.Models.Department;
+using SMSystem.Models.Student;
 using SMSystem.Models.Students;
 using SMSystem.Repository.Interfaces;
 using System.Collections;
@@ -170,8 +171,12 @@ namespace SMSystem.Controllers
                 {
                     student.StudentId = "STD-0001";
                 }
-
-                return View(student);
+                var register = new StudentRegisterViewModel()
+                {
+                    StudentModel = student,
+                    UserModel = new Models.Auth.ApplicationUser()
+                };
+                return View(register);
             }
             catch (Exception ex)
             {
@@ -183,11 +188,11 @@ namespace SMSystem.Controllers
 
         // POST: StudentController/Create
         [HttpPost]
-        public async Task<IActionResult> Create(StudentViewModel student)
+        public async Task<IActionResult> Create(StudentRegisterViewModel register)
         {
             try
             {
-                var response = await StdRepo.Add(student);
+                var response = await StdRepo.Add(register);
                 if (response.ResponseCode == 200)
                 {
                     TempData["Message"] = "Record Created Successfully.";

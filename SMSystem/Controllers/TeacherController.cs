@@ -163,7 +163,12 @@ namespace SMSystem.Controllers
                 {
                     teacher.TeacherId = "TCHR-0001";
                 }
-                return View(teacher);
+                var register = new TeacherRegisterViewModel()
+                {
+                    TeacherModel = teacher,
+                    UserModel = new Models.Auth.ApplicationUser()
+                };
+                return View(register);
             }
             catch (Exception ex)
             {
@@ -175,11 +180,11 @@ namespace SMSystem.Controllers
 
         // POST: TeacherController/Create
         [HttpPost]
-        public async Task<IActionResult> Create(TeacherViewModel teacher)
+        public async Task<IActionResult> Create(TeacherRegisterViewModel register)
         {
             try
             {
-                var response = await TeachRepo.Add(teacher);
+                var response = await TeachRepo.Add(register);
                 if (response.ResponseCode == 200)
                 {
                     TempData["Message"] = "Record Created Successfully.";

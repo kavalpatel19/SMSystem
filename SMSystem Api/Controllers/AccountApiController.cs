@@ -17,13 +17,31 @@ namespace SMSystem_Api.Controllers
         {
             authRepo = AuthRepo;
         }
-        [HttpPost]
+        [HttpPost("Login")]
         public IActionResult Login(LoginModel model)
         {
             var baseResponse = new BaseResponseModel<ApplicationUser>();
             try
             {
                 baseResponse = authRepo.Login(model);
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new ApplicationUser();
+                return Ok(baseResponse);
+            }
+        }
+
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register(ApplicationUser user)
+        {
+            var baseResponse = new BaseResponseModel<ApplicationUser>();
+            try
+            {
+                baseResponse = await authRepo.Register(user);
                 return Ok(baseResponse);
             }
             catch (Exception ex)

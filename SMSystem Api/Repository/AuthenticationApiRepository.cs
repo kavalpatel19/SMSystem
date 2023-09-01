@@ -14,6 +14,25 @@ namespace SMSystem_Api.Repository
         {
             this.context = context;
         }
+
+        public async Task<BaseResponseModel<ApplicationUser>> Register(ApplicationUser model)
+        {
+            var response = new BaseResponseModel<ApplicationUser>();
+            try
+            {
+                await context.User.AddAsync(model).ConfigureAwait(false);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+                response.ResponseCode = 200;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
+                return response;
+            }
+        }
+
         public BaseResponseModel<ApplicationUser> Login(LoginModel model)
         {
             var response = new BaseResponseModel<ApplicationUser>();
