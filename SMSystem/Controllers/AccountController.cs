@@ -44,11 +44,11 @@ namespace SMSystem.Controllers
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var authProperties = new AuthenticationProperties
                     {
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(1) // Set expiration time
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddDays(90) // Set expiration time
                     };
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-                    var user = stdRepo.GetAllStudents().Results.Where(x => x.Id == response.Result.UserId).FirstOrDefault();
+                    var user = stdRepo.GetAllStudents().Results.Where(x => x.StudentId == response.Result.UserId).FirstOrDefault();
 
                     TempData["Username"] = user.FirstName;
                     return RedirectToAction("Index", "Home"); // Redirect after successful login
