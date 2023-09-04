@@ -143,6 +143,7 @@ namespace SMSystem.Repository
                 }
 
                 teacher.Path = uniqueFileName;
+                register.UserModel.Role = "teacher";
 
                 using (var client = new HttpClient())
                 {

@@ -17,6 +17,25 @@ namespace SMSystem_Api.Controllers
         {
             authRepo = AuthRepo;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUsers() 
+        {
+            var baseResponse = new BaseResponseModel<ApplicationUser>();
+            try
+            {
+                baseResponse =  await authRepo.GetUsers();
+                return Ok(baseResponse);
+            }
+            catch (Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new ApplicationUser();
+                return Ok(baseResponse);
+            }
+        }
+
         [HttpPost("Login")]
         public IActionResult Login(LoginModel model)
         {

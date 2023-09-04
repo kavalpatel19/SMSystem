@@ -293,19 +293,6 @@ namespace SMSystem.Controllers
             }
         }
 
-        public IActionResult EmailExist(string email ,int id)
-        {
-            var Students = StdRepo.GetAllStudents().Results.Where(x => x.Email == email).FirstOrDefault();
-            if(Students != null)
-            {
-                if (id > 0 && id == Students.Id)
-                {
-                    return Json(true);
-                }
-                return Json("Email Already Exist!");
-            }
-            return Json(true);
-        }
     }
 }
 

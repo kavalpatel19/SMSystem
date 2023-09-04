@@ -71,5 +71,20 @@ namespace SMSystem.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Account"); // Redirect after logout
         }
+
+
+        public IActionResult EmailExist(string email, int id)
+        {
+            var users = authRepo.GetUsers().Results.Where(x => x.Email == email).FirstOrDefault();
+            if (users != null)
+            {
+                if (id > 0 && id == users.Id)
+                {
+                    return Json(true);
+                }
+                return Json("Email Already Exist!");
+            }
+            return Json(true);
+        }
     }
 }

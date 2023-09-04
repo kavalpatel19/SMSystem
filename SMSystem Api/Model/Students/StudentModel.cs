@@ -17,7 +17,6 @@ namespace SMSystem_Api.Model.Students
         public string RollNo { get; set; }
         public string BloodGroup { get; set; }
         public string Religion { get; set; }
-        public string Email { get; set; }
         public string Class { get; set; }
         public string Section { get; set; }
         public string AdmissionId { get; set; }

@@ -7,21 +7,38 @@
                     <li class="menu-title">
                         <span>Main Menu</span>
                     </li>
-                    <li class="submenu">
-                        <a href="#">
-                            <i class="feather-grid"></i> <span> Dashboard</span> <span class="menu-arrow"></span>
-                        </a>
-                        <ul>
-                            <li><a asp-action="Index" asp-controller="Home" class="loader">Admin Dashboard</a></li>
-                            <li><a href="teacher-dashboard.html">Teacher Dashboard</a></li>
-                            <li><a href="student-dashboard.html">Student Dashboard</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a asp-action="Index" asp-controller="Student" class="loader">
-                            <i class="fas fa-graduation-cap"></i> <span> Students</span> 
-                        </a>
-                    </li>
+                    @if (User.IsInRole("admin"))
+                    {
+                        <li>
+                            <a asp-action="Index" asp-controller="Home" class="loader">
+                                <i class="feather-grid"></i> <span>Dashboard</span>
+                            </a>
+                        </li>
+                    }
+                    @if (User.IsInRole("teacher"))
+                    {
+                        <li>
+                            <a href="teacher-dashboard.html">
+                                <i class="feather-grid"></i> <span>Dashboard</span>
+                            </a>
+                        </li>
+                    }
+                    @if (User.IsInRole("student"))
+                    {
+                        <li>
+                            <a href="student-dashboard.html">
+                                <i class="feather-grid"></i> <span>Dashboard</span>
+                            </a>
+                        </li>
+                    }
+                    @if (User.IsInRole("admin"))
+                    {
+                        <li>
+                            <a asp-action="Index" asp-controller="Student" class="loader">
+                                <i class="fas fa-graduation-cap"></i> <span> Students</span>
+                            </a>
+                        </li>
+                    }
                     <li>
                         <a asp-action ="Index" asp-controller="Teacher" class="loader">
                             <i class="fas fa-chalkboard-teacher"></i> <span> Teachers</span>
