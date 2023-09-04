@@ -18,7 +18,7 @@ using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds;
 
 namespace SMSystem.Controllers
 {
-    [Authorize(Roles ="admin")]
+    [Authorize(Roles ="admin , teacher")]
     public class StudentController : Controller
     {
         private readonly IStudentRepository StdRepo;

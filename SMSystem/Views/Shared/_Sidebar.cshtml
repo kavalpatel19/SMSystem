@@ -31,7 +31,7 @@
                             </a>
                         </li>
                     }
-                    @if (User.IsInRole("admin"))
+                    @if (User.IsInRole("admin") || User.IsInRole("teacher"))
                     {
                         <li>
                             <a asp-action="Index" asp-controller="Student" class="loader">
