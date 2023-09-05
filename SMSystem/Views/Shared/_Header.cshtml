@@ -1,4 +1,8 @@
-﻿
+﻿@using System.Security.Claims;
+@{
+    string userName = User.FindFirst(ClaimTypes.GivenName)?.Value;
+    string role = User.FindFirst(ClaimTypes.Role)?.Value;
+}
 <div>
     <div class="header">
 
@@ -163,9 +167,9 @@
                         <img class="rounded-circle" src="~/assets/img/profiles/avatar-01.jpg" width="31" alt="Jassa Rich">
                         <div class="user-text">
                             <h6>
-                                @TempData["Username"]
+                                @userName
                             </h6>
-                            <p class="text-muted mb-0">Administrator</p>
+                            <p class="text-muted mb-0">@role</p>
                         </div>
                     </span>
                 </a>
@@ -175,11 +179,14 @@
                             <img src="~/assets/img/profiles/avatar-01.jpg" alt="User Image" class="avatar-img rounded-circle">
                         </div>
                         <div class="user-text">
-                            <h6>Jassa Rich</h6>
+                            <h6>@userName</h6>
                             <p class="text-muted mb-0">Administrator</p>
                         </div>
                     </div>
-                    <a class="dropdown-item" href="profile.html">My Profile</a>
+                    @if (User.IsInRole("teacher") || User.IsInRole("student"))
+                    {
+                        <a class="dropdown-item" asp-action="Profile" asp-controller="Account">My Profile</a>
+                    }
                     <a class="dropdown-item" href="inbox.html">Inbox</a>
                     <a class="dropdown-item" asp-action="Logout" asp-controller="Account">Logout</a>
                 </div>

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using SMSystem.Models.Auth;
 using SMSystem.Repository.Interfaces;
 using SMSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SMSystem.Controllers
 {
@@ -17,6 +18,23 @@ namespace SMSystem.Controllers
         {
             authRepo = AuthRepo;
             stdRepo = StdRepo;
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            if(userId != null)
+            {
+                if (role.Equals("student"))
+                {
+                    var user = stdRepo.GetAllStudents().Results.Find(x => x.StudentId == userId);
+
+                }
+                
+            }
+            return View();
         }
 
         [HttpGet]
@@ -38,6 +56,7 @@ namespace SMSystem.Controllers
                 {
                     new Claim(ClaimTypes.Name, model.Username),
                     new Claim(ClaimTypes.Role, response.Result.Role),
+                    new Claim(ClaimTypes.GivenName, response.Result.Name),
                     // Add other claims as needed
                 };
 
@@ -48,9 +67,7 @@ namespace SMSystem.Controllers
                     };
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-                    //var user = stdRepo.GetAllStudents().Results.Where(x => x.StudentId == response.Result.UserId).FirstOrDefault();
 
-                    //TempData["Username"] = user.FirstName;
                     return RedirectToAction("Index", "Home"); // Redirect after successful login
                 }
 
@@ -65,14 +82,14 @@ namespace SMSystem.Controllers
                 return View(model);
             }
         }
-
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Account"); // Redirect after logout
         }
 
-
+        [Authorize]
         public IActionResult EmailExist(string email, int id)
         {
             var users = authRepo.GetUsers().Results.Where(x => x.Email == email).FirstOrDefault();
@@ -82,9 +99,17 @@ namespace SMSystem.Controllers
                 {
                     return Json(true);
                 }
+
                 return Json("Email Already Exist!");
             }
             return Json(true);
+        }
+        [Authorize]
+        public IActionResult AccessDenied()
+        {
+            TempData["Message"] = "Access Denied";
+            TempData["ResCode"] = 500;
+            return RedirectToAction("Index", "Home");
         }
     }
 }

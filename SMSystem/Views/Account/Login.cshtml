@@ -22,6 +22,7 @@
 
     <link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css">
     <link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
+    <script src="~/assets/js/jquery-3.6.0.min.js"></script>
 
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -36,6 +37,9 @@
                     </div>
                     <div class="login-right">
                         <div class="login-right-wrap">
+                            @{
+                                Html.RenderPartial("_Notification");
+                            }
                             <h1>Welcome to Preskool</h1>
                             <h2>Sign in</h2>
 
@@ -58,7 +62,7 @@
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>
-                                    <a href="forgot-password.html">Forgot Password?</a>
+                                    <a href="#">Forgot Password?</a>
                                 </div>
                                 <div class="form-group">
                                     <button class="btn btn-primary btn-block" type="submit">Login</button>
@@ -84,7 +88,13 @@
         </div>
     </div>
 
+    <script>
 
+        let responseCode = '@TempData["ResCode"]';
+        var message = '@TempData["Message"]';
+
+    </script>
+    <script src="~/js/site.js"></script>
     <script src="assets/js/jquery-3.6.0.min.js"></script>
 
     <script src="assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>

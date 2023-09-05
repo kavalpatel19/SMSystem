@@ -94,6 +94,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         // GET: DepartmentController/Create
         public async Task<IActionResult> Create()
         {
@@ -124,6 +125,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         // POST: DepartmentController/Create
         [HttpPost]
         public async Task<IActionResult> Create(SubjectViewModel subject)
@@ -152,6 +154,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         // GET: DepartmentController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
@@ -177,6 +180,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         // POST: DepartmentController/Edit/5
         [HttpPost]
         public async Task<IActionResult> Edit(SubjectViewModel subject)
@@ -205,6 +209,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         // POST: DepartmentController/Delete/5
         [HttpPost]
         public async Task<IActionResult> Delete(int id)

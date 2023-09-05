@@ -18,7 +18,7 @@ using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds;
 
 namespace SMSystem.Controllers
 {
-    [Authorize(Roles ="admin , teacher")]
+    [Authorize]
     public class StudentController : Controller
     {
         private readonly IStudentRepository StdRepo;
@@ -95,6 +95,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles ="admin , teacher")]
         public IActionResult ExportExcel()
         {
             try
@@ -153,6 +154,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: StudentController/Create
+        [Authorize(Roles ="admin , teacher")]
         public async Task<IActionResult> Create()
         {
             try
@@ -187,6 +189,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: StudentController/Create
+        [Authorize(Roles ="admin , teacher")]
         [HttpPost]
         public async Task<IActionResult> Create(StudentRegisterViewModel register)
         {
@@ -215,6 +218,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: StudentController/Edit/5
+        [Authorize(Roles ="admin , teacher")]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -240,6 +244,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: StudentController/Edit/5
+        [Authorize(Roles ="admin , teacher")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(StudentViewModel student)
@@ -269,6 +274,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: StudentController/Delete/5
+        [Authorize(Roles ="admin , teacher")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

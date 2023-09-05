@@ -23,7 +23,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         });
 
 builder.Services.AddDistributedMemoryCache(); // Use an in-memory cache for session data
-
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.AccessDeniedPath = new PathString("/Home/Index");
+});
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = "UserData";

@@ -10,7 +10,7 @@ using SMSystem.Repository.Interfaces;
 
 namespace SMSystem.Controllers
 {
-    [Authorize(Roles ="admin")]
+    [Authorize]
     public class TeacherController : Controller
     {
         private readonly ITeacherRepository TeachRepo;
@@ -87,6 +87,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         public IActionResult ExportExcel()
         {
             try
@@ -145,6 +146,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: TeacherController/Create
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Create()
         {
             try
@@ -179,6 +181,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: TeacherController/Create
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> Create(TeacherRegisterViewModel register)
         {
@@ -207,6 +210,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: TeacherController/Edit/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -232,6 +236,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: TeacherController/Edit/5
+        [Authorize(Roles = "admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(TeacherViewModel teacher)
@@ -261,6 +266,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: TeacherController/Delete/5
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

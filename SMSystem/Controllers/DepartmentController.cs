@@ -1,4 +1,4 @@
-﻿ using Azure;
+﻿using Azure;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Authorization;
@@ -35,7 +35,7 @@ namespace SMSystem.Controllers
             {
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
-                return RedirectToAction("Index","Home");
+                return RedirectToAction("Index", "Home");
             }
         }
 
@@ -46,7 +46,7 @@ namespace SMSystem.Controllers
             try
             {
                 response = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
-                if(response.ResponseCode == 200)
+                if (response.ResponseCode == 200)
                 {
                     return PartialView("_DepartmentData", response.Result);
                 }
@@ -67,6 +67,7 @@ namespace SMSystem.Controllers
         }
 
         //To Export Data
+        [Authorize(Roles = "admin")]
         public IActionResult ExportExcel()
         {
             try
@@ -80,7 +81,7 @@ namespace SMSystem.Controllers
                         using (var mstream = new MemoryStream())
                         {
                             wb.SaveAs(mstream);
-                            
+
                             return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Departments.xlsx");
                         }
                     }
@@ -92,7 +93,7 @@ namespace SMSystem.Controllers
                     return RedirectToAction("Index");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
@@ -101,6 +102,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: DepartmentController/Create
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Create()
         {
             try
@@ -131,6 +133,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: DepartmentController/Create
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> Create(DepartmentViewModel department)
         {
@@ -150,7 +153,7 @@ namespace SMSystem.Controllers
                     return RedirectToAction(nameof(Create));
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
@@ -159,12 +162,13 @@ namespace SMSystem.Controllers
         }
 
         // GET: DepartmentController/Edit/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id)
         {
             try
             {
                 var response = await DepRepo.GetDepartment(id).ConfigureAwait(false);
-                if(response.ResponseCode == 200)
+                if (response.ResponseCode == 200)
                 {
                     return View(response.Result);
                 }
@@ -175,7 +179,7 @@ namespace SMSystem.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
@@ -184,6 +188,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: DepartmentController/Edit/5
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(DepartmentViewModel department)
         {
@@ -212,6 +217,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: DepartmentController/Delete/5
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
@@ -228,11 +234,11 @@ namespace SMSystem.Controllers
                 var response = await DepRepo.Delete(id);
 
                 var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
-                return PartialView("_DepartmentData", departments.Result); 
+                return PartialView("_DepartmentData", departments.Result);
             }
             catch (Exception ex)
             {
-                return Json(new { message = ex.Message , responseCode = 500});
+                return Json(new { message = ex.Message, responseCode = 500 });
             }
         }
     }

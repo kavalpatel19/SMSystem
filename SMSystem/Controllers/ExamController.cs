@@ -94,6 +94,8 @@ namespace SMSystem.Controllers
                 return View("Index");
             }
         }
+
+        [Authorize(Roles = "admin , teacher")]
         public async Task<IActionResult> Create()
         {
             try
@@ -108,6 +110,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "admin , teacher")]
         [HttpPost]
         public async Task<IActionResult> Create(ExamViewModel exam)
         {
@@ -135,6 +138,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -159,6 +163,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(ExamViewModel exam)
         {
@@ -186,6 +191,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int id)
         {
             try

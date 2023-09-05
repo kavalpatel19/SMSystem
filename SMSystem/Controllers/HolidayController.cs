@@ -96,6 +96,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: HolidayController/Create
+        [Authorize(Roles ="admin")]
         public async Task<IActionResult> Create()
         {
             try
@@ -125,6 +126,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: HolidayController/Create
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> Create(HolidayViewModel holiday)
         {

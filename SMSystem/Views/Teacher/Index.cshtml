@@ -46,8 +46,11 @@
                             <div class="col-auto text-end float-end ms-auto download-grp">
                                 <a asp-controller="Teacher" asp-action="Index" class="btn btn-outline-gray me-2 active loader"><i class="feather-list"></i></a>
                                 <a asp-controller="Teacher" asp-action="GridIndex" class="btn btn-outline-gray me-2 loader"><i class="feather-grid "></i></a>
-                                <a asp-controller="Teacher" asp-action="ExportExcel" id="Export-Teach" class="btn btn-outline-primary me-2"><i class="fas fa-download"></i> Download</a>
-                                <a asp-controller="Teacher" asp-action="Create" class="btn btn-primary loader"><i class="fas fa-plus"></i></a>
+                                @if (User.IsInRole("admin"))
+                                {
+                                    <a asp-controller="Teacher" asp-action="ExportExcel" id="Export-Teach" class="btn btn-outline-primary me-2"><i class="fas fa-download"></i> Download</a>
+                                    <a asp-controller="Teacher" asp-action="Create" class="btn btn-primary loader"><i class="fas fa-plus"></i></a>
+                                }
                             </div>
                         </div>
                     </div>
