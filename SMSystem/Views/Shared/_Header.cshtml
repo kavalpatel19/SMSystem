@@ -2,6 +2,8 @@
 @{
     string userName = User.FindFirst(ClaimTypes.GivenName)?.Value;
     string role = User.FindFirst(ClaimTypes.Role)?.Value;
+    var path = User.FindFirst(ClaimTypes.Uri)?.Value;
+
 }
 <div>
     <div class="header">
@@ -164,7 +166,7 @@
             <li class="nav-item dropdown has-arrow new-user-menus">
                 <a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
                     <span class="user-img">
-                        <img class="rounded-circle" src="~/assets/img/profiles/avatar-01.jpg" width="31" alt="Jassa Rich">
+                        <img class="rounded-circle" src="@path" width="31" alt="Jassa Rich">
                         <div class="user-text">
                             <h6>
                                 @userName
@@ -176,14 +178,14 @@
                 <div class="dropdown-menu">
                     <div class="user-header">
                         <div class="avatar avatar-sm">
-                            <img src="~/assets/img/profiles/avatar-01.jpg" alt="User Image" class="avatar-img rounded-circle">
+                            <img src="@path" alt="User Image" class="avatar-img rounded-circle">
                         </div>
                         <div class="user-text">
                             <h6>@userName</h6>
-                            <p class="text-muted mb-0">Administrator</p>
+                            <p class="text-muted mb-0">@role</p>
                         </div>
                     </div>
-                    @if (User.IsInRole("teacher") || User.IsInRole("student"))
+                    @if (User.IsInRole("Teacher") || User.IsInRole("Student"))
                     {
                         <a class="dropdown-item" asp-action="Profile" asp-controller="Account">My Profile</a>
                     }

@@ -15,7 +15,7 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Class</th>
-                        @if (User.IsInRole("admin"))
+                        @if (User.IsInRole("Admin"))
                         { 
                             <th class="text-end">Action</th>
                         }
@@ -43,7 +43,7 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Class)
                                 </td>
-                                @if (User.IsInRole("admin"))
+                                @if (User.IsInRole("Admin"))
                                 { 
                                 <td class="text-end">
                                     <div class="actions">

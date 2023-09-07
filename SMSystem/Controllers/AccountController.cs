@@ -6,6 +6,8 @@ using SMSystem.Models.Auth;
 using SMSystem.Repository.Interfaces;
 using SMSystem.Models;
 using Microsoft.AspNetCore.Authorization;
+using SMSystem.Models.Students;
+using Azure;
 
 namespace SMSystem.Controllers
 {
@@ -13,11 +15,13 @@ namespace SMSystem.Controllers
     {
         private readonly IAuthenticationRepository authRepo;
         private readonly IStudentRepository stdRepo;
-
-        public AccountController(IAuthenticationRepository AuthRepo, IStudentRepository StdRepo)
+        private readonly ITeacherRepository teachRepo; 
+         
+        public AccountController(IAuthenticationRepository AuthRepo, IStudentRepository StdRepo,ITeacherRepository TeachRepo)
         {
             authRepo = AuthRepo;
             stdRepo = StdRepo;
+            teachRepo = TeachRepo;
         }
 
         [Authorize]
@@ -27,14 +31,45 @@ namespace SMSystem.Controllers
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
             if(userId != null)
             {
-                if (role.Equals("student"))
+                if (role.Equals("Teacher"))
                 {
-                    var user = stdRepo.GetAllStudents().Results.Find(x => x.StudentId == userId);
-
+                    var teacher = teachRepo.GetAllTeachers().Results.Find(x => x.TeacherId == userId);
+                    var res = authRepo.GetUsers().Results.Find (x => x.UserId == userId);
+                    var address = $"{teacher.AddressLine1},\n{teacher.City},\n{teacher.Country},\n{teacher.PostalCode}.";
+                    var user = new UserModel()
+                    {
+                        Name =  teacher.Name,
+                        DOB = teacher.DateOfBirth,
+                        Path = teacher.Path,
+                        Email = res.Email,
+                        Phone = teacher.PhoneNo,
+                        Role = "Teacher",
+                        Address = address
+                    };
+                    return View(user);
                 }
                 
+                if (role.Equals("Student"))
+                {
+                    var student = stdRepo.GetAllStudents().Results.Find(x => x.StudentId == userId);
+                    var res = authRepo.GetUsers().Results.Find (x => x.UserId == userId);
+                    var name = student.FirstName +" "+ student.LastName;
+                    var user = new UserModel()
+                    {
+                        Name =  name,
+                        DOB = student.DateOfBirth,
+                        Path = student.Path,
+                        Email = res.Email,
+                        Phone = student.Phone,
+                        Role = "Student",
+                        Address = student.Address
+                    };
+                    return View(user);
+                }
             }
-            return View();
+            TempData["Message"] = "Something's Wrong!";
+            TempData["ResCode"] = 500;
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -53,12 +88,41 @@ namespace SMSystem.Controllers
                 if (response.ResponseCode == 200)
                 {
                     var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, model.Username),
-                    new Claim(ClaimTypes.Role, response.Result.Role),
-                    new Claim(ClaimTypes.GivenName, response.Result.Name),
-                    // Add other claims as needed
-                };
+                    {
+                        new Claim(ClaimTypes.Name, response.Result.UserId),
+                        new Claim(ClaimTypes.Role, response.Result.Role),
+                        new Claim(ClaimTypes.GivenName, response.Result.Name), 
+                        new Claim(ClaimTypes.Uri,"/images/Default/Admin.jfif"),
+
+                    };
+
+                    if (response.Result.Role == "Student")
+                    {
+                        var student = stdRepo.GetAllStudents().Results.Find(x => x.StudentId == response.Result.UserId);
+
+                        claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name, response.Result.UserId),
+                            new Claim(ClaimTypes.Role, response.Result.Role),
+                            new Claim(ClaimTypes.GivenName, response.Result.Name),
+                            new Claim(ClaimTypes.Uri, student.Path),
+                            // Add other claims as needed
+                        };
+                    }
+                    if (response.Result.Role == "Teacher")
+                    {
+                        var teacher = teachRepo.GetAllTeachers().Results.Find(x => x.TeacherId == response.Result.UserId);
+
+                        claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name, response.Result.UserId),
+                            new Claim(ClaimTypes.Role, response.Result.Role),
+                            new Claim(ClaimTypes.GivenName, response.Result.Name),
+                            new Claim(ClaimTypes.Uri, teacher.Path),
+                            // Add other claims as needed
+                        };
+                    }
+                    
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var authProperties = new AuthenticationProperties

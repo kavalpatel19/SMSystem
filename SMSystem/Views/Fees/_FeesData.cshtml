@@ -14,7 +14,7 @@
                         <th><i class="fas fa-rupee-sign"></i> Amount</th>
                         <th>Start Date</th>
                         <th>End Date</th>
-                        @if (User.IsInRole("admin"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <th class="text-end">Action</th>
                         }
@@ -48,7 +48,7 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.EndDate)
                                 </td>
-                                @if (User.IsInRole("admin"))
+                                @if (User.IsInRole("Admin"))
                                 {
                                     <td class="text-end">
                                         <div class="actions">

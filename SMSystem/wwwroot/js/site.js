@@ -18,7 +18,7 @@ if (responseCode != 200 && responseCode != '') {
     $("#ExcMsg").append(message);
     $("#exception").addClass("show");
     setTimeout("$('#exception').removeClass('show');", 4000);
-    setTimeout("$('#ExcMsg').removeText();", 1500);
+    setTimeout("$('#ExcMsg').removeText();", 4000);
 
     $.fn.removeText = function () {
         this.each(function () {

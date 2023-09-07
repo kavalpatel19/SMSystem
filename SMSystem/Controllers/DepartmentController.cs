@@ -9,6 +9,7 @@ using SMSystem.Models;
 using SMSystem.Models.Department;
 using SMSystem.Models.Students;
 using SMSystem.Repository.Interfaces;
+using System.Security.Claims;
 
 namespace SMSystem.Controllers
 {
@@ -67,7 +68,7 @@ namespace SMSystem.Controllers
         }
 
         //To Export Data
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ExportExcel()
         {
             try
@@ -102,7 +103,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: DepartmentController/Create
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             try
@@ -133,12 +134,14 @@ namespace SMSystem.Controllers
         }
 
         // POST: DepartmentController/Create
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(DepartmentViewModel department)
         {
             try
             {
+                department.CreatedBy = User.FindFirst(ClaimTypes.Name).Value;
+                department.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await DepRepo.Add(department);
                 if (response.ResponseCode == 200)
                 {
@@ -162,7 +165,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: DepartmentController/Edit/5
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -188,12 +191,13 @@ namespace SMSystem.Controllers
         }
 
         // POST: DepartmentController/Edit/5
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(DepartmentViewModel department)
         {
             try
             {
+                department.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await DepRepo.Update(department);
                 if (response.ResponseCode == 200)
                 {
@@ -217,7 +221,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: DepartmentController/Delete/5
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

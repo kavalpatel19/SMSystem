@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
@@ -9,6 +10,7 @@ using SMSystem.Models.Fees;
 using SMSystem.Repository.Interfaces;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace SMSystem.Controllers
 {
@@ -95,7 +97,7 @@ namespace SMSystem.Controllers
             }
         }
 
-        [Authorize(Roles = "admin , teacher")]
+        [Authorize(Roles = "Admin , Teacher")]
         public async Task<IActionResult> Create()
         {
             try
@@ -110,12 +112,14 @@ namespace SMSystem.Controllers
             }
         }
 
-        [Authorize(Roles = "admin , teacher")]
+        [Authorize(Roles = "Admin , Teacher")]
         [HttpPost]
         public async Task<IActionResult> Create(ExamViewModel exam)
         {
             try
             {
+                exam.CreatedBy = User.FindFirst(ClaimTypes.Name).Value;
+                exam.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await ExamRepo.Add(exam);
                 if (response.ResponseCode == 200)
                 {
@@ -138,7 +142,7 @@ namespace SMSystem.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -163,12 +167,13 @@ namespace SMSystem.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(ExamViewModel exam)
         {
             try
             {
+                exam.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await ExamRepo.Update(exam);
                 if (response.ResponseCode == 200)
                 {
@@ -191,7 +196,7 @@ namespace SMSystem.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             try

@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Dapper;
 using SMSystem_Api.Model.Fees;
 using SMSystem_Api.Model.Exam;
-using SMSystem_Api.Migrations;
 
 namespace SMSystem_Api.Repository
 {

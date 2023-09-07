@@ -7,7 +7,7 @@
                     <li class="menu-title">
                         <span>Main Menu</span>
                     </li>
-                    @if (User.IsInRole("admin"))
+                    @if (User.IsInRole("Admin"))
                     {
                         <li>
                             <a asp-action="Index" asp-controller="Home" class="loader">
@@ -15,7 +15,7 @@
                             </a>
                         </li>
                     }
-                    @if (User.IsInRole("teacher"))
+                    @if (User.IsInRole("Teacher"))
                     {
                         <li>
                             <a href="teacher-dashboard.html">
@@ -23,7 +23,7 @@
                             </a>
                         </li>
                     }
-                    @if (User.IsInRole("student"))
+                    @if (User.IsInRole("Student"))
                     {
                         <li>
                             <a href="student-dashboard.html">

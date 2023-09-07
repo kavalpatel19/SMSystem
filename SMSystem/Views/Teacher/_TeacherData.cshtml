@@ -60,7 +60,7 @@
                                         <a asp-controller="Teacher" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm bg-success-light me-2 loader">
                                             <i class="feather-eye"></i>
                                         </a>
-                                        @if (User.IsInRole("admin"))
+                                        @if (User.IsInRole("Admin"))
                                         {
                                             <a asp-controller="Teacher" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm bg-danger-light me-2 loader">
                                                 <i class="feather-edit"></i>

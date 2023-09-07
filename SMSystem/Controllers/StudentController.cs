@@ -3,6 +3,7 @@ using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using SMSystem.Helpers;
 using SMSystem.Models;
@@ -14,6 +15,7 @@ using System.Collections;
 using System.Configuration;
 using System.Data;
 using System.Reflection;
+using System.Security.Claims;
 using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds;
 
 namespace SMSystem.Controllers
@@ -95,7 +97,7 @@ namespace SMSystem.Controllers
             }
         }
 
-        [Authorize(Roles ="admin , teacher")]
+        [Authorize(Roles ="Admin , Teacher")]
         public IActionResult ExportExcel()
         {
             try
@@ -154,11 +156,12 @@ namespace SMSystem.Controllers
         }
 
         // GET: StudentController/Create
-        [Authorize(Roles ="admin , teacher")]
+        [Authorize(Roles ="Admin , Teacher")]
         public async Task<IActionResult> Create()
         {
             try
             {
+                
                 var student = new StudentViewModel();
                 var students = StdRepo.GetAllStudents().Results;
                 if (students.Count > 0)
@@ -189,12 +192,15 @@ namespace SMSystem.Controllers
         }
 
         // POST: StudentController/Create
-        [Authorize(Roles ="admin , teacher")]
+        [Authorize(Roles ="Admin , Teacher")]
         [HttpPost]
         public async Task<IActionResult> Create(StudentRegisterViewModel register)
         {
             try
             {
+                register.UserModel.Name = register.StudentModel.FirstName;
+                register.StudentModel.CreatedBy = User.FindFirst(ClaimTypes.Name).Value;
+                register.StudentModel.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await StdRepo.Add(register);
                 if (response.ResponseCode == 200)
                 {
@@ -218,7 +224,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: StudentController/Edit/5
-        [Authorize(Roles ="admin , teacher")]
+        [Authorize(Roles ="Admin , Teacher")]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -244,13 +250,14 @@ namespace SMSystem.Controllers
         }
 
         // POST: StudentController/Edit/5
-        [Authorize(Roles ="admin , teacher")]
+        [Authorize(Roles ="Admin , Teacher")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(StudentViewModel student)
         {
             try
             {
+                student.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await StdRepo.Update(student);
                 if (response.ResponseCode == 200)
                 {
@@ -274,7 +281,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: StudentController/Delete/5
-        [Authorize(Roles ="admin , teacher")]
+        [Authorize(Roles ="Admin , Teacher")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

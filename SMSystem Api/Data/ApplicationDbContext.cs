@@ -9,6 +9,7 @@ using SMSystem_Api.Model.Holiday;
 using SMSystem_Api.Model.Students;
 using SMSystem_Api.Model.Subjects;
 using SMSystem_Api.Model.Teachers;
+using System.Security.Claims;
 
 namespace SMSystem_Api.Data
 {
