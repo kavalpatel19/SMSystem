@@ -1,5 +1,8 @@
-﻿@{
-    ViewData["Title"] = "Admin Dashboard";
+﻿@using System.Security.Claims;
+@{
+    ViewData["Title"] = "Dashboard";
+    string userName = User.FindFirst(ClaimTypes.GivenName)?.Value;
+
 }
 
 
@@ -9,7 +12,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="page-sub-header">
-                    <h3 class="page-title">Welcome Admin!</h3>
+                    <h3 class="page-title">Welcome @userName</h3>
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/Home/Index">Home</a></li>
                         <li class="breadcrumb-item active">Admin</li>

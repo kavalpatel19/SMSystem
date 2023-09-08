@@ -14,7 +14,10 @@
                         <th><i class="fas fa-rupee-sign"></i> Amount</th>
                         <th>Start Date</th>
                         <th>End Date</th>
-                        <th class="text-end">Action</th>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <th class="text-end">Action</th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -45,16 +48,19 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.EndDate)
                                 </td>
-                                <td class="text-end">
-                                    <div class="actions">
-                                        <a asp-controller="Fees" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm bg-danger-light me-2 loader">
-                                            <i class="feather-edit"></i>
-                                        </a>
-                                        <a value="@item.Id" id="dlt_fees" class="btn btn-sm bg-success-light me-2">
-                                            <i class="feather-trash-2"></i>
-                                        </a>
-                                    </div>
-                                </td>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td class="text-end">
+                                        <div class="actions">
+                                            <a asp-controller="Fees" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm bg-danger-light me-2 loader">
+                                                <i class="feather-edit"></i>
+                                            </a>
+                                            <a value="@item.Id" id="dlt_fees" class="btn btn-sm bg-success-light me-2">
+                                                <i class="feather-trash-2"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                }
                             </tr>
                         }
                     }

@@ -1,6 +1,7 @@
-﻿ using Azure;
+﻿using Azure;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
@@ -8,9 +9,11 @@ using SMSystem.Models;
 using SMSystem.Models.Department;
 using SMSystem.Models.Students;
 using SMSystem.Repository.Interfaces;
+using System.Security.Claims;
 
 namespace SMSystem.Controllers
 {
+    [Authorize]
     public class DepartmentController : Controller
     {
         private readonly IDepartmentRepository DepRepo;
@@ -33,7 +36,7 @@ namespace SMSystem.Controllers
             {
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
-                return RedirectToAction("Index","Home");
+                return RedirectToAction("Index", "Home");
             }
         }
 
@@ -44,7 +47,7 @@ namespace SMSystem.Controllers
             try
             {
                 response = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
-                if(response.ResponseCode == 200)
+                if (response.ResponseCode == 200)
                 {
                     return PartialView("_DepartmentData", response.Result);
                 }
@@ -65,6 +68,7 @@ namespace SMSystem.Controllers
         }
 
         //To Export Data
+        [Authorize(Roles = "Admin")]
         public IActionResult ExportExcel()
         {
             try
@@ -78,7 +82,7 @@ namespace SMSystem.Controllers
                         using (var mstream = new MemoryStream())
                         {
                             wb.SaveAs(mstream);
-                            
+
                             return File(mstream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Departments.xlsx");
                         }
                     }
@@ -90,7 +94,7 @@ namespace SMSystem.Controllers
                     return RedirectToAction("Index");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
@@ -99,6 +103,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: DepartmentController/Create
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             try
@@ -129,11 +134,14 @@ namespace SMSystem.Controllers
         }
 
         // POST: DepartmentController/Create
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(DepartmentViewModel department)
         {
             try
             {
+                department.CreatedBy = User.FindFirst(ClaimTypes.Name).Value;
+                department.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await DepRepo.Add(department);
                 if (response.ResponseCode == 200)
                 {
@@ -148,7 +156,7 @@ namespace SMSystem.Controllers
                     return RedirectToAction(nameof(Create));
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
@@ -157,12 +165,13 @@ namespace SMSystem.Controllers
         }
 
         // GET: DepartmentController/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             try
             {
                 var response = await DepRepo.GetDepartment(id).ConfigureAwait(false);
-                if(response.ResponseCode == 200)
+                if (response.ResponseCode == 200)
                 {
                     return View(response.Result);
                 }
@@ -173,7 +182,7 @@ namespace SMSystem.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 TempData["Message"] = ex.Message;
                 TempData["ResCode"] = 500;
@@ -182,11 +191,13 @@ namespace SMSystem.Controllers
         }
 
         // POST: DepartmentController/Edit/5
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(DepartmentViewModel department)
         {
             try
             {
+                department.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await DepRepo.Update(department);
                 if (response.ResponseCode == 200)
                 {
@@ -210,6 +221,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: DepartmentController/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
@@ -226,11 +238,11 @@ namespace SMSystem.Controllers
                 var response = await DepRepo.Delete(id);
 
                 var departments = await DepRepo.GetDepartmnets(para).ConfigureAwait(false);
-                return PartialView("_DepartmentData", departments.Result); 
+                return PartialView("_DepartmentData", departments.Result);
             }
             catch (Exception ex)
             {
-                return Json(new { message = ex.Message , responseCode = 500});
+                return Json(new { message = ex.Message, responseCode = 500 });
             }
         }
     }

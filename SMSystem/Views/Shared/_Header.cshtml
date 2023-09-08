@@ -1,4 +1,11 @@
-﻿<div>
+﻿@using System.Security.Claims;
+@{
+    string userName = User.FindFirst(ClaimTypes.GivenName)?.Value;
+    string role = User.FindFirst(ClaimTypes.Role)?.Value;
+    var path = User.FindFirst(ClaimTypes.Uri)?.Value;
+
+}
+<div>
     <div class="header">
 
         <div class="header-left">
@@ -159,26 +166,31 @@
             <li class="nav-item dropdown has-arrow new-user-menus">
                 <a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
                     <span class="user-img">
-                        <img class="rounded-circle" src="~/assets/img/profiles/avatar-01.jpg" width="31" alt="Jassa Rich">
+                        <img class="rounded-circle" src="@path" width="31" alt="Jassa Rich">
                         <div class="user-text">
-                            <h6>Jassa Rich</h6>
-                            <p class="text-muted mb-0">Administrator</p>
+                            <h6>
+                                @userName
+                            </h6>
+                            <p class="text-muted mb-0">@role</p>
                         </div>
                     </span>
                 </a>
                 <div class="dropdown-menu">
                     <div class="user-header">
                         <div class="avatar avatar-sm">
-                            <img src="~/assets/img/profiles/avatar-01.jpg" alt="User Image" class="avatar-img rounded-circle">
+                            <img src="@path" alt="User Image" class="avatar-img rounded-circle">
                         </div>
                         <div class="user-text">
-                            <h6>Jassa Rich</h6>
-                            <p class="text-muted mb-0">Administrator</p>
+                            <h6>@userName</h6>
+                            <p class="text-muted mb-0">@role</p>
                         </div>
                     </div>
-                    <a class="dropdown-item" href="profile.html">My Profile</a>
+                    @if (User.IsInRole("Teacher") || User.IsInRole("Student"))
+                    {
+                        <a class="dropdown-item" asp-action="Profile" asp-controller="Account">My Profile</a>
+                    }
                     <a class="dropdown-item" href="inbox.html">Inbox</a>
-                    <a class="dropdown-item" href="login.html">Logout</a>
+                    <a class="dropdown-item" asp-action="Logout" asp-controller="Account">Logout</a>
                 </div>
             </li>
 

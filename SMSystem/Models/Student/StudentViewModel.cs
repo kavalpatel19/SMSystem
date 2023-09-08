@@ -31,10 +31,6 @@ namespace SMSystem.Models.Students
         public string BloodGroup { get; set; }
         [Required(ErrorMessage = "The Religion is required to select.")]
         public string Religion { get; set; }
-        [Required]
-        [Remote(action:"EmailExist",controller:"Student",AdditionalFields ="Id")]
-        [RegularExpression("^[a-zA-Z0-9_\\.-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", ErrorMessage = "Not a valid e-mail address.")]
-        public string Email { get; set; }
         [Required(ErrorMessage = "The Class is required to select.")]
         public string Class { get; set; }
         [Required(ErrorMessage = "The Section is required to select.")]

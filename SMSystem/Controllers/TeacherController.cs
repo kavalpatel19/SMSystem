@@ -1,14 +1,18 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Win32;
 using SMSystem.Helpers;
 using SMSystem.Models;
 using SMSystem.Models.Students;
 using SMSystem.Models.Teacher;
 using SMSystem.Repository.Interfaces;
+using System.Security.Claims;
 
 namespace SMSystem.Controllers
 {
+    [Authorize]
     public class TeacherController : Controller
     {
         private readonly ITeacherRepository TeachRepo;
@@ -85,6 +89,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult ExportExcel()
         {
             try
@@ -143,6 +148,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: TeacherController/Create
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             try
@@ -161,7 +167,12 @@ namespace SMSystem.Controllers
                 {
                     teacher.TeacherId = "TCHR-0001";
                 }
-                return View(teacher);
+                var register = new TeacherRegisterViewModel()
+                {
+                    TeacherModel = teacher,
+                    UserModel = new Models.Auth.ApplicationUser()
+                };
+                return View(register);
             }
             catch (Exception ex)
             {
@@ -172,12 +183,16 @@ namespace SMSystem.Controllers
         }
 
         // POST: TeacherController/Create
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Create(TeacherViewModel teacher)
+        public async Task<IActionResult> Create(TeacherRegisterViewModel register)
         {
             try
             {
-                var response = await TeachRepo.Add(teacher);
+                register.UserModel.Name = register.TeacherModel.Name;
+                register.TeacherModel.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
+                register.TeacherModel.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
+                var response = await TeachRepo.Add(register);
                 if (response.ResponseCode == 200)
                 {
                     TempData["Message"] = "Record Created Successfully.";
@@ -200,6 +215,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: TeacherController/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -225,12 +241,14 @@ namespace SMSystem.Controllers
         }
 
         // POST: TeacherController/Edit/5
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(TeacherViewModel teacher)
         {
             try
             {
+                teacher.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await TeachRepo.Update(teacher);
                 if (response.ResponseCode == 200)
                 {
@@ -254,6 +272,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: TeacherController/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

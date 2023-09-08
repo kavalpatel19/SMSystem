@@ -10,7 +10,6 @@ using SMSystem_Api.Repository.Interfaces;
 using Dapper;
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Exam;
-using SMSystem_Api.Migrations;
 
 namespace SMSystem_Api.Repository
 {

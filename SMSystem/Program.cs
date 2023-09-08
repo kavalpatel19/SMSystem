@@ -1,3 +1,5 @@
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using SMSystem.Repository;
 using SMSystem.Repository.Interfaces;
 
@@ -12,9 +14,25 @@ builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
 builder.Services.AddScoped<IHolidayRepository, HolidayRepository>();
 builder.Services.AddScoped<IFeesRepository, FeesRepository>();
 builder.Services.AddScoped<IExamRepository, ExamRepository>();
+builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Account/Login"; // Set the login URL
+        });
 
-
+builder.Services.AddDistributedMemoryCache(); // Use an in-memory cache for session data
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.AccessDeniedPath = new PathString("/Home/Index");
+});
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = "UserData";
+    options.IdleTimeout = TimeSpan.Zero; // Session expires when browser is closed
+    options.Cookie.IsEssential = true;
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,15 +43,17 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

@@ -3,7 +3,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SMSystem_Api.Data;
 using SMSystem_Api.Helpers;
-using SMSystem_Api.Migrations;
 using SMSystem_Api.Model;
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Exam;

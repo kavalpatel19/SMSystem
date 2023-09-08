@@ -1,13 +1,16 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
 using SMSystem.Models;
 using SMSystem.Models.Department;
 using SMSystem.Models.Holiday;
 using SMSystem.Repository.Interfaces;
+using System.Security.Claims;
 
 namespace SMSystem.Controllers
 {
+    [Authorize]
     public class HolidayController : Controller
     {
         private readonly IHolidayRepository HoliRepo;
@@ -94,6 +97,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: HolidayController/Create
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Create()
         {
             try
@@ -123,11 +127,14 @@ namespace SMSystem.Controllers
         }
 
         // POST: HolidayController/Create
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(HolidayViewModel holiday)
         {
             try
             {
+                holiday.CreatedBy = User.FindFirst(ClaimTypes.Name).Value;
+                holiday.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await HoliRepo.Add(holiday);
                 if (response.ResponseCode == 200)
                 {

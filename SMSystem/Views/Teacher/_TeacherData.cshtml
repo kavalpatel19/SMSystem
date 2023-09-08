@@ -52,18 +52,23 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.PhoneNo)
                                 </td>
-                                <td>@item.AddressLine1 , @item.Country</td>
+                                <td>
+                                    @item.AddressLine1 , @item.Country
+                                </td>
                                 <td class="text-end">
                                     <div class="actions">
                                         <a asp-controller="Teacher" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm bg-success-light me-2 loader">
                                             <i class="feather-eye"></i>
                                         </a>
-                                        <a asp-controller="Teacher" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm bg-danger-light me-2 loader">
-                                            <i class="feather-edit"></i>
-                                        </a>
-                                        <a value="@item.Id" id="dlt_teacher" class="btn btn-sm bg-success-light me-2">
-                                            <i class="feather-trash-2"></i>
-                                        </a>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-controller="Teacher" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm bg-danger-light me-2 loader">
+                                                <i class="feather-edit"></i>
+                                            </a>
+                                            <a value="@item.Id" id="dlt_teacher" class="btn btn-sm bg-success-light me-2">
+                                                <i class="feather-trash-2"></i>
+                                            </a>
+                                        }
                                     </div>
                                 </td>
                             </tr>

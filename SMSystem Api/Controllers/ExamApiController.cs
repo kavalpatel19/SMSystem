@@ -3,7 +3,6 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem_Api.Helpers;
-using SMSystem_Api.Migrations;
 using SMSystem_Api.Model;
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model.Exam;

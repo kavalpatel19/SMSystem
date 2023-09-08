@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem.Helpers;
 using SMSystem.Models;
@@ -7,9 +8,11 @@ using SMSystem.Models.Department;
 using SMSystem.Models.Exam;
 using SMSystem.Models.Fees;
 using SMSystem.Repository.Interfaces;
+using System.Security.Claims;
 
 namespace SMSystem.Controllers
 {
+    [Authorize]
     public class FeesController : Controller
     {
         private readonly IFeesRepository FeesRepo;
@@ -91,6 +94,8 @@ namespace SMSystem.Controllers
                 return View("Index");
             }
         }
+
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             try
@@ -119,11 +124,14 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles ="Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(FeesViewModel fee)
         {
             try
             {
+                fee.CreatedBy = User.FindFirst(ClaimTypes.Name).Value;
+                fee.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await FeesRepo.Add(fee);
                 if (response.ResponseCode == 200)
                 {
@@ -146,6 +154,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -170,11 +179,13 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles ="Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(FeesViewModel fee)
         {
             try
             {
+                fee.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await FeesRepo.Update(fee);
                 if (response.ResponseCode == 200)
                 {
@@ -197,6 +208,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             try
