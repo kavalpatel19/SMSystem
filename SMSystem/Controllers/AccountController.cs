@@ -27,49 +27,58 @@ namespace SMSystem.Controllers
         [Authorize]
         public async Task<IActionResult> Profile()
         {
-            var userId = User.FindFirst(ClaimTypes.Name)?.Value;
-            var role = User.FindFirst(ClaimTypes.Role)?.Value;
-            if(userId != null)
+            try
             {
-                if (role.Equals("Teacher"))
+                var userId = User.FindFirst(ClaimTypes.Name)?.Value;
+                var role = User.FindFirst(ClaimTypes.Role)?.Value;
+                if (userId != null)
                 {
-                    var teacher = teachRepo.GetAllTeachers().Results.Find(x => x.TeacherId == userId);
-                    var res = authRepo.GetUsers().Results.Find (x => x.UserId == userId);
-                    var address = $"{teacher.AddressLine1},\n{teacher.City},\n{teacher.Country},\n{teacher.PostalCode}.";
-                    var user = new UserModel()
+                    if (role.Equals("Teacher"))
                     {
-                        Name =  teacher.Name,
-                        DOB = teacher.DateOfBirth,
-                        Path = teacher.Path,
-                        Email = res.Email,
-                        Phone = teacher.PhoneNo,
-                        Role = "Teacher",
-                        Address = address
-                    };
-                    return View(user);
-                }
-                
-                if (role.Equals("Student"))
-                {
-                    var student = stdRepo.GetAllStudents().Results.Find(x => x.StudentId == userId);
-                    var res = authRepo.GetUsers().Results.Find (x => x.UserId == userId);
-                    var name = student.FirstName +" "+ student.LastName;
-                    var user = new UserModel()
+                        var teacher = teachRepo.GetAllTeachers().Results.Find(x => x.TeacherId == userId);
+                        var res = authRepo.GetUsers().Results.Find(x => x.UserId == userId);
+                        var address = $"{teacher.AddressLine1},\n{teacher.City},\n{teacher.Country},\n{teacher.PostalCode}.";
+                        var user = new UserModel()
+                        {
+                            Name = teacher.Name,
+                            DOB = teacher.DateOfBirth,
+                            Path = teacher.Path,
+                            Email = res.Email,
+                            Phone = teacher.PhoneNo,
+                            Role = "Teacher",
+                            Address = address
+                        };
+                        return View(user);
+                    }
+
+                    if (role.Equals("Student"))
                     {
-                        Name =  name,
-                        DOB = student.DateOfBirth,
-                        Path = student.Path,
-                        Email = res.Email,
-                        Phone = student.Phone,
-                        Role = "Student",
-                        Address = student.Address
-                    };
-                    return View(user);
+                        var student = stdRepo.GetAllStudents().Results.Find(x => x.StudentId == userId);
+                        var res = authRepo.GetUsers().Results.Find(x => x.UserId == userId);
+                        var name = student.FirstName + " " + student.LastName;
+                        var user = new UserModel()
+                        {
+                            Name = name,
+                            DOB = student.DateOfBirth,
+                            Path = student.Path,
+                            Email = res.Email,
+                            Phone = student.Phone,
+                            Role = "Student",
+                            Address = student.Address
+                        };
+                        return View(user);
+                    }
                 }
+                TempData["Message"] = "Something's Wrong!";
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index", "Home");
             }
-            TempData["Message"] = "Something's Wrong!";
-            TempData["ResCode"] = 500;
-            return RedirectToAction("Index", "Home");
+            catch(Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpGet]
@@ -149,32 +158,60 @@ namespace SMSystem.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login", "Account"); // Redirect after logout
+            try
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                return RedirectToAction("Login", "Account"); // Redirect after logout
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Index", "Home");
+            }
         }
 
+        [Authorize]
         public ActionResult ChangePassword()
         {
-            var model = new PasswordModel();
-            return PartialView("_ChangePassword",model);
+            try
+            {
+                var model = new PasswordModel();
+                return PartialView("_ChangePassword", model);
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Profile");
+            }
         }
 
-
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public ActionResult ChangePassword(PasswordModel model)
         {
-            model.UserId = User.FindFirst(ClaimTypes.Name)?.Value;
-            var response = authRepo.ChangePassword(model);
-            if(response.ResponseCode == 200)
+            try
             {
-                TempData["ResCode"] = 200;
-                TempData["Message"] = "Password Changed Successfully.";
+                model.UserId = User.FindFirst(ClaimTypes.Name)?.Value;
+                var response = authRepo.ChangePassword(model);
+                if (response.ResponseCode == 200)
+                {
+                    TempData["ResCode"] = 200;
+                    TempData["Message"] = "Password Changed Successfully.";
+                    return RedirectToAction("Profile");
+                }
+                TempData["ResCode"] = 500;
+                TempData["Message"] = response.Message;
                 return RedirectToAction("Profile");
             }
-            TempData["ResCode"] = 500;
-            TempData["Message"] = response.Message;
-            return RedirectToAction("Profile");
+            catch(Exception ex)
+            {
+                TempData["Message"] = ex.Message;
+                TempData["ResCode"] = 500;
+                return RedirectToAction("Profile");
+            }
         }
 
         [Authorize]
