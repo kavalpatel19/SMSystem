@@ -1,21 +1,26 @@
 ﻿using Azure;
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using SMSystem.Helpers;
 using SMSystem.Models;
 using SMSystem.Models.Department;
+using SMSystem.Models.Student;
 using SMSystem.Models.Students;
 using SMSystem.Repository.Interfaces;
 using System.Collections;
 using System.Configuration;
 using System.Data;
 using System.Reflection;
+using System.Security.Claims;
 using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds;
 
 namespace SMSystem.Controllers
 {
+    [Authorize]
     public class StudentController : Controller
     {
         private readonly IStudentRepository StdRepo;
@@ -92,6 +97,7 @@ namespace SMSystem.Controllers
             }
         }
 
+        [Authorize(Roles ="Admin , Teacher")]
         public IActionResult ExportExcel()
         {
             try
@@ -150,10 +156,12 @@ namespace SMSystem.Controllers
         }
 
         // GET: StudentController/Create
+        [Authorize(Roles ="Admin , Teacher")]
         public async Task<IActionResult> Create()
         {
             try
             {
+                
                 var student = new StudentViewModel();
                 var students = StdRepo.GetAllStudents().Results;
                 if (students.Count > 0)
@@ -168,8 +176,12 @@ namespace SMSystem.Controllers
                 {
                     student.StudentId = "STD-0001";
                 }
-
-                return View(student);
+                var register = new StudentRegisterViewModel()
+                {
+                    StudentModel = student,
+                    UserModel = new Models.Auth.ApplicationUser()
+                };
+                return View(register);
             }
             catch (Exception ex)
             {
@@ -180,12 +192,16 @@ namespace SMSystem.Controllers
         }
 
         // POST: StudentController/Create
+        [Authorize(Roles ="Admin , Teacher")]
         [HttpPost]
-        public async Task<IActionResult> Create(StudentViewModel student)
+        public async Task<IActionResult> Create(StudentRegisterViewModel register)
         {
             try
             {
-                var response = await StdRepo.Add(student);
+                register.UserModel.Name = register.StudentModel.FirstName;
+                register.StudentModel.CreatedBy = User.FindFirst(ClaimTypes.Name).Value;
+                register.StudentModel.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
+                var response = await StdRepo.Add(register);
                 if (response.ResponseCode == 200)
                 {
                     TempData["Message"] = "Record Created Successfully.";
@@ -208,6 +224,7 @@ namespace SMSystem.Controllers
         }
 
         // GET: StudentController/Edit/5
+        [Authorize(Roles ="Admin , Teacher")]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -233,16 +250,18 @@ namespace SMSystem.Controllers
         }
 
         // POST: StudentController/Edit/5
+        [Authorize(Roles ="Admin , Teacher")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(StudentViewModel student)
         {
             try
             {
+                student.ModifiedBy = User.FindFirst(ClaimTypes.Name).Value;
                 var response = await StdRepo.Update(student);
                 if (response.ResponseCode == 200)
                 {
-                    TempData["Message"] = "Department has been saved successfully.";
+                    TempData["Message"] = "Data saved successfully.";
                     TempData["ResCode"] = response.ResponseCode;
                     return RedirectToAction(nameof(Index));
                 }
@@ -262,6 +281,7 @@ namespace SMSystem.Controllers
         }
 
         // POST: StudentController/Delete/5
+        [Authorize(Roles ="Admin , Teacher")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
@@ -286,19 +306,6 @@ namespace SMSystem.Controllers
             }
         }
 
-        public IActionResult EmailExist(string email ,int id)
-        {
-            var Students = StdRepo.GetAllStudents().Results.Where(x => x.Email == email).FirstOrDefault();
-            if(Students != null)
-            {
-                if (id > 0 && id == Students.Id)
-                {
-                    return Json(true);
-                }
-                return Json("Email Already Exist!");
-            }
-            return Json(true);
-        }
     }
 }
 

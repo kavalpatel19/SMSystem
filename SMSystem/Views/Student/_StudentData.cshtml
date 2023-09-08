@@ -69,12 +69,15 @@
                                         <a asp-controller="Student" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm bg-success-light me-2 loader">
                                             <i class="feather-eye"></i>
                                         </a>
-                                        <a asp-controller="Student" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm bg-danger-light me-2 loader">
-                                            <i class="feather-edit"></i>
-                                        </a>
-                                        <a value="@item.Id" id="dlt_student" class="btn btn-sm bg-success-light me-2">
-                                            <i class="feather-trash-2"></i>
-                                        </a>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                                        {
+                                            <a asp-controller="Student" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm bg-danger-light me-2 loader">
+                                                <i class="feather-edit"></i>
+                                            </a>
+                                            <a value="@item.Id" id="dlt_student" class="btn btn-sm bg-success-light me-2">
+                                                <i class="feather-trash-2"></i>
+                                            </a>
+                                        }
                                     </div>
                                 </td>
                             </tr>

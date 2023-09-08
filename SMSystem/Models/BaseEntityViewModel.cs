@@ -4,16 +4,16 @@
     {
         public BaseEntityViewModel()
         {
-            CreatedBy = 0;
+            CreatedBy = null;
             CreatedDate = DateTime.Now;
-            ModifiedBy = 0;
+            ModifiedBy = null;
             ModifiedDate = DateTime.Now;
             IsActive = true;
             IsDelete = false;
         }
-        public int? CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
+        public string? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool? IsActive { get; set; }
         public bool? IsDelete { get; set; }

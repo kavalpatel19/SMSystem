@@ -103,13 +103,6 @@
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="Email">E-Mail <span class="login-danger">*</span></label>
-                                    <input asp-for="Email" class="form-control EmailVal" onkeyup="EmailExist()" type="text" placeholder="Enter Email Address" />
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-4">
-                                <div class="form-group local-forms">
                                     <label asp-for="Class">Class <span class="login-danger">*</span></label>
                                     <select class="form-control select" asp-for="Class" asp-items="EnumHelper.GetEnumSelectList<Class>()">
                                         <option value="">Please Select Class </option>
@@ -160,6 +153,8 @@
                             <input asp-for="CreatedDate" class="form-control" hidden/>
                             <input asp-for="Path" class="form-control" hidden/>
                             <input asp-for="ModifiedDate" class="form-control" hidden/>
+                            <input asp-for="CreatedBy" class="form-control" hidden/>
+                            <input asp-for="ModifiedBy" class="form-control" hidden/>
                             <div class="col-12">
                                 <div class="student-submit">
                                     <button type="submit" class="btn btn-primary loader">Submit</button>

@@ -11,7 +11,7 @@ namespace SMSystem.Repository.Interfaces
         BaseResponseViewModel<TeacherViewModel> GetAllTeachers();
         Task<BaseResponseViewModel<TeacherPagedViewModel>> GetTeachers(SearchingParaModel para);
         Task<BaseResponseViewModel<TeacherViewModel>> GetTeacher(int id);
-        Task<BaseResponseViewModel<TeacherViewModel>> Add(TeacherViewModel teacher);
+        Task<BaseResponseViewModel<TeacherRegisterViewModel>> Add(TeacherRegisterViewModel teacher);
         Task<BaseResponseViewModel<TeacherViewModel>> Update(TeacherViewModel teacher);
         Task<BaseResponseViewModel<TeacherViewModel>> Delete(int id);
     }

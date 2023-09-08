@@ -1,4 +1,4 @@
-﻿@model SMSystem.Models.Students.StudentViewModel;
+﻿@model SMSystem.Models.Student.StudentRegisterViewModel;
 @using SMSystem.Helpers.DropdownHelper;
 
 
@@ -29,130 +29,158 @@
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="StudentId">Student Id</label>
+                                    <label asp-for="StudentModel.StudentId">Student Id</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input class="form-control" value="@Model.StudentId" disabled />
+                                        <input class="form-control" value="@Model.StudentModel.StudentId" disabled />
                                     </div>
-                                    <input asp-for="StudentId" class="form-control" value="@Model.StudentId" hidden/>
+                                    <input asp-for="StudentModel.StudentId" class="form-control" value="@Model.StudentModel.StudentId" hidden />
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="FirstName">First Name <span class="login-danger">*</span></label>
-                                    <input asp-for="FirstName" class="form-control" type="text" placeholder="Enter First Name" />
-                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                    <label asp-for="StudentModel.FirstName">First Name <span class="login-danger">*</span></label>
+                                    <input asp-for="StudentModel.FirstName" class="form-control" type="text" placeholder="Enter First Name" />
+                                    <span asp-validation-for="StudentModel.FirstName" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="ParentName">Middle Name <span class="login-danger">*</span></label>
-                                    <input asp-for="ParentName" class="form-control" type="text" placeholder="Enter Middle Name" />
-                                    <span asp-validation-for="ParentName" class="text-danger"></span>
+                                    <label asp-for="StudentModel.ParentName">Middle Name <span class="login-danger">*</span></label>
+                                    <input asp-for="StudentModel.ParentName" class="form-control" type="text" placeholder="Enter Middle Name" />
+                                    <span asp-validation-for="StudentModel.ParentName" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="LastName">Last Name <span class="login-danger">*</span></label>
-                                    <input asp-for="LastName" class="form-control" type="text" placeholder="Enter Last Name" />
-                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                    <label asp-for="StudentModel.LastName">Last Name <span class="login-danger">*</span></label>
+                                    <input asp-for="StudentModel.LastName" class="form-control" type="text" placeholder="Enter Last Name" />
+                                    <span asp-validation-for="StudentModel.LastName" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms ">
-                                    <label asp-for="Gender">Gender <span class="login-danger">*</span></label>
-                                    <select class="form-control select" asp-for="Gender" asp-items="EnumHelper.GetEnumSelectList<Gender>()">
+                                    <label asp-for="StudentModel.Gender">Gender <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="StudentModel.Gender" asp-items="EnumHelper.GetEnumSelectList<Gender>()">
                                         <option value="">Select Gender</option>
                                     </select>
-                                    <span asp-validation-for="Gender" class="text-danger"></span>
+                                    <span asp-validation-for="StudentModel.Gender" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms calendar-icon">
-                                    <label asp-for="DateOfBirth">Date Of Birth <span class="login-danger">*</span></label>
-                                    <input asp-for="DateOfBirth" class="form-control datetimepicker" placeholder="DD-MM-YYYY" type="datetime" autocomplete="off" value=""/>
-                                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                    <label asp-for="StudentModel.DateOfBirth">Date Of Birth <span class="login-danger">*</span></label>
+                                    <input asp-for="StudentModel.DateOfBirth" class="form-control datetimepicker" placeholder="DD-MM-YYYY" type="datetime" autocomplete="off" value="" />
+                                    <span asp-validation-for="StudentModel.DateOfBirth" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="RollNo">Roll <span class="login-danger">*</span></label>
-                                    <input asp-for="RollNo" class="form-control" type="text" placeholder="Enter Roll Number" />
-                                    <span asp-validation-for="RollNo" class="text-danger"></span>
+                                    <label asp-for="StudentModel.RollNo">Roll <span class="login-danger">*</span></label>
+                                    <input asp-for="StudentModel.RollNo" class="form-control" type="text" placeholder="Enter Roll Number" />
+                                    <span asp-validation-for="StudentModel.RollNo" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="BloodGroup">Blood Group <span class="login-danger">*</span></label>
-                                    <select class="form-control select" asp-for="BloodGroup" asp-items="EnumHelper.GetEnumSelectList<BloodGroup>()">
+                                    <label asp-for="StudentModel.BloodGroup">Blood Group <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="StudentModel.BloodGroup" asp-items="EnumHelper.GetEnumSelectList<BloodGroup>()">
                                         <option value="">Please Select Group </option>
                                     </select>
-                                    <span asp-validation-for="BloodGroup" class="text-danger"></span>
+                                    <span asp-validation-for="StudentModel.BloodGroup" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="Religion">Religion <span class="login-danger">*</span></label>
-                                    <select class="form-control select" asp-for="Religion" asp-items="EnumHelper.GetEnumSelectList<Religion>()">
+                                    <label asp-for="StudentModel.Religion">Religion <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="StudentModel.Religion" asp-items="EnumHelper.GetEnumSelectList<Religion>()">
                                         <option value="">Please Select Religion </option>
                                     </select>
-                                    <span asp-validation-for="Religion" class="text-danger"></span>
+                                    <span asp-validation-for="StudentModel.Religion" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="Email">E-Mail <span class="login-danger">*</span></label>
-                                    <input asp-for="Email" class="form-control" type="text" placeholder="Enter Email Address" />
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-4">
-                                <div class="form-group local-forms">
-                                    <label asp-for="Class">Class <span class="login-danger">*</span></label>
-                                    <select class="form-control select" asp-for="Class" asp-items="EnumHelper.GetEnumSelectList<Class>()">
+                                    <label asp-for="StudentModel.Class">Class <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="StudentModel.Class" asp-items="EnumHelper.GetEnumSelectList<Class>()">
                                         <option value="">Please Select Class </option>
                                     </select>
-                                    <span asp-validation-for="Class" class="text-danger"></span>
+                                    <span asp-validation-for="StudentModel.Class" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="Section">Section <span class="login-danger">*</span></label>
-                                    <select class="form-control select" asp-for="Section" asp-items="EnumHelper.GetEnumSelectList<Section>()">
+                                    <label asp-for="StudentModel.Section">Section <span class="login-danger">*</span></label>
+                                    <select class="form-control select" asp-for="StudentModel.Section" asp-items="EnumHelper.GetEnumSelectList<Section>()">
                                         <option value="">Please Select Section </option>
                                     </select>
-                                    <span asp-validation-for="Section" class="text-danger"></span>
+                                    <span asp-validation-for="StudentModel.Section" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="AdmissionId">Admission ID <span class="login-danger">*</span></label>
-                                    <input asp-for="AdmissionId" class="form-control" type="text" placeholder="Enter Admission ID" />
-                                    <span asp-validation-for="AdmissionId" class="text-danger"></span>
+                                    <label asp-for="StudentModel.AdmissionId">Admission ID <span class="login-danger">*</span></label>
+                                    <input asp-for="StudentModel.AdmissionId" class="form-control" type="text" placeholder="Enter Admission ID" />
+                                    <span asp-validation-for="StudentModel.AdmissionId" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12 col-sm-4">
                                 <div class="form-group local-forms">
-                                    <label asp-for="Phone">Phone <span class="login-danger">*</span></label>
-                                    <input asp-for="Phone" class="form-control" type="text" placeholder="Enter Phone Number" />
-                                    <span asp-validation-for="Phone" class="text-danger"></span>
+                                    <label asp-for="StudentModel.Phone">Phone <span class="login-danger">*</span></label>
+                                    <input asp-for="StudentModel.Phone" class="form-control" type="text" placeholder="Enter Phone Number" />
+                                    <span asp-validation-for="StudentModel.Phone" class="text-danger"></span>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-4">
+                            <div class="col-12 col-sm-8">
                                 <div class="form-group local-forms">
-                                    <label asp-for="Address">Address <span class="login-danger">*</span></label>
-                                    <textarea asp-for="Address" class="form-control" type="text" placeholder="Enter Address..."></textarea>
-                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                    <label asp-for="StudentModel.Address">Address <span class="login-danger">*</span></label>
+                                    <textarea asp-for="StudentModel.Address" class="form-control" type="text" placeholder="Enter Address..."></textarea>
+                                    <span asp-validation-for="StudentModel.Address" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12">
                                 <div class="form-group students-up-files">
-                                    <label asp-for="ImagePath">Upload Student Photo (150px X 150px)</label>
+                                    <label asp-for="StudentModel.ImagePath">Upload Student Photo (150px X 150px)</label>
                                     <div class="uplod">
                                         <label class="file-upload image-upbtn mb-0">
-                                            Choose File <input type="file" asp-for="ImagePath">
+                                            Choose File <input type="file" asp-for="StudentModel.ImagePath">
                                         </label>
                                     </div>
+                                </div>
+                            </div>
+
+                            @**@@*Register Student*@@**@
+                            @**@
+                            <div class="col-12">
+                                <h5 class="form-title"><span>Login Details</span></h5>
+                            </div>
+                            <input asp-for="UserModel.UserId" class="form-control" value="@Model.StudentModel.StudentId" hidden />
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="UserModel.Username">Username <span class="login-danger">*</span></label>
+                                    <input type="text" asp-for="UserModel.Username" class="form-control" placeholder="Enter Username">
+                                    <span asp-validation-for ="UserModel.Username" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="UserModel.Email">Email ID <span class="login-danger">*</span></label>
+                                    <input type="email" asp-for="UserModel.Email" class="form-control" placeholder="Enter Mail Id">
+                                    <span asp-validation-for ="UserModel.Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="UserModel.Password">Password <span class="login-danger">*</span></label>
+                                    <input type="text" asp-for=UserModel.Password class="form-control" placeholder="Enter Password">
+                                    <span asp-validation-for="UserModel.Password" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group local-forms">
+                                    <label asp-for="UserModel.RepeatPassword">Confirm Password <span class="login-danger">*</span></label>
+                                    <input type="text" asp-for="UserModel.RepeatPassword" class="form-control" placeholder="Confirm Password">
+                                    <span asp-validation-for="UserModel.RepeatPassword" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-12">
