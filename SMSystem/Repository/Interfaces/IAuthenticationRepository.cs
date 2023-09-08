@@ -7,6 +7,7 @@ namespace SMSystem.Repository.Interfaces
     {
         public BaseResponseViewModel<ApplicationUser> Login(LoginViewModel model);
         public BaseResponseViewModel<ApplicationUser> GetUsers();
+        public BaseResponseViewModel<ApplicationUser> ChangePassword(PasswordModel model);
 
     }
 }

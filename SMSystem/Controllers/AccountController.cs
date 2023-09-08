@@ -131,7 +131,6 @@ namespace SMSystem.Controllers
                     };
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-
                     return RedirectToAction("Index", "Home"); // Redirect after successful login
                 }
 
@@ -141,16 +140,41 @@ namespace SMSystem.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Message"] = ex.Message;
+                TempData["Message"] = "Please contect ADMIN!";
                 TempData["ResCode"] = 500;
                 return View(model);
             }
         }
+
         [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Account"); // Redirect after logout
+        }
+
+        public ActionResult ChangePassword()
+        {
+            var model = new PasswordModel();
+            return PartialView("_ChangePassword",model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ChangePassword(PasswordModel model)
+        {
+            model.UserId = User.FindFirst(ClaimTypes.Name)?.Value;
+            var response = authRepo.ChangePassword(model);
+            if(response.ResponseCode == 200)
+            {
+                TempData["ResCode"] = 200;
+                TempData["Message"] = "Password Changed Successfully.";
+                return RedirectToAction("Profile");
+            }
+            TempData["ResCode"] = 500;
+            TempData["Message"] = response.Message;
+            return RedirectToAction("Profile");
         }
 
         [Authorize]
@@ -168,6 +192,7 @@ namespace SMSystem.Controllers
             }
             return Json(true);
         }
+
         [Authorize]
         public IActionResult AccessDenied()
         {

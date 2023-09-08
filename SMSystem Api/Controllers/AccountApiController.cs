@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Model;
@@ -71,5 +72,24 @@ namespace SMSystem_Api.Controllers
                 return Ok(baseResponse);
             }
         }
+
+        [HttpPost("ChangePassword")]
+        public IActionResult ChangePassword(PasswordModel model)
+        {
+            var baseResponse = new BaseResponseModel<ApplicationUser>();
+            try
+            {
+                baseResponse = authRepo.ChangePassword(model);
+                return Ok(baseResponse);
+            }
+            catch(Exception ex)
+            {
+                baseResponse.Message = ex.Message;
+                baseResponse.ResponseCode = 500;
+                baseResponse.Result = new ApplicationUser();
+                return Ok(baseResponse);
+            }
+        }
+
     }
 }

@@ -27,7 +27,15 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+    <div id="overlay">
 
+        <div class="cv-spinner">
+
+            <span class="spinner"></span>
+
+        </div>
+
+    </div>
     <div class="main-wrapper login-body">
         <div class="login-wrapper">
             <div class="container">
@@ -46,14 +54,16 @@
 
                             <form asp-action="Login">
                                 <div class="form-group">
-                                    <label asp-for="Username">Username <span class="login-danger">*</span></label>
+                                    <label asp-for="Username">Username/E-Mail <span class="login-danger">*</span></label>
                                     <input class="form-control" asp-for="Username" type="text">
                                     <span class="profile-views"><i class="fas fa-user-circle"></i></span>
+                                    <span asp-validation-for="Username" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <label asp-for="Password">Password <span class="login-danger">*</span></label>
                                     <input class="form-control pass-input" asp-for="Password" type="password">
                                     <span class="profile-views feather-eye toggle-password"></span>
+                                    <span asp-validation-for="Password" class="text-danger"></span>
                                 </div>
                                 <div class="forgotpass">
                                     <div class="remember-me">
@@ -66,7 +76,7 @@
                                     <a href="#">Forgot Password?</a>
                                 </div>
                                 <div class="form-group">
-                                    <button class="btn btn-primary btn-block" type="submit">Login</button>
+                                    <button class="btn btn-primary btn-block loader" type="submit">Login</button>
                                 </div>
                             </form>
 
@@ -103,5 +113,10 @@
     <script src="assets/js/feather.min.js"></script>
 
     <script src="assets/js/script.js"></script>
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
 </body>
 </html>

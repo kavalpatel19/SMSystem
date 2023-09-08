@@ -8,6 +8,6 @@ namespace SMSystem_Api.Repository.Interfaces
         public BaseResponseModel<ApplicationUser> Login(LoginModel model);
         public Task<BaseResponseModel<ApplicationUser>> Register(ApplicationUser model);
         public Task<BaseResponseModel<ApplicationUser>> GetUsers();
-
+        public BaseResponseModel<ApplicationUser> ChangePassword(PasswordModel model);
     }
 }

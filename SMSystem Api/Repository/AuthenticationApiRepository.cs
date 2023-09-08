@@ -1,8 +1,12 @@
-﻿using SMSystem_Api.Data;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.EntityFrameworkCore;
+using SMSystem_Api.Data;
 using SMSystem_Api.Model;
 using SMSystem_Api.Model.Auth;
 using SMSystem_Api.Model.Department;
 using SMSystem_Api.Repository.Interfaces;
+using System.Security.Claims;
 
 namespace SMSystem_Api.Repository
 {
@@ -78,6 +82,38 @@ namespace SMSystem_Api.Repository
                 response.ResponseCode = 500;
                 response.Message = ex.Message;
                 response.Result = new ApplicationUser();
+                return response;
+            }
+        }
+
+        public BaseResponseModel<ApplicationUser> ChangePassword(PasswordModel model)
+        {
+            var response = new BaseResponseModel<ApplicationUser>();
+            try
+            {
+                var user = context.User.Where(x => x.UserId == model.UserId).FirstOrDefault();
+                if(user != null)
+                {
+                    if(user.Password == model.OldPassword)
+                    {
+                        user.Password = model.NewPassword;
+                        context.Attach(user).State = EntityState.Modified;
+                        context.SaveChanges();
+                        response.ResponseCode = 200;
+                        return response;
+                    }
+                    response.ResponseCode = 500;
+                    response.Message = "Old password is wrong!";
+                    return response;
+                }
+                response.ResponseCode = 500;
+                response.Message = "Something Went wrong!";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ResponseCode = 500;
+                response.Message = ex.Message;
                 return response;
             }
         }

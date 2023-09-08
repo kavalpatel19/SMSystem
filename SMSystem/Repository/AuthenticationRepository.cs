@@ -79,5 +79,37 @@ namespace SMSystem.Repository
                 return baseResponse;
             }
         }
+
+        public BaseResponseViewModel<ApplicationUser> ChangePassword(PasswordModel model)
+        {
+            var baseResponse = new BaseResponseViewModel<ApplicationUser>();
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(configuration.GetSection("ApiUrl").Value);
+                    var response = client.PostAsJsonAsync("AccountApi/ChangePassword", model).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var data = response.Content.ReadAsStringAsync().Result;
+                        baseResponse = JsonConvert.DeserializeObject<BaseResponseViewModel<ApplicationUser>>(data);
+                        return baseResponse;
+                    }
+
+                    baseResponse.ResponseCode = (int)response.StatusCode;
+                    baseResponse.Message = response.ReasonPhrase;
+                    return baseResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                baseResponse.ResponseCode = 500;
+                baseResponse.Message = ex.Message;
+                baseResponse.Result = new ApplicationUser();
+                return baseResponse;
+            }
+        }
+
     }
 }
