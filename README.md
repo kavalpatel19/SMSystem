@@ -79,5 +79,5 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 ## **Contact**  
-📧 **Email:** your.email@example.com  
+📧 **Email:** kavalpatel330@gmail.com  
 🌐 **GitHub:** [kavalpatel19](https://github.com/kavalpatel19)  
