@@ -29,12 +29,12 @@ steps:
 - task: VSBuild@1
   displayName: 'Build UI Project'
   inputs:
-    solution: 'SMSSystem/SMSSystem.csproj'
+    solution: 'SMSystem/SMSystem.csproj'
     msbuildArgs: >
       /p:DeployOnBuild=true
       /p:WebPublishMethod=Package
       /p:PackageAsSingleFile=true
-      /p:DesktopBuildPackageLocation="$(Build.ArtifactStagingDirectory)\SMSSystemUI.zip"
+      /p:DesktopBuildPackageLocation="$(Build.ArtifactStagingDirectory)\SMSystemUI.zip"
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
